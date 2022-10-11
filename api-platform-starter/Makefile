@@ -1,8 +1,11 @@
 build:
 	docker compose build --no-cache --force-rm --pull
 	docker compose run --rm php composer install
+	make jwt
 	make start
 	make migration
+jwt:
+	docker compose run --rm php sh 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
 start:
 	docker compose up -d
 stop:
