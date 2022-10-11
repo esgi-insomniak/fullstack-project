@@ -21,7 +21,7 @@ migration:
 migrate:
 	docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
 bash:
-	docker compose exec php bash
+	docker compose exec php sh
 composer:
 	docker compose exec php composer $(filter-out $@,$(MAKECMDGOALS))
 entity:
