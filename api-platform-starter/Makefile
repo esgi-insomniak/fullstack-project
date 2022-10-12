@@ -35,4 +35,5 @@ test:
 	docker compose exec -T php php bin/console -e test doctrine:migrations:migrate --no-interaction
 	docker compose exec -T php php bin/console doctrine:fixtures:load --no-interaction --env=test
 	docker compose exec php bin/phpunit
-
+get-env:
+	docker compose exec php bin/console debug:container --env-vars
