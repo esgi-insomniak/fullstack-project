@@ -1,12 +1,11 @@
 import { createStore } from 'vuex'
-import { myActionLogin, myRegisterAction } from './actions/index'
+import { auth } from './auth.module'
 
 const store = createStore({
-    state() {
-        return {
-
-        }
-    }
+    modules: {
+        // Add your modules here
+        auth,
+    },
 })
 
 export default store

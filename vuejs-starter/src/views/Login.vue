@@ -1,45 +1,35 @@
 <script>
 export default {
-    name: 'login',
-    data() {
-        return {
-            email: '',
-            password: '',
-            error: ''
-        }
-    },
-    methods: {
-        async login() {
-          const headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          };
-
-          const login_response = fetch('https://localhost/authentication_token', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({
-              email: this.email,
-              password: this.password
-            })
-          })
-
-          const data = await login_response;
-
-          //check if 401
-          if (data.status === 401) {
-            this.error = data.message;
-          } else {
-            if (data.token) {
-              alert('Login successful');
-              // localStorage.setItem('token', data.token);
-              // this.$router.push({ name: 'home' });
-            } else {
-              this.error = data.error;
-            }
-          }
-        }
+  name: 'login',
+  data() {
+      return {
+          email: '',
+          password: '',
+          error: ''
+      }
+  },
+  computed: {
+    loggedIn() {
+      return this.$store.state.auth.status.loggedIn;
     }
+  },
+  created() {
+    if (this.loggedIn) {
+      this.$router.push('/home');
+    }
+  },
+
+  methods: {
+    handleLogin(user) {
+      this.$store.dispatch('auth/login', user)
+        .then(() => {
+          this.$router.push('/home');
+        })
+        .catch((error) => {
+          this.error = error;
+        });
+    }
+  }
 }
 </script>
 
@@ -50,7 +40,7 @@ export default {
                 <FormKit
                   type="form"
                   form-class="w-full flex justify-center  flex-col h-4/6"
-                  @submit="login"
+                  @submit="handleLogin"
                   submit-label="Connexion"
                 >
                     <FormKit
