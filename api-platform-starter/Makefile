@@ -1,7 +1,7 @@
 build:
 	docker compose build --no-cache --force-rm --pull
 	docker compose run --rm php composer install --no-interaction --no-progress --no-suggest
-	docker compose run --rm php sh -c "chmod +x bin/console && mkdir 'config/jwt' || true"
+	docker compose run --rm php sh -c "chmod +x bin/** && mkdir 'config/jwt' || true"
 	make jwt
 	make start
 	make migration
