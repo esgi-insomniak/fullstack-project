@@ -28,10 +28,11 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
-            
     access_control:
-        - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI Docs
         - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
+        - { path: ^/users, roles: PUBLIC_ACCESS, methods: [POST] } # Register
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
             
 when@test:

@@ -11,10 +11,26 @@ const routes = [
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),
+        beforeEnter: (to, from, next) => {
+            const publicPages = ['/login', '/register'];
+            const authRequired = !publicPages.includes(to.path);
+            const loggedIn = localStorage.getItem('user');
+
+            if (authRequired && !loggedIn) {
+                return next('/login');
+            }
+
+            next();
+        }
         // meta: {
         //     hideNavBar: true
         // }
     },
+    {
+        path: '/register',
+        name: 'register',
+        component: () => import('../views/Register.vue'),
+    }
 ]
 
 const router = VueRouter.createRouter({
