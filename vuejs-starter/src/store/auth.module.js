@@ -8,6 +8,15 @@ const initialState = user
 export const auth = {
   namespaced: true,
   state: initialState,
+  getters: {
+    isLoggedIn: (state) => {
+        return state.status.loggedIn;
+    },
+    user: (state) => {
+        return state.user;
+    }
+  },
+
   actions: {
     //LOGIN
     login({ commit }, user) {

@@ -1,42 +1,48 @@
-<script>
-export default {
-  name: 'register',
-  data() {
-      return {
-        email: '',
-        plainPassword: '',
-        password_confirmation: '',
-        error: ''
-      }
-  },
-  computed: {
-    loggedIn() {
-      return this.$store.state.auth.status.loggedIn;
-    }
-  },
-  created() {
-    if (this.loggedIn) {
-      this.$router.push('/home');
-    }
-  },
+<script setup>
 
-  methods: {
-    handleRegister(user) {
-      console.log(user);
-      if (user.plainPassword !== user.password_confirmation) {
-        this.error = 'Les mots de passe ne correspondent pas';
-        return;
-      }
-      this.$store.dispatch('auth/register', user)
-        .then(() => {
-          this.$router.push('/login');
-        })
-        .catch((error) => {
-          this.error = error;
-        });
-    }
+import {ref, computed, onMounted} from 'vue'
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
+
+const props = defineProps({
+  email: {
+    type: String,
+  },
+  plainPassword: {
+    type: String,
+  },
+  confirmPassword: {
+    type: String,
   }
+})
+
+const email = ref('')
+const plainPassword = ref('')
+const confirmPassword = ref('')
+
+const store = useStore();
+const router = useRouter();
+
+onMounted(() => {
+  if (store.getters['auth/loggedIn']) {
+    router.push('/home');
+  }
+});
+
+const handleRegister = (user) => {
+  if (user.plainPassword !== user.password_confirmation) {
+    this.error = 'Les mots de passe ne correspondent pas';
+    return;
+  }
+  store.dispatch('auth/register', user)
+    .then(() => {
+      router.push('/login');
+    })
+    .catch((error) => {
+      this.error = error;
+    });
 }
+
 </script>
 
 <template>
@@ -71,7 +77,7 @@ export default {
               label="Password Confirmation"
               placeholder="Mot de passe"
               validation="required|password"
-              v-model="password_confirmation"
+              v-model="confirmPassword"
           />
         </FormKit>
         <div class="h-1/6 w-full mt-10" />

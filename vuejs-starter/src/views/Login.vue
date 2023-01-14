@@ -1,36 +1,45 @@
-<script>
-export default {
-  name: 'login',
-  data() {
-      return {
-          email: '',
-          password: '',
-          error: ''
-      }
-  },
-  computed: {
-    loggedIn() {
-      return this.$store.state.auth.status.loggedIn;
-    }
-  },
-  created() {
-    if (this.loggedIn) {
-      this.$router.push('/home');
-    }
-  },
+<script setup>
+import {ref, computed, onMounted} from 'vue'
+import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
-  methods: {
-    handleLogin(user) {
-      this.$store.dispatch('auth/login', user)
-        .then(() => {
-          this.$router.push('/home');
-        })
-        .catch((error) => {
-          this.error = error;
-        });
-    }
+const props = defineProps({
+  email: {
+    type: String,
+  },
+  password: {
+    type: String,
   }
+})
+
+const email = ref('')
+const password = ref('')
+const store = useStore();
+const router = useRouter();
+
+const isDisabled = computed(() => {
+  return email.value.length === 0 || password.value.length === 0
+});
+
+const loggedIn = computed(() => {
+  return store.state.auth.status.loggedIn;
+});
+
+const handleLogin = () => {
+  store.dispatch('auth/login', {email: email.value, password: password.value}).then(() => {
+    router.push('/home');
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 }
+
+onMounted(() => {
+  if (loggedIn.value) {
+    router.push('/home');
+  }
+});
+
 </script>
 
 <template>
