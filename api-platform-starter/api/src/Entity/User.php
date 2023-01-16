@@ -11,6 +11,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -87,6 +89,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\OneToMany(mappedBy: 'orderer', targetEntity: Order::class)]
+    private Collection $orders;
+
+    #[ORM\OneToMany(mappedBy: 'recover', targetEntity: Recovery::class)]
+    private Collection $recoveries;
+
+    public function __construct()
+    {
+        $this->orders = new ArrayCollection();
+        $this->recoveries = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -237,6 +251,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Order>
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Order $order): self
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders->add($order);
+            $order->setOrderer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Order $order): self
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getOrderer() === $this) {
+                $order->setOrderer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recovery>
+     */
+    public function getRecoveries(): Collection
+    {
+        return $this->recoveries;
+    }
+
+    public function addRecovery(Recovery $recovery): self
+    {
+        if (!$this->recoveries->contains($recovery)) {
+            $this->recoveries->add($recovery);
+            $recovery->setRecover($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecovery(Recovery $recovery): self
+    {
+        if ($this->recoveries->removeElement($recovery)) {
+            // set the owning side to null (unless already changed)
+            if ($recovery->getRecover() === $this) {
+                $recovery->setRecover(null);
+            }
+        }
 
         return $this;
     }
