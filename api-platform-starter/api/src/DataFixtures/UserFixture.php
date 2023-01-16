@@ -16,6 +16,12 @@ class UserFixture extends Fixture
         $fakeUser->setEmail("user@user.fr");
         $fakeUser->setPassword($pwd);
         $fakeUser->setRoles(['ROLE_USER']);
+        $fakeUser->setFirstName("User");
+        $fakeUser->setLastName("User");
+        $fakeUser->setVerifiedAt(new \DateTimeImmutable());
+        $fakeUser->setCoordinates(["48.856614","2.3522219"]);
+        $fakeUser->setCreatedAt(new \DateTimeImmutable());
+        $fakeUser->setUpdatedAt(null);
 
         $manager->persist($fakeUser);
         $manager->flush();
