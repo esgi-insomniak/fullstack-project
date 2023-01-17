@@ -20,7 +20,7 @@ class CarCategory
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 80)]
+    #[ORM\Column(length: 80, unique: true)]
     private ?string $slug = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Car::class, orphanRemoval: true)]

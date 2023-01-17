@@ -23,6 +23,8 @@ down: ## Stop and remove the docker containers
 	docker compose down
 fixtures: ## Load the fixtures
 	docker compose exec php bin/console doctrine:fixtures:load --no-interaction
+fixtures-purge: ## Purge the database and load the fixtures
+	docker compose exec php bin/console doctrine:fixtures:load --purge-with-truncate --no-interaction
 migration: ## Run the migrations and migrate them
 	docker compose exec php bin/console make:migration
 	make migrate

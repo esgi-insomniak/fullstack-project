@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -75,7 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:read', 'user:update'])]
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $verified_at = null;
+    private ?DateTimeImmutable $verified_at = null;
 
     #[Assert\Json]
     #[Groups(['user:read', 'user:create', 'user:update'])]
@@ -84,11 +85,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['user:read'])]
     #[ORM\Column]
-    private \DateTimeImmutable $created_at;
+    private DateTimeImmutable $created_at;
 
     #[Groups(['user:read'])]
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?DateTimeImmutable $updated_at = null;
 
     #[ORM\OneToMany(mappedBy: 'orderer', targetEntity: Order::class)]
     private Collection $orders;
@@ -208,12 +209,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getVerifiedAt(): ?\DateTimeImmutable
+    public function getVerifiedAt(): ?DateTimeImmutable
     {
         return $this->verified_at;
     }
 
-    public function setVerifiedAt(?\DateTimeImmutable $verified_at): self
+    public function setVerifiedAt(?DateTimeImmutable $verified_at): self
     {
         $this->verified_at = $verified_at;
 
@@ -236,19 +237,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(DateTimeImmutable $created_at): self
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(?DateTimeImmutable $updated_at): self
     {
         $this->updated_at = $updated_at;
 

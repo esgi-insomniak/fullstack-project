@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
@@ -54,11 +55,27 @@ class Car
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[ORM\Column]
+    private ?int $year = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $options = [];
+
+    #[ORM\ManyToMany(targetEntity: Image::class)]
+    private Collection $images;
+
+    #[ORM\Column(length: 10)]
+    private ?string $gearbox_type = null;
+
+    #[ORM\Column]
+    private ?int $mileage = null;
+
     public function __construct()
     {
         $this->garages = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -251,12 +268,82 @@ class Car
 
     public function removeRecovery(Recovery $recovery): self
     {
-        if ($this->recoveries->removeElement($recovery)) {
-            // set the owning side to null (unless already changed)
-            if ($recovery->getCar() === $this) {
-                $recovery->setCar(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->recoveries->removeElement($recovery) && $recovery->getCar() === $this) {
+            $recovery->setCar(null);
         }
+
+        return $this;
+    }
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(int $year): self
+    {
+        $this->year = $year;
+
+        return $this;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function setOptions(?array $options): self
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): self
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): self
+    {
+        $this->images->removeElement($image);
+
+        return $this;
+    }
+
+    public function getGearboxType(): ?string
+    {
+        return $this->gearbox_type;
+    }
+
+    public function setGearboxType(string $gearbox_type): self
+    {
+        $this->gearbox_type = $gearbox_type;
+
+        return $this;
+    }
+
+    public function getMileage(): ?int
+    {
+        return $this->mileage;
+    }
+
+    public function setMileage(int $mileage): self
+    {
+        $this->mileage = $mileage;
 
         return $this;
     }

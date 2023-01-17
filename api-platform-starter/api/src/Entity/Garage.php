@@ -21,7 +21,7 @@ class Garage
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column(type: 'json')]
     private array $coordinates = [];
 
     #[ORM\Column]
