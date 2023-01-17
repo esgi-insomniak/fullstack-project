@@ -4,11 +4,11 @@ build:
 	docker compose run --rm php sh -c "chmod +x bin/** && mkdir 'config/jwt' || true"
 	make jwt
 	make start
-	make migration
 jwt:
 	docker compose run --rm php sh -c 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair --overwrite && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
 start:
 	docker compose up -d
+	make migrate
 stop:
 	docker compose stop
 restart:
