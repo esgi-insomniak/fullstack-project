@@ -1,3 +1,6 @@
+## List of all commands available
+list:
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s \033[90m%s\033[0m \033[0m
 build:
 	docker compose build --no-cache --force-rm --pull
 	docker compose run --rm php composer install --no-interaction --no-progress --no-suggest
