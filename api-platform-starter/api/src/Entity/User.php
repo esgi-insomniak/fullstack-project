@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\User\ConfirmationEmailController;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,6 +27,21 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
         new Put(processor: UserPasswordHasher::class),
         new Patch(processor: UserPasswordHasher::class),
         new Delete(),
+        new Post(
+            uriTemplate: '/users/{id}/send_confirmation_email',
+            controller: ConfirmationEmailController::class,
+            output: false,
+            defaults: ['_api_receive' => false],
+            openapiContext: [
+                'requestBody' => [
+                    'content' => [
+                        'application/ld+json' => [
+                            'schema' => [],
+                        ],
+                    ],
+                ],
+            ],
+        ),
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
