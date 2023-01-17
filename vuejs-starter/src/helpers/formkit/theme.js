@@ -1,26 +1,26 @@
 export default {
     text: {
-        outer: 'mb-2 text-green-500',
+        outer: 'mb-2 text-white',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-green-400 rounded-lg mb-1 overflow-hidden',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
         input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
-        help: 'text-xs text-green-500',
+        help: 'text-xs text-blue-500',
         messages: 'list-none p-0 mt-1 mb-0',
         message: 'text-red-500 mb-1 text-xs'
     },
     password: {
-        outer: 'mb-5 text-green-500',
+        outer: 'mb-5 text-blue-500',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-green-400 rounded-lg mb-1 overflow-hidden',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
         input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
-        help: 'text-xs text-green-500',
+        help: 'text-xs text-blue-500',
         messages: 'list-none p-0 mt-1 mb-0',
         message: 'text-red-500 mb-1 text-xs'
     },
     select: {
         outer: 'mb-5',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
         input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
         help: 'text-xs text-gray-500',
         messages: 'list-none p-0 mt-1 mb-0',
@@ -29,7 +29,7 @@ export default {
     checkbox: {
         outer: 'mb-5',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
         input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
         help: 'text-xs text-gray-500',
         messages: 'list-none p-0 mt-1 mb-0',
@@ -38,7 +38,7 @@ export default {
     radio: {
         outer: 'mb-5',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
         input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
         help: 'text-xs text-gray-500',
         messages: 'list-none p-0 mt-1 mb-0',
@@ -47,7 +47,7 @@ export default {
     textarea: {
         outer: 'mb-5',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
         input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
         help: 'text-xs text-gray-500',
         messages: 'list-none p-0 mt-1 mb-0',
@@ -56,8 +56,8 @@ export default {
     submit: {
         outer: 'mb-5',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-        input: 'w-full h-10 px-3 border-none text-white bg-[#3b3b3b] rounded-full hover:text-white hover:font-bold hover:bg-green-400 placeholder-gray-400 hover:shadow-green-400/50 hover:shadow-lg',
+        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+        input: 'w-full h-10 px-3 border-none text-white bg-[#3b3b3b] rounded-xl mt-2 hover:text-white hover:font-bold hover:bg-blue-400 placeholder-gray-400 hover:shadow-blue-400/50 hover:shadow-lg cursor-pointer',
         help: 'text-xs text-gray-500',
         messages: 'list-none p-0 mt-1 mb-0',
         message: 'text-red-500 mb-1 text-xs'
@@ -65,8 +65,8 @@ export default {
     button: {
         outer: 'mb-5',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'max-w-md border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-        input: 'w-full h-10 px-3 border-none text-white bg-[#3b3b3b] rounded-md hover:text-white hover:font-bold hover:bg-green-400 placeholder-gray-400',
+        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
+        input: 'w-full h-10 px-3 border-none text-white bg-[#3b3b3b] rounded-md hover:text-white hover:font-bold hover:bg-blue-400 placeholder-gray-400',
         help: 'text-xs text-gray-500',
         messages: 'list-none p-0 mt-1 mb-0',
         message: 'text-red-500 mb-1 text-xs'

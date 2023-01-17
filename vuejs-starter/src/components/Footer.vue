@@ -24,7 +24,7 @@
                 </router-link>
             </div>
             <div class="space-y-1 flex flex-col items-end w-2/4">
-                <a class="font-bold text-white text-left underline pl-1">Retrouvez nous sur d'autres site</a>
+                <span class="font-bold text-white text-left underline pl-1">Retrouvez nous sur d'autres site</span>
                 <a href="https://www.bmw.be/fr/topics/fascination-bmw/jobs.html"
                     class="hover:underline cursor-pointer p-1 text-slate-200" target="_blank">Jobs</a>
                 <a href="https://www.bmw.be/fr/topics/fascination-bmw/bmw-group.html"
