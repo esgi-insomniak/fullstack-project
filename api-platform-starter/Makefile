@@ -1,43 +1,44 @@
-## List of all commands available
-list:
-	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s \033[90m%s\033[0m \033[0m
-build:
+
+.PHONY: list
+list: ## List of all commands available
+	@LC_ALL=C $(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/(^|\n)# Files(\n|$$)/,/(^|\n)# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
+build: ## Build the docker images
 	docker compose build --no-cache --force-rm --pull
 	docker compose run --rm php composer install --no-interaction --no-progress --no-suggest
 	docker compose run --rm php sh -c "chmod +x bin/** && mkdir 'config/jwt' || true"
 	make jwt
 	make start
 	make migration
-jwt:
+jwt: ## Generate the JWT keys
 	docker compose run --rm php sh -c 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair --overwrite && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
-start:
+start: ## Start the docker containers
 	docker compose up -d
-stop:
+stop: ## Stop the docker containers
 	docker compose stop
-restart:
+restart: ## Restart the docker containers
 	docker compose restart
-logs:
+logs: ## Display the logs of the docker containers
 	docker compose logs -f
-down:
+down: ## Stop and remove the docker containers
 	docker compose down
-fixtures:
+fixtures: ## Load the fixtures
 	docker compose exec php bin/console doctrine:fixtures:load --no-interaction
-migration:
+migration: ## Run the migrations and migrate them
 	docker compose exec php bin/console make:migration
 	make migrate
-migrate:
+migrate: ## Migrate the database
 	docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
-bash:
+bash: ## Open a bash shell in the php container
 	docker compose exec php sh
-composer:
+composer: ## Run composer
 	docker compose exec php composer $(filter-out $@,$(MAKECMDGOALS))
-entity:
+entity: ## Create a new entity
 	docker compose exec php bin/console make:entity $(filter-out $@,$(MAKECMDGOALS))
-test:
+test: ## Run the tests
 	docker compose exec php php bin/console doctrine:database:drop --force --if-exists --env=test
 	docker compose exec php php bin/console doctrine:database:create --env=test
 	docker compose exec -T php php bin/console -e test doctrine:migrations:migrate --no-interaction
 	docker compose exec -T php php bin/console doctrine:fixtures:load --no-interaction --env=test
 	docker compose exec php bin/phpunit
-get-env:
+get-env: ## Get the environment variables
 	docker compose exec php bin/console debug:container --env-vars
