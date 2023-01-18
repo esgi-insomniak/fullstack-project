@@ -32,9 +32,8 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
         new Delete(),
         new Post(
             uriTemplate: '/users/{id}/send_confirmation_email',
-            controller: ConfirmationEmailController::class,
-            output: false,
             defaults: ['_api_receive' => false],
+            controller: ConfirmationEmailController::class,
             openapiContext: [
                 'requestBody' => [
                     'content' => [
@@ -44,6 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
                     ],
                 ],
             ],
+            output: false,
         ),
     ],
     normalizationContext: ['groups' => ['user:read']],
