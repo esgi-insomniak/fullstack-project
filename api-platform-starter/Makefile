@@ -21,6 +21,8 @@ logs: ## Display the logs of the docker containers
 	docker compose logs -f
 down: ## Stop and remove the docker containers
 	docker compose down
+new-fixture: ## Create a new fixture
+	docker compose exec php bin/console make:fixtures $(filter-out $@,$(MAKECMDGOALS))
 fixtures: ## Load the fixtures
 	docker compose exec php bin/console doctrine:fixtures:load --no-interaction
 fixtures-purge: ## Purge the database and load the fixtures
@@ -30,6 +32,8 @@ migration: ## Run the migrations and migrate them
 	make migrate
 migrate: ## Migrate the database
 	docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
+schema: ## Update the database schema
+	docker compose exec php bin/console doctrine:schema:update --force
 bash: ## Open a bash shell in the php container
 	docker compose exec php sh
 composer: ## Run composer

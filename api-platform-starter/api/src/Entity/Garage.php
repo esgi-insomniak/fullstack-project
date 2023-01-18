@@ -27,20 +27,20 @@ class Garage
     #[ORM\Column]
     private ?bool $is_open = null;
 
-    #[ORM\ManyToMany(targetEntity: Car::class, inversedBy: 'garages')]
-    private Collection $cars;
-
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Order::class)]
     private Collection $orders;
 
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
+    private Collection $cars;
+
     public function __construct()
     {
-        $this->cars = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
+        $this->cars = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,30 +80,6 @@ class Garage
     public function setIsOpen(bool $is_open): self
     {
         $this->is_open = $is_open;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Car>
-     */
-    public function getCars(): Collection
-    {
-        return $this->cars;
-    }
-
-    public function addCar(Car $car): self
-    {
-        if (!$this->cars->contains($car)) {
-            $this->cars->add($car);
-        }
-
-        return $this;
-    }
-
-    public function removeCar(Car $car): self
-    {
-        $this->cars->removeElement($car);
 
         return $this;
     }
@@ -163,6 +139,34 @@ class Garage
             if ($recovery->getGarage() === $this) {
                 $recovery->setGarage(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Car>
+     */
+    public function getCars(): Collection
+    {
+        return $this->cars;
+    }
+
+    public function addCar(Car $car): self
+    {
+        if (!$this->cars->contains($car)) {
+            $this->cars->add($car);
+            $car->setGarage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCar(Car $car): self
+    {
+        // set the owning side to null (unless already changed)
+        if ($this->cars->removeElement($car) && $car->getGarage() === $this) {
+            $car->setGarage(null);
         }
 
         return $this;
