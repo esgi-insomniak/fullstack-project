@@ -18,10 +18,7 @@ class Car
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
-
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
     #[ORM\Column(length: 20)]
@@ -41,13 +38,6 @@ class Car
 
     #[ORM\Column]
     private ?float $price = null;
-
-    #[ORM\ManyToOne(inversedBy: 'cars')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?CarCategory $category = null;
-
-    #[ORM\ManyToMany(targetEntity: Garage::class, mappedBy: 'car')]
-    private Collection $garages;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Order::class)]
     private Collection $orders;
@@ -70,9 +60,15 @@ class Car
     #[ORM\Column]
     private ?int $mileage = null;
 
+    #[ORM\ManyToOne(inversedBy: 'cars')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CarIdentity $identity = null;
+
+    #[ORM\ManyToOne(inversedBy: 'cars')]
+    private ?Garage $garage = null;
+
     public function __construct()
     {
-        $this->garages = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
         $this->images = new ArrayCollection();
@@ -81,18 +77,6 @@ class Car
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getSlug(): ?string
@@ -175,45 +159,6 @@ class Car
     public function setPrice(float $price): self
     {
         $this->price = $price;
-
-        return $this;
-    }
-
-    public function getCategory(): ?CarCategory
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?CarCategory $category): self
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Garage>
-     */
-    public function getGarages(): Collection
-    {
-        return $this->garages;
-    }
-
-    public function addGarage(Garage $garage): self
-    {
-        if (!$this->garages->contains($garage)) {
-            $this->garages->add($garage);
-            $garage->addCar($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGarage(Garage $garage): self
-    {
-        if ($this->garages->removeElement($garage)) {
-            $garage->removeCar($this);
-        }
 
         return $this;
     }
@@ -344,6 +289,30 @@ class Car
     public function setMileage(int $mileage): self
     {
         $this->mileage = $mileage;
+
+        return $this;
+    }
+
+    public function getIdentity(): ?CarIdentity
+    {
+        return $this->identity;
+    }
+
+    public function setIdentity(?CarIdentity $identity): self
+    {
+        $this->identity = $identity;
+
+        return $this;
+    }
+
+    public function getGarage(): ?Garage
+    {
+        return $this->garage;
+    }
+
+    public function setGarage(?Garage $garage): self
+    {
+        $this->garage = $garage;
 
         return $this;
     }

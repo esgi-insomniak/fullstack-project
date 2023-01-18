@@ -23,12 +23,12 @@ class CarCategory
     #[ORM\Column(length: 80, unique: true)]
     private ?string $slug = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Car::class, orphanRemoval: true)]
-    private Collection $cars;
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: CarIdentity::class, orphanRemoval: true)]
+    private Collection $carIdentities;
 
     public function __construct()
     {
-        $this->cars = new ArrayCollection();
+        $this->carIdentities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -61,30 +61,28 @@ class CarCategory
     }
 
     /**
-     * @return Collection<int, Car>
+     * @return Collection<int, CarIdentity>
      */
-    public function getCars(): Collection
+    public function getCarIdentities(): Collection
     {
-        return $this->cars;
+        return $this->carIdentities;
     }
 
-    public function addCar(Car $car): self
+    public function addCarIdentity(CarIdentity $carIdentity): self
     {
-        if (!$this->cars->contains($car)) {
-            $this->cars->add($car);
-            $car->setCategory($this);
+        if (!$this->carIdentities->contains($carIdentity)) {
+            $this->carIdentities->add($carIdentity);
+            $carIdentity->setCategory($this);
         }
 
         return $this;
     }
 
-    public function removeCar(Car $car): self
+    public function removeCarIdentity(CarIdentity $carIdentity): self
     {
-        if ($this->cars->removeElement($car)) {
-            // set the owning side to null (unless already changed)
-            if ($car->getCategory() === $this) {
-                $car->setCategory(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->carIdentities->removeElement($carIdentity) && $carIdentity->getCategory() === $this) {
+            $carIdentity->setCategory(null);
         }
 
         return $this;

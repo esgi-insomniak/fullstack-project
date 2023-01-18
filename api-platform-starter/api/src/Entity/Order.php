@@ -28,7 +28,7 @@ class Order
     #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?Garage $garage = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::FLOAT, nullable: true)]
     private ?float $total_price = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -46,6 +46,12 @@ class Order
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
+
+    #[ORM\Column(nullable: true)]
+    private array $stripe = [];
+
+    #[ORM\Column(type: Types::GUID, unique: true)]
+    private ?string $uuid = null;
 
     public function getId(): ?int
     {
@@ -93,7 +99,7 @@ class Order
         return $this->total_price;
     }
 
-    public function setTotalPrice(float $total_price): self
+    public function setTotalPrice(?float $total_price): self
     {
         $this->total_price = $total_price;
 
@@ -156,6 +162,30 @@ class Order
     public function setStatus(?Status $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getStripe(): array
+    {
+        return $this->stripe;
+    }
+
+    public function setStripe(?array $stripe): self
+    {
+        $this->stripe = $stripe;
+
+        return $this;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }
