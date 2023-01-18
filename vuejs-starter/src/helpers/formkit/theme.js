@@ -18,11 +18,20 @@ export default {
         message: 'text-red-500 mb-1 text-xs'
     },
     select: {
-        outer: 'mb-5',
+        outer: 'mb-2 text-white',
         label: 'block mb-1 font-bold text-sm',
-        inner: 'border border-gray-400 rounded-lg mb-1 overflow-hidden focus-within:border-blue-500',
-        input: 'w-full h-10 px-3 border-none text-base text-gray-700 placeholder-gray-400',
-        help: 'text-xs text-gray-500',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
+        input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
+        help: 'text-xs text-blue-500',
+        messages: 'list-none p-0 mt-1 mb-0',
+        message: 'text-red-500 mb-1 text-xs'
+    },
+    autocomplete: {
+        outer: 'mb-2 text-white',
+        label: 'block mb-1 font-bold text-sm',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
+        input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
+        help: 'text-xs text-blue-500',
         messages: 'list-none p-0 mt-1 mb-0',
         message: 'text-red-500 mb-1 text-xs'
     },
@@ -71,4 +80,31 @@ export default {
         messages: 'list-none p-0 mt-1 mb-0',
         message: 'text-red-500 mb-1 text-xs'
     },
+    date: {
+        outer: 'mb-2 text-white',
+        label: 'block mb-1 font-bold text-sm',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
+        input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
+        help: 'text-xs text-blue-500',
+        messages: 'list-none p-0 mt-1 mb-0',
+        message: 'text-red-500 mb-1 text-xs'
+    },
+    number: {
+        outer: 'mb-2 text-white',
+        label: 'block mb-1 font-bold text-sm',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
+        input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
+        help: 'text-xs text-blue-500',
+        messages: 'list-none p-0 mt-1 mb-0',
+        message: 'text-red-500 mb-1 text-xs'
+    },
+    file: {
+        outer: 'mb-2 text-white',
+        label: 'block mb-1 font-bold text-sm',
+        inner: 'border border-blue-400 rounded-lg mb-1 overflow-hidden',
+        input: 'w-full h-10 px-3 border-none outline-none text-base text-white placeholder-gray-400',
+        help: 'text-xs text-blue-500',
+        messages: 'list-none p-0 mt-1 mb-0',
+        message: 'text-red-500 mb-1 text-xs'
+    }
 }

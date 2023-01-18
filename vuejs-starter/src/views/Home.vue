@@ -12,7 +12,7 @@ const router = useRouter();
     <div class="w-full h-screen">
         <header class="h-[70vh] -mt-24 bg-[url('/public/bg_header.jpg')] bg-cover bg-center">
             <div class="relative">
-                <h1 class="uppercase top-28 left-10 absolute text-3xl font-extrabold tracking-wider">
+                <h1 class="uppercase top-28 left-32 absolute text-3xl font-extrabold tracking-wider">
                     Achat de véhicules neuf ou d'occasion
                 </h1>
             </div>

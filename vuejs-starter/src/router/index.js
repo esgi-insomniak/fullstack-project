@@ -40,12 +40,41 @@ const routes = [
         // user 
         path: '/me',
         name: 'User',
-        component: () => import('../views/user/Me.vue'),
-    },
-    {
-        path: '/me/favorites',
-        name: 'UserFavorites',
-        component: () => import('../views/user/Favorites.vue'),
+        component: () => import('../views/user/LayoutUser.vue'),
+        children: [
+            {
+                path: 'favorites',
+                name: 'UserFavorites',
+                component: () => import('../views/user/Favorites.vue'),
+            },
+            {
+                path: 'list',
+                name: 'UserList',
+                component: () => import('../views/user/Orders/LayoutOrders.vue'),
+                children: [
+                    {
+                        path: 'orders',
+                        name: 'UserOrders',
+                        component: () => import('../views/user/Orders/Achat.vue'),
+                    },
+                    {
+                        path: 'sales',
+                        name: 'UserSales',
+                        component: () => import('../views/user/Orders/VenteForm.vue'),
+                    },
+                    {
+                        path: 'sales/:id',
+                        name: 'UserSalesEdit',
+                        component: () => import('../views/user/Orders/Sales.vue'),
+                    }
+                ]
+            },
+            {
+                path: 'profile',
+                name: 'UserProfile',
+                component: () => import('../views/user/User.vue'),
+            }
+        ]
     },
 ]
 
