@@ -13,7 +13,7 @@ class Image
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 1000, unique: true)]
+    #[ORM\Column(length: 1500, unique: true)]
     private ?string $src = null;
 
     #[ORM\ManyToOne]
