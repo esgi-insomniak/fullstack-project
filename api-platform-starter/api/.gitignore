@@ -8,6 +8,10 @@
 /public/bundles/
 /var/
 /vendor/
+/symfony.lock
+/composer.lock
+/yarn.lock
+/package.lock
 ###< symfony/framework-bundle ###
 
 ###> friendsofphp/php-cs-fixer ###
