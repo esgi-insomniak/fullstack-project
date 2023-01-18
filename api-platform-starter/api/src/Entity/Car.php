@@ -183,11 +183,9 @@ class Car
 
     public function removeOrder(Order $order): self
     {
-        if ($this->orders->removeElement($order)) {
-            // set the owning side to null (unless already changed)
-            if ($order->getCar() === $this) {
-                $order->setCar(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->orders->removeElement($order) && $order->getCar() === $this) {
+            $order->setCar(null);
         }
 
         return $this;

@@ -164,11 +164,9 @@ class Garage
 
     public function removeCar(Car $car): self
     {
-        if ($this->cars->removeElement($car)) {
-            // set the owning side to null (unless already changed)
-            if ($car->getGarage() === $this) {
-                $car->setGarage(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->cars->removeElement($car) && $car->getGarage() === $this) {
+            $car->setGarage(null);
         }
 
         return $this;

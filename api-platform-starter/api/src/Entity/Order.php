@@ -53,6 +53,9 @@ class Order
     #[ORM\Column(type: Types::GUID, unique: true)]
     private ?string $uuid = null;
 
+    #[ORM\Column]
+    private ?bool $sold = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -186,6 +189,18 @@ class Order
     public function setUuid(string $uuid): self
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function isSold(): ?bool
+    {
+        return $this->sold;
+    }
+
+    public function setSold(bool $sold): self
+    {
+        $this->sold = $sold;
 
         return $this;
     }

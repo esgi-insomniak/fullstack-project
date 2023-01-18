@@ -27,6 +27,8 @@ class OrderFixture extends Fixture implements DependentFixtureInterface
             $updated_at = $this->faker->dateTimeBetween($created_at, 'now');
             $appointment = $this->faker->dateTimeBetween($created_at, 'now');
 
+            $sold = false;
+            $car = $cars[array_rand($cars)];
             $finalised_at = (random_int(0, 1) === 1) ? $this->faker->dateTimeBetween($appointment, 'now') : null;
             $stripe = [];
             if ($finalised_at){
@@ -80,6 +82,12 @@ class OrderFixture extends Fixture implements DependentFixtureInterface
                     $order_status = array_filter($status, static function (Status $statu) use ($possible_status) {
                         return in_array($statu->getSlug(), $possible_status, true);
                     });
+
+                    // delete car from cars
+                    $cars = array_filter($cars, static function (Car $carToRemove) use ($car) {
+                        return $carToRemove->getId() !== $car->getId();
+                    });
+                    $sold = true;
                 }
             }else{
                 $possible_status = [
@@ -109,11 +117,11 @@ class OrderFixture extends Fixture implements DependentFixtureInterface
             $order->setStripe($stripe);
             $order->setTotalPrice($stripe['amount'] ?? null);
 
-            $car = $cars[array_rand($cars)];
             $order->setGarage($car->getGarage());
             $order->setCar($car);
             $order->setOrderer($users[array_rand($users)]);
             $order->setStatus($final_status);
+            $order->setSold($sold);
             $order->setFinalisedAt($finalised_at ? DateTimeImmutable::createFromMutable($finalised_at) : null);
             $manager->persist($order);
         }
