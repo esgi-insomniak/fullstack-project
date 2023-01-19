@@ -1,0 +1,38 @@
+version: 2.1
+
+jobs:    
+  build:
+    docker:
+      - image: circleci/php:8.0-fpm-node-browsers
+    steps:
+      - checkout
+      - run:
+          name: Set up SSH
+          command: |
+            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ssh_key
+            chmod 600 ssh_key
+            ssh-keyscan frozox.fr >> ~/.ssh/known_hosts
+      # - run:
+      #     name: "Build api platform"
+      #     command: |
+      #         cd ./api-platform-starter
+      #         docker-compose build --no-cache --force-rm --pull
+      #         docker-compose run --rm php composer install --no-interaction --no-progress --no-suggest
+      #         docker-compose run --rm php sh -c "chmod +x bin/** && mkdir 'config/jwt' || true"
+      #         docker-compose run --rm php sh -c 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair --overwrite && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
+      # - run:
+      #     name: "Build vuejs"
+      #     command: |
+      #         cd ./vuejs-starter
+      #         docker-compose build --no-cache --force-rm --pull
+      #         docker-compose run --rm node yarn install
+      #         docker-compose run --rm node yarn build
+      - deploy:
+          name: Deploy to environment
+          command: |
+            set -x
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+                ssh circle-ci@frozox.fr sudo ./ci-deploy/esgi-challenge-ta-bmw-deploy-preprod.sh
+            elif [ "${CIRCLE_BRANCH}" == "main" ]; then
+                ssh circle-ci@frozox.fr sudo ./ci-deploy/esgi-challenge-ta-bmw-deploy-prod.sh
+            fi
