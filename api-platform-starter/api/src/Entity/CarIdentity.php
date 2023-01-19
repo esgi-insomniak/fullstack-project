@@ -7,6 +7,7 @@ use App\Repository\CarIdentityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CarIdentityRepository::class)]
 #[ApiResource]
@@ -17,9 +18,11 @@ class CarIdentity
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['car:read:item', 'car:read:collection'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups(['car:read:item', 'car:read:collection'])]
     #[ORM\ManyToOne(inversedBy: 'carIdentities')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CarCategory $category = null;

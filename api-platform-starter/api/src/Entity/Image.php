@@ -2,10 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ApiResource]
 class Image
 {
     #[ORM\Id]
@@ -13,6 +16,7 @@ class Image
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['car:read:item', 'car:read:collection'])]
     #[ORM\Column(length: 1500, unique: true)]
     private ?string $src = null;
 
