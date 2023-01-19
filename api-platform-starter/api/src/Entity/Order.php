@@ -25,7 +25,7 @@ use App\Controller\PaymentController;
         new Patch(),
         new Delete(),
         new Post(
-            uriTemplate: '/order/{id}/payment/',
+            uriTemplate: '/payment/{id}',
             controller: PaymentController::class,
             output: false,
             defaults: ['_api_receive' => false],
