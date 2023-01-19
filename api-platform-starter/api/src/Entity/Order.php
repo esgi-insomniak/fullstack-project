@@ -25,10 +25,10 @@ use App\Controller\PaymentController;
         new Patch(),
         new Delete(),
         new Post(
-            uriTemplate: '/order/{id}/payment',
+            uriTemplate: '/order/{id}/payment/',
             controller: PaymentController::class,
             output: false,
-            defaults: ['_api_order' => false],
+            defaults: ['_api_receive' => false],
             openapiContext: [
                 'requestBody' => [
                     'content' => [
@@ -85,6 +85,9 @@ class Order
 
     #[ORM\Column(type: Types::GUID, unique: true)]
     private ?string $uuid = null;
+
+    #[ORM\Column]
+    private ?bool $sold = null;
 
     public function getId(): ?int
     {
@@ -219,6 +222,18 @@ class Order
     public function setUuid(string $uuid): self
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function isSold(): ?bool
+    {
+        return $this->sold;
+    }
+
+    public function setSold(bool $sold): self
+    {
+        $this->sold = $sold;
 
         return $this;
     }

@@ -15,6 +15,7 @@
   
   <script>
   import { StripeCheckout } from '@vue-stripe/vue-stripe';
+  import axios from 'axios';
   export default {
     components: {
       StripeCheckout,
@@ -25,7 +26,7 @@
         loading: false,
         lineItems: [
           {
-            price: 'price_1MRXUnKanJPVHpR6gKDgqaQL',
+            price: null,
             quantity: 1,
           },
         ],
@@ -33,10 +34,20 @@
         cancelURL: 'http://localhost:8080/cancel',
       };
     },
-    methods: {
-      submit () {
-        this.$refs.checkoutRef.redirectToCheckout();
-      },
+    mounted() {
+      axios.post(`https://localhost/order/3/payment`)
+        .then(response => {
+          console.log(response.data.price);
+          //this.lineItems[0].price = response.data.price;
+        })
+        .catch(error => {
+          console.log(error)
+        });
     },
-  };
-  </script>
+  methods: {
+    submit () {
+      this.$refs.checkoutRef.redirectToCheckout();
+    },
+  },
+};
+</script>
