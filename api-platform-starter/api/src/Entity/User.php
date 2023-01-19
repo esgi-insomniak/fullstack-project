@@ -326,13 +326,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeRecovery(Recovery $recovery): self
     {
-        if ($this->recoveries->removeElement($recovery)) {
-            // set the owning side to null (unless already changed)
-            if ($recovery->getRecover() === $this) {
-                $recovery->setRecover(null);
-            }
+        // set the owning side to null (unless already changed)
+        if ($this->recoveries->removeElement($recovery) && $recovery->getRecover() === $this) {
+            $recovery->setRecover(null);
         }
 
         return $this;
     }
+
 }
