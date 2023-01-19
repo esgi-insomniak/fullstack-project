@@ -3,7 +3,7 @@ import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import VerticalArtcile from "../components/VerticalArtcile.vue";
 import Footer from "../components/Footer.vue";
-
+console.log("process.env.VUE_APP_API_URL", import.meta.env.VITE_API_URL);
 const store = useStore();
 const router = useRouter();
 </script>

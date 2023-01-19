@@ -3,13 +3,46 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Controller\User\ConfirmationEmailController;
 use App\Repository\OrderRepository;
+use App\State\UserPasswordHasher;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Post(),
+        new Get(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ],
+
+    normalizationContext: ['groups' => ['order:read:item', 'order:read:collection']],
+    denormalizationContext: ['groups' => ['order:create', 'order:update']],
+)]
+#[ApiResource(
+    uriTemplate: '/users/{id}/orders',
+    operations: [
+        new GetCollection()
+    ],
+    uriVariables: [
+        'orderer' => new Link(
+            fromProperty: 'id',
+            fromClass: User::class
+        )
+    ],
+)]
 class Order
 {
     #[ORM\Id]
@@ -29,19 +62,19 @@ class Order
     private ?Garage $garage = null;
 
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
-    private ?float $total_price = null;
+    private ?float $totalPrice = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $appointment_date = null;
+    private ?\DateTimeInterface $appointmentDate = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $finalised_at = null;
+    private ?\DateTimeImmutable $finalisedAt = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -99,60 +132,60 @@ class Order
 
     public function getTotalPrice(): ?float
     {
-        return $this->total_price;
+        return $this->totalPrice;
     }
 
-    public function setTotalPrice(?float $total_price): self
+    public function setTotalPrice(?float $totalPrice): self
     {
-        $this->total_price = $total_price;
+        $this->totalPrice = $totalPrice;
 
         return $this;
     }
 
     public function getAppointmentDate(): ?\DateTimeInterface
     {
-        return $this->appointment_date;
+        return $this->appointmentDate;
     }
 
-    public function setAppointmentDate(?\DateTimeInterface $appointment_date): self
+    public function setAppointmentDate(?\DateTimeInterface $appointmentDate): self
     {
-        $this->appointment_date = $appointment_date;
+        $this->appointmentDate = $appointmentDate;
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
 
     public function getFinalisedAt(): ?\DateTimeImmutable
     {
-        return $this->finalised_at;
+        return $this->finalisedAt;
     }
 
-    public function setFinalisedAt(?\DateTimeImmutable $finalised_at): self
+    public function setFinalisedAt(?\DateTimeImmutable $finalisedAt): self
     {
-        $this->finalised_at = $finalised_at;
+        $this->finalisedAt = $finalisedAt;
 
         return $this;
     }

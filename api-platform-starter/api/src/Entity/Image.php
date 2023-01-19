@@ -22,7 +22,7 @@ class Image
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $uploaded_by = null;
+    private ?User $uploadedBy = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -49,12 +49,12 @@ class Image
 
     public function getUploadedBy(): ?User
     {
-        return $this->uploaded_by;
+        return $this->uploadedBy;
     }
 
-    public function setUploadedBy(?User $uploaded_by): self
+    public function setUploadedBy(?User $uploadedBy): self
     {
-        $this->uploaded_by = $uploaded_by;
+        $this->uploadedBy = $uploadedBy;
 
         return $this;
     }

@@ -28,7 +28,10 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
         new Post(processor: UserPasswordHasher::class),
         new Get(),
         new Put(processor: UserPasswordHasher::class),
-        new Patch(processor: UserPasswordHasher::class),
+        new Patch(
+            denormalizationContext: ['groups' => ['user:update']],
+            processor: UserPasswordHasher::class
+        ),
         new Delete(),
         new Post(
             uriTemplate: '/users/{id}/send_confirmation_email',
@@ -84,28 +87,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
     #[Groups(['user:read', 'user:create', 'user:update'])]
     #[ORM\Column(length: 50)]
-    private ?string $first_name = null;
+    private ?string $firstName = null;
+
+
     #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
     #[Groups(['user:read', 'user:create', 'user:update'])]
     #[ORM\Column(length: 50)]
-    private ?string $last_name = null;
+    private ?string $lastName = null;
 
     #[Groups(['user:read', 'user:update'])]
     #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $verified_at = null;
+    private ?DateTimeImmutable $verifiedAt = null;
 
-    #[Assert\Json]
     #[Groups(['user:read', 'user:create', 'user:update'])]
     #[ORM\Column(type: 'json')]
     private array $coordinates;
 
     #[Groups(['user:read'])]
     #[ORM\Column]
-    private DateTimeImmutable $created_at;
+    private DateTimeImmutable $createdAt;
 
     #[Groups(['user:read'])]
-    #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $updated_at = null;
+    #[ORM\Column(type: 'datetime_immutable', nullable: true, options: ['default' => null])]
+    private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'orderer', targetEntity: Order::class)]
     private Collection $orders;
@@ -203,36 +207,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getFirstName(): ?string
     {
-        return $this->first_name;
+        return $this->firstName;
     }
 
-    public function setFirstName(string $first_name): self
+    public function setFirstName(string $firstName): self
     {
-        $this->first_name = $first_name;
+        $this->firstName = $firstName;
 
         return $this;
     }
 
     public function getLastName(): ?string
     {
-        return $this->last_name;
+        return $this->lastName;
     }
 
-    public function setLastName(string $last_name): self
+    public function setLastName(string $lastName): self
     {
-        $this->last_name = $last_name;
+        $this->lastName = $lastName;
 
         return $this;
     }
 
     public function getVerifiedAt(): ?DateTimeImmutable
     {
-        return $this->verified_at;
+        return $this->verifiedAt;
     }
 
-    public function setVerifiedAt(?DateTimeImmutable $verified_at): self
+    public function setVerifiedAt(?DateTimeImmutable $verifiedAt): self
     {
-        $this->verified_at = $verified_at;
+        $this->verifiedAt = $verifiedAt;
 
         return $this;
     }
@@ -250,24 +254,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getCreatedAt(): DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeImmutable $created_at): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

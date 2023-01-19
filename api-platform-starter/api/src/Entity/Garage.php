@@ -51,7 +51,7 @@ class Garage
 
     #[Groups(['car:read:item'])]
     #[ORM\Column]
-    private ?bool $is_open = null;
+    private ?bool $isOpen = null;
 
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Order::class)]
     private Collection $orders;
@@ -101,12 +101,12 @@ class Garage
 
     public function isIsOpen(): ?bool
     {
-        return $this->is_open;
+        return $this->isOpen;
     }
 
-    public function setIsOpen(bool $is_open): self
+    public function setIsOpen(bool $isOpen): self
     {
-        $this->is_open = $is_open;
+        $this->isOpen = $isOpen;
 
         return $this;
     }

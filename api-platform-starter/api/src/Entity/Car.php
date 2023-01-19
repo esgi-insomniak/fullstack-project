@@ -99,7 +99,7 @@ class Car
 
     #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
     #[ORM\Column(length: 10)]
-    private ?string $gearbox_type = null;
+    private ?string $gearboxType = null;
 
     #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
     #[ORM\Column]
@@ -316,12 +316,12 @@ class Car
 
     public function getGearboxType(): ?string
     {
-        return $this->gearbox_type;
+        return $this->gearboxType;
     }
 
-    public function setGearboxType(string $gearbox_type): self
+    public function setGearboxType(string $gearboxType): self
     {
-        $this->gearbox_type = $gearbox_type;
+        $this->gearboxType = $gearboxType;
 
         return $this;
     }
