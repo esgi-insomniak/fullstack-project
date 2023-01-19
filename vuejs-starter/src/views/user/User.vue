@@ -37,7 +37,7 @@ onMounted(async () => {
                 <div class="absolute top-20 w-1/2 h-1/2">
                     <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour" :disabled="editMode">
                         <FormKit type="text" name="firstName" label="Prénom" />
-                        <FormKit type="text" name="firstName" label="Nom" />
+                        <FormKit type="text" name="lastName" label="Nom" />
                         <FormKit type="text" name="email" label="Email" />
                         <FormKit type="text" name="phone" label="Téléphone" />
                     </FormKit>
