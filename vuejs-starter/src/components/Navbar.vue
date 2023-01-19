@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { UserIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
-import { ref, reactive, computed, watch } from 'vue';
+import { UserIcon, MagnifyingGlassIcon, StarIcon, InboxIcon, ShoppingCartIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, RocketLaunchIcon } from '@heroicons/vue/24/outline';
+import { ref, reactive, computed } from 'vue';
 import { useStore } from 'vuex';
 
 const route = useRoute();
@@ -15,14 +15,14 @@ const navLink = reactive([
     { name: 'Nos concessionaires', href: '/garage', current: false },
 ]);
 const userLink = [
-    { name: 'Mon profil', href: '/me/profile', isAuth: true, icon: null, isAdmin: false },
-    { name: 'Mes favoris', href: '/me/favorites', isAuth: true, icon: null, isAdmin: false },
-    { name: 'Mes achats/ventes', href: '/me/list', isAuth: true, icon: null, isAdmin: false },
-    { name: 'Mes messages', href: '/me/messages', isAuth: true, icon: null, isAdmin: false },
+    { name: 'Mon profil', href: '/me/profile', isAuth: true, icon: UserIcon, isAdmin: false },
+    { name: 'Mes favoris', href: '/me/favorites', isAuth: true, icon: StarIcon, isAdmin: false },
+    { name: 'Mes achats/ventes', href: '/me/list', isAuth: true, icon: ShoppingCartIcon, isAdmin: false },
+    { name: 'Mes messages', href: '/me/messages', isAuth: true, icon: InboxIcon, isAdmin: false },
     //{ name: 'Administration', href: '/admin', isAuth: true, icon: null, isAdmin: true },
-    { name: 'Se déconnecter', href: '/logout', isAuth: true, icon: null, isAdmin: false },
-    { name: 'Se connecter', href: '/login', isAuth: false, icon: null, isAdmin: false },
-    { name: 'S\'inscrire', href: '/register', isAuth: false, icon: null, isAdmin: false },
+    { name: 'Se déconnecter', href: '/logout', isAuth: true, icon: ArrowLeftOnRectangleIcon, isAdmin: false },
+    { name: 'Se connecter', href: '/login', isAuth: false, icon: ArrowRightOnRectangleIcon, isAdmin: false },
+    { name: 'S\'inscrire', href: '/register', isAuth: false, icon: RocketLaunchIcon, isAdmin: false },
 ]
 const showUserMenu = ref(false)
 const searchBar = reactive({
@@ -62,8 +62,11 @@ const handleSearch = () => {
                     <template v-for="link in userLink">
                         <div class="flex group" v-if="link.isAuth === isLoggedIn">
                             <router-link :to="link.href" @click="showUserMenu = false"
-                                class="p-3 rounded-sm text-gray-700 min-w-full cursor-pointer group-hover:bg-slate-300 bg-slate-200 group-hover:text-white">
-                                {{ link.name }}
+                                class="p-3 rounded-sm text-gray-700 min-w-full cursor-pointer group-hover:bg-slate-300 bg-slate-200 group-hover:text-white group-hover:shadow-inner group-hover:shadow-black">
+                                <div class="flex space-x-2 items-center w-full text-left">
+                                    <component :is="link.icon" class="h-6 w-6" />
+                                    <span>{{ link.name }}</span>
+                                </div>
                             </router-link>
                         </div>
                     </template>
@@ -71,7 +74,8 @@ const handleSearch = () => {
             </div>
         </div>
         <router-link class="flex items-center ml-5 rounded-full h-16 w-16" :to="'/home'">
-            <img src="../assets/bmw_logo.png" alt="" class="rounded-full cursor-pointer hover:scale-110 duration-300">
+            <img src="../assets/bmw_logo.png" alt=""
+                class="rounded-full cursor-pointer hover:scale-110 hover:shadow-md hover:shadow-white duration-300">
         </router-link>
     </nav>
 </template>

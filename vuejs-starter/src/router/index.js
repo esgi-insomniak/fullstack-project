@@ -91,6 +91,11 @@ const routes = [
             }
         ]
     },
+    {
+        path: '/services',
+        name: 'Services',
+        component: () => import('../views/Services.vue'),
+    }
 ]
 
 const router = VueRouter.createRouter({
