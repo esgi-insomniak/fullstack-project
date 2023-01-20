@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20230119112222 extends AbstractMigration
+final class Version20230120133539 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -39,8 +39,9 @@ final class Version20230119112222 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_1A9681883DA5256D ON car_image (image_id)');
         $this->addSql('CREATE TABLE car_category (id INT NOT NULL, name VARCHAR(50) NOT NULL, slug VARCHAR(80) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_897A2CC5989D9B62 ON car_category (slug)');
-        $this->addSql('CREATE TABLE car_identity (id INT NOT NULL, category_id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE car_identity (id INT NOT NULL, category_id INT NOT NULL, main_picture_id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_E5A3DCC012469DE2 ON car_identity (category_id)');
+        $this->addSql('CREATE INDEX IDX_E5A3DCC0D6BDC9DC ON car_identity (main_picture_id)');
         $this->addSql('CREATE TABLE garage (id INT NOT NULL, name VARCHAR(255) NOT NULL, coordinates JSON NOT NULL, is_open BOOLEAN NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE greeting (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE image (id INT NOT NULL, uploaded_by_id INT NOT NULL, src VARCHAR(1500) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
@@ -75,6 +76,7 @@ final class Version20230119112222 extends AbstractMigration
         $this->addSql('ALTER TABLE car_image ADD CONSTRAINT FK_1A968188C3C6F69F FOREIGN KEY (car_id) REFERENCES car (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE car_image ADD CONSTRAINT FK_1A9681883DA5256D FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE car_identity ADD CONSTRAINT FK_E5A3DCC012469DE2 FOREIGN KEY (category_id) REFERENCES car_category (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE car_identity ADD CONSTRAINT FK_E5A3DCC0D6BDC9DC FOREIGN KEY (main_picture_id) REFERENCES image (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE image ADD CONSTRAINT FK_C53D045FA2B28FE8 FOREIGN KEY (uploaded_by_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE "order" ADD CONSTRAINT FK_F5299398DF123119 FOREIGN KEY (orderer_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE "order" ADD CONSTRAINT FK_F5299398C3C6F69F FOREIGN KEY (car_id) REFERENCES car (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -105,6 +107,7 @@ final class Version20230119112222 extends AbstractMigration
         $this->addSql('ALTER TABLE car_image DROP CONSTRAINT FK_1A968188C3C6F69F');
         $this->addSql('ALTER TABLE car_image DROP CONSTRAINT FK_1A9681883DA5256D');
         $this->addSql('ALTER TABLE car_identity DROP CONSTRAINT FK_E5A3DCC012469DE2');
+        $this->addSql('ALTER TABLE car_identity DROP CONSTRAINT FK_E5A3DCC0D6BDC9DC');
         $this->addSql('ALTER TABLE image DROP CONSTRAINT FK_C53D045FA2B28FE8');
         $this->addSql('ALTER TABLE "order" DROP CONSTRAINT FK_F5299398DF123119');
         $this->addSql('ALTER TABLE "order" DROP CONSTRAINT FK_F5299398C3C6F69F');

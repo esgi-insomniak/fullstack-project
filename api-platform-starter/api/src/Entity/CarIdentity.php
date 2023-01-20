@@ -72,6 +72,11 @@ class CarIdentity
     #[ORM\OneToMany(mappedBy: 'identity', targetEntity: Car::class, orphanRemoval: true)]
     private Collection $cars;
 
+    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Image $mainPicture = null;
+
     public function __construct()
     {
         $this->cars = new ArrayCollection();
@@ -132,6 +137,18 @@ class CarIdentity
                 $car->setIdentity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMainPicture(): ?Image
+    {
+        return $this->mainPicture;
+    }
+
+    public function setMainPicture(?Image $mainPicture): self
+    {
+        $this->mainPicture = $mainPicture;
 
         return $this;
     }
