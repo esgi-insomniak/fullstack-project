@@ -1,6 +1,6 @@
 <script setup>
 
-import {ref, computed, onMounted} from 'vue'
+import {ref, onMounted} from 'vue'
 import {useStore} from "vuex";
 import {useRouter} from "vue-router";
 
@@ -23,7 +23,6 @@ onMounted(() => {
 });
 
 const handleRegister = (form) => {
-  console.log(form);
   if (form.plainPassword !== form.confirmPassword) {
     this.error = 'Les mots de passe ne correspondent pas';
     return;
