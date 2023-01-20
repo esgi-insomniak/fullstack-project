@@ -22,7 +22,9 @@ class AuthService {
     return getAxiosInstance().post("users", {
         email: user.email,
         plainPassword: user.plainPassword,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        coordinates: user.coordinates,
     });
   }
 }

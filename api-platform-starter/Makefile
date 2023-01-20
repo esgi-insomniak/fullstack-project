@@ -12,7 +12,6 @@ jwt: ## Generate the JWT keys
 	docker compose run --rm php sh -c 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair --overwrite && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
 start: ## Start the docker containers
 	docker compose up -d
-	make migrate
 stop: ## Stop the docker containers
 	docker compose stop
 restart: ## Restart the docker containers
@@ -28,12 +27,14 @@ fixtures: ## Load the fixtures
 fixtures-purge: ## Purge the database and load the fixtures
 	docker compose exec php bin/console doctrine:fixtures:load --purge-with-truncate --no-interaction
 migration: ## Run the migrations and migrate them
-	docker compose exec php bin/console make:migration
+	docker compose exec php bin/console make:migration:diff
 	make migrate
 migrate: ## Migrate the database
 	docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
 schema: ## Update the database schema
 	docker compose exec php bin/console doctrine:schema:update --force
+drop-data:
+	docker compose exec php bin/console doctrine:schema:drop --force --full-database
 bash: ## Open a bash shell in the php container
 	docker compose exec php sh
 composer: ## Run composer
