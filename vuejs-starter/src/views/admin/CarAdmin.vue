@@ -41,6 +41,32 @@
             console.log(error)
         })
     };
+
+    const previousPage = async () => {
+        if(currentPage.value > 1) {
+            currentPage.value--;
+            await getAxiosInstance().get('/cars?page='+currentPage.value)
+                .then(response => {
+                    cars.value = response.data;
+                    loading.value = false;
+                })
+                .catch(error => {
+                    console.log(error)
+                });
+        }
+    };
+
+    const nextPage = async () => {
+        currentPage.value++;
+        await getAxiosInstance().get('/cars?page='+currentPage.value)
+            .then(response => {
+                cars.value = response.data;
+                loading.value = false;
+            })
+            .catch(error => {
+                console.log(error)
+            });
+    };
 </script>
 
 <template>
