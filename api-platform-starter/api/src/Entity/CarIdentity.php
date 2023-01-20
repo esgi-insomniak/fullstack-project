@@ -69,6 +69,7 @@ class CarIdentity
     #[ORM\JoinColumn(nullable: false)]
     private ?CarCategory $category = null;
 
+    #[Groups(['car_identity:read:item', 'car_identity:read:collection'])]
     #[ORM\OneToMany(mappedBy: 'identity', targetEntity: Car::class, orphanRemoval: true)]
     private Collection $cars;
 
