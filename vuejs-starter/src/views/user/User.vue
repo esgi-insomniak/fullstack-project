@@ -3,13 +3,17 @@ import Avatar from '../../components/Avatar.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { PencilIcon } from '@heroicons/vue/24/outline';
 import UserService from "../../services/user.service.js";
+import JawgJSLoader from '@jawg/js-loader';
+
+const loader = new JawgJSLoader({ accessToken: 'rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ' });
+
+
 
 const formData = reactive({});
 const editMode = ref(true);
 
 const handleSendUpdate = async (form) => {
     const response = await UserService.Patch('me', form);
-    console.log(response);
 };
 
 onMounted(async () => {
@@ -18,6 +22,10 @@ onMounted(async () => {
     formData.lastName = me.lastName;
     formData.email = me.email;
     formData.coordinates = me.coordinates;
+
+    loader.loadJawgPlaces().then((JawgPlaces) => {
+      let jawgPlaces = new JawgPlaces.Input({ input: '#address' });
+    });
 });
 </script>
 <template>
@@ -35,12 +43,12 @@ onMounted(async () => {
             </div>
             <div class="relative h-[120vh] w-full flex justify-evenly">
                 <div class="absolute top-20 w-1/2 h-1/2">
-                    <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour"
-                        :disabled="editMode">
+                    <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour" :disabled="editMode">
                         <FormKit type="text" name="firstName" label="Prénom" />
                         <FormKit type="text" name="lastName" label="Nom" />
                         <FormKit type="text" name="email" label="Email" />
                         <FormKit type="text" name="phone" label="Téléphone" />
+                        <input type="text" name="address" id="address" />
                     </FormKit>
                 </div>
                 <div class="absolute bottom-5 px-3 w-full grid grid-flow-row grid-cols-2 gap-2 h-1/2 overflow-scroll">
