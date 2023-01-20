@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Controller\PaymentController;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -10,18 +11,10 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Controller\User\ConfirmationEmailController;
 use App\Repository\OrderRepository;
-use App\State\UserPasswordHasher;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use App\Controller\PaymentController;
+
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -48,23 +41,25 @@ use App\Controller\PaymentController;
             fromClass: User::class
         )
     ]
-])
+)]
 #[ApiResource(
-    new Post(
-        uriTemplate: '/payment/{id}',
-        controller: PaymentController::class,
-        output: false,
-        defaults: ['_api_receive' => false],
-        openapiContext: [
-            'requestBody' => [
-                'content' => [
-                    'application/ld+json' => [
-                        'schema' => [],
+    operations: [
+        new Post(
+            uriTemplate: '/payment/{id}',
+            defaults: ['_api_receive' => false],
+            controller: PaymentController::class,
+            openapiContext: [
+                'requestBody' => [
+                    'content' => [
+                        'application/ld+json' => [
+                            'schema' => [],
+                        ],
                     ],
                 ],
             ],
-        ],
-    ),
+            output: false,
+        ),
+    ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
