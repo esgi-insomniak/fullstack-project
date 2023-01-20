@@ -15,6 +15,13 @@ use App\Repository\OrderRepository;
 use App\State\UserPasswordHasher;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Controller\PaymentController;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -27,7 +34,6 @@ use Doctrine\ORM\Mapping as ORM;
         new Patch(),
         new Delete(),
     ],
-
     normalizationContext: ['groups' => ['order:read:item', 'order:read:collection']],
     denormalizationContext: ['groups' => ['order:create', 'order:update']],
 )]
@@ -41,7 +47,26 @@ use Doctrine\ORM\Mapping as ORM;
             fromProperty: 'id',
             fromClass: User::class
         )
-    ],
+    ]
+])
+#[ApiResource(
+    new Post(
+        uriTemplate: '/payment/{id}',
+        controller: PaymentController::class,
+        output: false,
+        defaults: ['_api_receive' => false],
+        openapiContext: [
+            'requestBody' => [
+                'content' => [
+                    'application/ld+json' => [
+                        'schema' => [],
+                    ],
+                ],
+            ],
+        ],
+    ),
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
 class Order
 {
