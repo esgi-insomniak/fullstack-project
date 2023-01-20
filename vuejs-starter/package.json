@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run --spec 'cypress/e2e/*.cy.js'"
   },
   "dependencies": {
     "@formkit/addons": "^1.0.0-beta.10",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.1.0",
     "autoprefixer": "^10.4.11",
+    "cypress": "^12.3.0",
     "postcss": "^8.4.16",
     "tailwindcss": "^3.1.8",
     "vite": "^3.1.0"
