@@ -68,11 +68,11 @@ const answers = ref([])
 const currentQuestion = ref(0)
 const nextQuestion = (e) => {
     e.preventDefault()
-    currentQuestion++
+    currentQuestion.value++
 }
 const previousQuestion = (e) => {
     e.preventDefault()
-    currentQuestion--
+    currentQuestion.value--
 }
 
 </script>
@@ -80,7 +80,7 @@ const previousQuestion = (e) => {
 
 <template>
     <form class="p-6 rounded-lg">
-        <div v-for="(question, index) in questions" :key="index" :v-if="currentQuestion === index">
+        <div v-for="(question, index) in questions" :key="index" v-if="currentQuestion === index">
             <label class="block text-white font-medium">{{ question.name }}</label>
             <div v-if="question.type === 'radio'">
                 <RadioGroup :options="question.options" />
