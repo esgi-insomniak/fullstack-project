@@ -1,36 +1,44 @@
 <template>
     <div>
-      <h1>Merci !</h1>
-      <p>Votre paiement a été effectué avec succès.</p>
-      <p>ID de la transaction : {{ transactionId }}</p>
-      <p>Montant : {{ amount }} {{ currency }}</p>
+      <h1>Payment Receipt</h1>
+      <p>Transaction ID: {{ transactionId }}</p>
+      <p>Amount: {{ amount }} {{ currency }}</p>
+      <p>Payment status: {{ status }}</p>
     </div>
-</template>
+  </template>
   
 <script>
     import {loadStripe} from '@stripe/stripe-js';
-  
+    import axios from 'axios';
+
+    const urlParams = new URLSearchParams(window.location.search);
+const sessionId = urlParams.get('session_id');
     export default {
         data() {
             return {
                 transactionId: null,
                 amount: null,
-                currency: null
+                currency: null,
+                status: null,
             }
         },
         created() {
-    // Récupérer l'ID de la transaction à partir de l'URL
-            console.log(this.$route.query)
-            this.transactionId = this.$route.query.transaction_id;
-
-    // Charger Stripe.js
-            const stripe = loadStripe("pk_test_51MRXR1KanJPVHpR6ajE7MCpymd1qd5FRXgfkeS7MP2mIeZiMXvWlarpNrbL0hqznLoHc9FN5wV893HsHEnWOlSfo00X91Qetbx");
-            
-            // Récupérer les informations de la transaction à partir de l'ID
-            stripe.retrieveTransaction(this.transactionId).then(transaction => {
-                this.amount = transaction.amount / 100;
-                this.currency = transaction.currency;
-            });
+            axios.get(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
+  headers: {
+    'Authorization': `Bearer sk_test_51MRXR1KanJPVHpR6mu816wVhlqu7S1qte3mQLTwSS4OgUCWt4Qgezp9f6vCyGjZdHS0Z253Drt4NOMzurHb30zZ300QTIkmjpF`
+  }
+})
+.then(response => {
+  console.log(response.data);
+    this.transactionId = response.data.id;
+    this.amount = response.data.amount_total / 100;
+    this.currency = response.data.currency;
+    this.status = response.data.payment_status;
+  // Use the data from the response to update your application
+})
+.catch(error => {
+  console.log(error);
+});
         }
     }
 </script>

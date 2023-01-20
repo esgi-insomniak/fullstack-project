@@ -16,6 +16,8 @@
   <script>
   import { StripeCheckout } from '@vue-stripe/vue-stripe';
   import axios from 'axios';
+  import authHeader from '../../services/auth-header';
+
   export default {
     components: {
       StripeCheckout,
@@ -30,15 +32,15 @@
             quantity: 1,
           },
         ],
-        successURL: 'http://localhost:8080/success',
+        successURL: 'http://localhost:8080/success?session_id={CHECKOUT_SESSION_ID}',
         cancelURL: 'http://localhost:8080/cancel',
       };
     },
     mounted() {
-      axios.post(`https://localhost/order/3/payment`)
+      axios.post(`https://localhost/payment/1004`, {}, { headers: authHeader() })
         .then(response => {
           console.log(response.data.price);
-          //this.lineItems[0].price = response.data.price;
+          this.lineItems[0].price = response.data.price;
         })
         .catch(error => {
           console.log(error)
