@@ -38,7 +38,7 @@ const questions = [
     },
     { name: 'Quel est le kilométrage de votre véhicule ?', type: 'number', step: 2 },
     {
-        name: 'Quel est le type de carburant de votre véhicule ?', type: 'select', options: [
+        name: 'Quel est le type de carburant de votre véhicule ?', type: 'radio', options: [
             { label: 'Essence', value: 'essence', id: 1 },
             { label: 'Diesel', value: 'diesel', id: 2 },
             { label: 'Hybride', value: 'hybride', id: 5 },
@@ -87,7 +87,7 @@ const previousQuestion = (e) => {
             </div>
             <div v-if="question.type === 'select'">
                 <select
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
+                    class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
                     <option v-for="option in question.options" :key="option.value" :value="option.value">
                         {{ option.label }}
                     </option>
@@ -95,11 +95,11 @@ const previousQuestion = (e) => {
             </div>
             <div v-if="question.type === 'number'">
                 <input type="number"
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
+                    class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
             </div>
             <div v-if="question.type === 'datetime'">
                 <input type="datetime-local"
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
+                    class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
             </div>
 
         </div>
