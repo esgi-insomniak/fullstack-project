@@ -13,6 +13,7 @@ const newUser = ref({
   email: '',
   plainPassword: '',
   confirmPassword: '',
+  coordinates: []
 })
 
 const messError = ref('');
