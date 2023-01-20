@@ -15,8 +15,7 @@
   
   <script>
   import { StripeCheckout } from '@vue-stripe/vue-stripe';
-  import axios from 'axios';
-  import authHeader from '../../services/auth-header';
+  import {getAxiosInstance} from "../../helpers/axios/config.js";
 
   export default {
     components: {
@@ -37,7 +36,7 @@
       };
     },
     mounted() {
-      axios.post(`https://localhost/payment/1004`, {}, { headers: authHeader() })
+      getAxiosInstance().post(`https://localhost/payment/1004`)
         .then(response => {
           console.log(response.data.price);
           this.lineItems[0].price = response.data.price;
