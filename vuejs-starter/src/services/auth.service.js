@@ -1,26 +1,17 @@
 import axios from "axios";
-
-const API_URL = "https://localhost/";
+import { getAxiosInstance } from "../helpers/axios/config.js";
 
 class AuthService {
   login(user) {
-    return axios
-      .post(API_URL + "authentication_token", {
-        email: user.email,
-        password: user.password
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        }
-      })
-      .then(response => {
-        if (response.data.token) {
-          localStorage.setItem("user", JSON.stringify(response.data));
-        }
-
-        return response.data;
-      });
+    return getAxiosInstance()
+        .post("authentication_token", {email: user.email, password: user.password})
+        .then((response_authentication_token) => {
+          if (response_authentication_token.data.token) {
+            const token = response_authentication_token.data.token;
+            localStorage.setItem("user", JSON.stringify({token: token}));
+          }
+          return response_authentication_token.data;
+        });
   }
 
   logout() {
@@ -28,10 +19,12 @@ class AuthService {
   }
 
   register(user) {
-    return axios.post(API_URL + "users", {
-      email: user.email,
-      plainPassword: user.plainPassword,
-      roles: user.roles
+    return getAxiosInstance().post("users", {
+        email: user.email,
+        plainPassword: user.plainPassword,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        coordinates: user.coordinates,
     });
   }
 }

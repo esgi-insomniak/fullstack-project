@@ -33,6 +33,7 @@ security:
         - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI Docs
         - { path: ^/authentication_token, roles: PUBLIC_ACCESS }
         - { path: ^/users, roles: PUBLIC_ACCESS, methods: [POST] } # Register
+        - { path: /send_confirmation_email$, roles: IS_AUTHENTICATED_FULLY } # Send confirmation email
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
             
 when@test:
