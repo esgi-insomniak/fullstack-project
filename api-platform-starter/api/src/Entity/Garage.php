@@ -2,15 +2,38 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\GarageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GarageRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    shortName: 'garages',
+    operations: [
+        new GetCollection(
+            paginationItemsPerPage: 10,
+            normalizationContext: ['groups' => ['garage:read:collection']],
+        ),
+        new Get(),
+        new Post(),
+        new Put(),
+        new Patch(),
+        new Delete(),
+    ],
+    denormalizationContext: ['groups' => ['garage:create', 'garage:update']],
+)]
 class Garage
 {
     #[ORM\Id]
@@ -18,14 +41,17 @@ class Garage
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['car:read:item'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups(['car:read:item'])]
     #[ORM\Column(type: 'json')]
     private array $coordinates = [];
 
+    #[Groups(['car:read:item'])]
     #[ORM\Column]
-    private ?bool $is_open = null;
+    private ?bool $isOpen = null;
 
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Order::class)]
     private Collection $orders;
@@ -33,6 +59,7 @@ class Garage
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[Groups(['garage:read:collection'])]
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
     private Collection $cars;
 
@@ -74,12 +101,12 @@ class Garage
 
     public function isIsOpen(): ?bool
     {
-        return $this->is_open;
+        return $this->isOpen;
     }
 
-    public function setIsOpen(bool $is_open): self
+    public function setIsOpen(bool $isOpen): self
     {
-        $this->is_open = $is_open;
+        $this->isOpen = $isOpen;
 
         return $this;
     }

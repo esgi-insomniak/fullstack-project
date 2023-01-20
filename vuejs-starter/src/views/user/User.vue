@@ -1,21 +1,24 @@
 <script setup>
-import { useStore } from 'vuex';
 import Avatar from '../../components/Avatar.vue';
-import { reactive, ref, defineProps } from 'vue';
+import {onMounted, reactive, ref} from 'vue';
 import { PencilIcon } from '@heroicons/vue/24/outline';
+import UserService from "../../services/user.service.js";
 
-const defaultUserValues = {
-    firstName: 'Loan',
-    lastName: 'CLERIS',
-    email: 'loan.cleris@gmail.com',
-    phone: '06 12 34 56 78',
-};
-const formData = ref(defaultUserValues)
+const formData = reactive({});
 const editMode = ref(true);
 
-const handleSendUpdate = (form) => {
-    console.log(form);
+const handleSendUpdate = async (form) => {
+  const response = await UserService.update(form);
+  console.log(response);
 };
+
+onMounted(async () => {
+  const me =  await UserService.me();
+  formData.firstName = me.firstName;
+  formData.lastName = me.lastName;
+  formData.email = me.email;
+  formData.coordinates = me.coordinates;
+});
 </script>
 <template>
     <div class="mx-auto flex justify-center items-center h-full">
@@ -32,8 +35,7 @@ const handleSendUpdate = (form) => {
             </div>
             <div class="relative h-[120vh] w-full flex justify-evenly">
                 <div class="absolute top-20 w-1/2 h-1/2">
-                    <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour"
-                        :disabled="editMode">
+                    <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour" :disabled="editMode">
                         <FormKit type="text" name="firstName" label="Prénom" />
                         <FormKit type="text" name="lastName" label="Nom" />
                         <FormKit type="text" name="email" label="Email" />

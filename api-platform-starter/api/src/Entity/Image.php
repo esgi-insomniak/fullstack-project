@@ -2,10 +2,13 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
+#[ApiResource]
 class Image
 {
     #[ORM\Id]
@@ -13,12 +16,13 @@ class Image
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['car:read:item', 'car:read:collection'])]
     #[ORM\Column(length: 1500, unique: true)]
     private ?string $src = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $uploaded_by = null;
+    private ?User $uploadedBy = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -45,12 +49,12 @@ class Image
 
     public function getUploadedBy(): ?User
     {
-        return $this->uploaded_by;
+        return $this->uploadedBy;
     }
 
-    public function setUploadedBy(?User $uploaded_by): self
+    public function setUploadedBy(?User $uploadedBy): self
     {
-        $this->uploaded_by = $uploaded_by;
+        $this->uploadedBy = $uploadedBy;
 
         return $this;
     }

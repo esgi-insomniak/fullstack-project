@@ -28,7 +28,7 @@ class Recovery
     private ?Garage $garage = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $car_description = null;
+    private ?string $carDescription = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -89,12 +89,12 @@ class Recovery
 
     public function getCarDescription(): ?string
     {
-        return $this->car_description;
+        return $this->carDescription;
     }
 
-    public function setCarDescription(?string $car_description): self
+    public function setCarDescription(?string $carDescription): self
     {
-        $this->car_description = $car_description;
+        $this->carDescription = $carDescription;
 
         return $this;
     }

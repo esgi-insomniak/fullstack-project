@@ -51,7 +51,7 @@ class UserFixture extends Fixture
         $fakeUser->setFirstName("User");
         $fakeUser->setLastName("User");
         $fakeUser->setVerifiedAt(new DateTimeImmutable());
-        $fakeUser->setCoordinates(["48.856614","2.3522219"]);
+        $fakeUser->setCoordinates([48.856614,2.3522219]);
         $fakeUser->setCreatedAt(new DateTimeImmutable());
         $fakeUser->setUpdatedAt(null);
         return $fakeUser;
@@ -66,7 +66,7 @@ class UserFixture extends Fixture
         $fakeAdmin->setFirstName("Admin");
         $fakeAdmin->setLastName("Admin");
         $fakeAdmin->setVerifiedAt(new DateTimeImmutable());
-        $fakeAdmin->setCoordinates(["48.856614", "2.3522219"]);
+        $fakeAdmin->setCoordinates([48.856614, 2.3522219]);
         $fakeAdmin->setCreatedAt(new DateTimeImmutable());
         $fakeAdmin->setUpdatedAt(null);
         return $fakeAdmin;
