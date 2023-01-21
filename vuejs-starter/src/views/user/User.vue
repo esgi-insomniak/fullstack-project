@@ -4,13 +4,13 @@ import { onMounted, reactive, ref } from 'vue';
 import { PencilIcon } from '@heroicons/vue/24/outline';
 import UserService from "../../services/user.service.js";
 import JawgJSLoader from '@jawg/js-loader';
+import CarService from "../../services/car.service.js";
 
 const loader = new JawgJSLoader({ accessToken: 'rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ' });
 
-
-
 const formData = reactive({});
 const editMode = ref(true);
+const cars = ref([]);
 
 const handleSendUpdate = async (form) => {
     const response = await UserService.Patch('me', form);
@@ -24,9 +24,15 @@ onMounted(async () => {
     formData.coordinates = me.coordinates;
 
     loader.loadJawgPlaces().then((JawgPlaces) => {
-      let jawgPlaces = new JawgPlaces.Input({ input: '#address' });
+      let jawgPlaces = new JawgPlaces.Input({
+        input: '#address',
+        searchOnTyping: true
+      });
     });
-});
+
+    cars.value = await CarService.loadCarIdentities();
+    console.log(cars.value);
+  });
 </script>
 <template>
     <div class="mx-auto flex justify-center items-center h-full">
@@ -41,27 +47,59 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
-            <div class="relative h-[120vh] w-full flex justify-evenly">
-                <div class="absolute top-20 w-1/2 h-1/2">
+            <div class="w-full flex flex-col items-center py-5">
+                <div class="w-1/3">
                     <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour" :disabled="editMode">
                         <FormKit type="text" name="firstName" label="Prénom" />
                         <FormKit type="text" name="lastName" label="Nom" />
                         <FormKit type="text" name="email" label="Email" />
                         <FormKit type="text" name="phone" label="Téléphone" />
-                        <input type="text" name="address" id="address" />
+                        <FormKit type="text" name="address" id="address" label="Adresse" />
                     </FormKit>
                 </div>
-                <div class="absolute bottom-5 px-3 w-full grid grid-flow-row grid-cols-2 gap-2 h-1/2 overflow-scroll">
-                    <div
-                        class="object-cover flex items-center relative flex-col text-center rounded-lg bg-white/10 max-h-64">
-                        <img src="../../assets/bmw_serie_1.png" alt=""
-                            class="w-96 h-52 hover:scale-150 ease-in-out duration-500 absolute" />
-                        <span class="absolute bottom-4">BMW Serie 1 | 2022</span>
+                <div class="w-3/4">
+
+                    <h2 class="text-2xl font-bold text-white/80 mt-10 mb-5">
+                      Mes Favoris
+                    </h2>
+
+                    <div class="grid grid-flow-row md:grid-cols-2 sm:grid-cols-1 gap-2">
+
+                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10" v-for="car in cars">
+                        <img :src="car.mainPicture.src" :alt="car.name" class="hover:scale-150 ease-in-out duration-500" />
+                        <span>BMW {{ car.name }}</span>
+                      </div>
+
+                      <!--
+
+                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
+                          <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
+                          <span>BMW Serie 1 | 2022</span>
+                      </div>
+
+                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
+                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
+                        <span>BMW Serie 1 | 2022</span>
+                      </div>
+
+                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
+                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
+                        <span>BMW Serie 1 | 2022</span>
+                      </div>
+
+                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
+                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
+                        <span>BMW Serie 1 | 2022</span>
+                      </div>
+
+                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
+                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
+                        <span>BMW Serie 1 | 2022</span>
+                      </div>
+
+                      -->
                     </div>
                 </div>
-            </div>
-            <div>
-
             </div>
         </div>
     </div>

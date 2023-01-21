@@ -48,7 +48,9 @@ onMounted(() => {
 </template>
  -->
 
-<script setup></script>
+<script setup>
+
+</script>
 <template>
     <div class="w-full h-screen overflow-auto">
         <div ref="mapContainer" class="w-full h-full" />
