@@ -49,8 +49,22 @@ onMounted(() => {
  -->
 
 <script setup>
-import Map from "../components/Map.vue";
+import GarageService from "../services/garage.service.js";
+import {onMounted, ref, defineAsyncComponent} from "vue";
+
+const MapLoader = defineAsyncComponent(() => import("../components/Map.vue"));
+const garages = ref([]);
+
+onMounted(async () => {
+  garages.value = await GarageService.getGarages();
+});
+
 </script>
 <template>
-  <Map :zoom="11" />
+  <MapLoader :zoom="11" :points-to-display="garages.map(garage => {
+    return {
+      name: garage.name,
+      coordinates: [garage.coordinates[0], garage.coordinates[1]]
+    }
+  })" />
 </template>

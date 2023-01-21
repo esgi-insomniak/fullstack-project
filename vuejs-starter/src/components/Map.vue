@@ -58,6 +58,11 @@ const props = defineProps({
       console.error('Error while loading the map');
     },
   },
+  pointsToDisplay: {
+    type: Array,
+    required: false,
+    default: () => [],
+  },
 });
 
 
@@ -66,6 +71,13 @@ const loader = new JawgJSLoader({ accessToken: token });
 
 loader.loadJawgPlaces().then((jawg) => {
   const map = new L.map('mapContainer').setView(props.coordinates, props.zoom);
+
+  // display pointsToDisplay
+  console.log(props.pointsToDisplay);
+  props.pointsToDisplay.forEach(point => {
+    L.marker(point.coordinates).addTo(map).bindPopup(point.name);
+  });
+
   map.addLayer(new L.TileLayer(
       `https://tile.jawg.io/jawg-${props.style}/{z}/{x}/{y}.png?access-token=${token}`,
       {
