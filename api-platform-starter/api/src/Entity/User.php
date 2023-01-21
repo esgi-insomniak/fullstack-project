@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\User\ConfirmationEmailController;
+use App\Controller\User\ValidateAccountController;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
 use DateTimeImmutable;
@@ -48,6 +49,26 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
             ],
             output: false,
         ),
+        new Post(
+            uriTemplate: '/users/{id}/validate_account',
+            defaults: ['_api_receive' => false],
+            controller: ValidateAccountController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "confirmationCode" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            output: false,
+        )
     ],
     normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:create', 'user:update']],
@@ -69,14 +90,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:update'])]
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     #[Assert\NotBlank(groups: ['user:create'])]
     #[Groups(['user:create', 'user:update'])]
     private ?string $plainPassword = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $confirmationCode;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $recoveryToken;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups(['user:read'])]
+    private $haveRecoverToken = false;
 
     /**
      * @var string The hashed password
@@ -121,6 +151,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
+        $this->haveRecoverToken = false;
     }
 
     public function getId(): ?int
@@ -192,6 +223,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $painPassword): self
     {
         $this->plainPassword = $painPassword;
+
+        return $this;
+    }
+
+    public function isActivated(): ?bool
+    {
+        return $this->verifiedAt !== null;
+    }
+
+    public function isHaveRecoverToken(): ?bool
+    {
+        return $this->haveRecoverToken;
+    }
+
+    public function activate(): self
+    {
+        $this->verifiedAt = new DateTimeImmutable();
+        $this->confirmationCode = null;
+
+        return $this;
+    }
+
+    public function setHaveRecoverToken(bool $haveRecoverToken): self
+    {
+        $this->haveRecoverToken = $haveRecoverToken;
+
+        return $this;
+    }
+
+    public function getConfirmationCode(): ?string
+    {
+        return $this->confirmationCode;
+    }
+
+    public function setConfirmationCode(?string $confirmationCode): self
+    {
+        $this->confirmationCode = $confirmationCode;
+
+        return $this;
+    }
+
+    public function getRecoveryToken(): ?string
+    {
+        return $this->recoveryToken;
+    }
+
+    public function setRecoveryToken(?string $recoveryToken): self
+    {
+        $this->recoveryToken = $recoveryToken;
 
         return $this;
     }
@@ -333,5 +413,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
 }

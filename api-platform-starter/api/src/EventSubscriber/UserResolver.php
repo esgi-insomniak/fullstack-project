@@ -38,6 +38,10 @@ final class UserResolver implements EventSubscriberInterface
             return;
         }
 
+        if (null === $this->tokenStorage->getToken()) {
+            return;
+        }
+        
         $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user instanceof User) {

@@ -53,6 +53,10 @@ onMounted(() => {
           <FormKit type="password" name="password" label="Password" placeholder="Mot de passe"
             validation="required|password" v-model="password" />
         </FormKit>
+        <div class="text-blue-500 hover:underline hover:cursor-pointer">
+          Mot de passe oublié ?
+        </div>
+
         <div class="h-1/6 w-full mt-10" />
       </div>
       <div class="w-1/3 flex flex-col justify-end items-end">
