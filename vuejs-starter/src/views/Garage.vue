@@ -49,10 +49,43 @@ onMounted(() => {
  -->
 
 <script setup>
+import JawgJSLoader from "@jawg/js-loader";
+import L from 'leaflet'
+import "leaflet/dist/leaflet.css";
 
+const loader = new JawgJSLoader({ accessToken: 'rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ' });
+
+loader.loadJawgPlaces().then((jawg) => {
+  const map = new L.map('mapContainer').setView([0, 0], 2);
+  map.addLayer(new L.TileLayer(
+      'https://tile.jawg.io/jawg-sunny/{z}/{x}/{y}.png?access-token=rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ',
+      {
+        attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
+        maxZoom: 22,
+      }
+  ));
+  console.log(map)
+  const control = new jawg.Leaflet({
+    searchOnTyping: true,
+    adminArea: {
+      fillColor: 'rgba(172,59,246, 0.1)',
+      outlineColor: 'rgb(172,59,246)',
+      show: true,
+    },
+    sources: 'wof',
+    L: L,
+  });
+  /*
+  L.TileLayer(
+    `https://tile.jawg.io/jawg-sunny/{z}/{x}/{y}.png?access-token=rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ`,
+      {
+        attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
+        maxZoom: 22
+      }
+  ).addTo(map)*/
+  map.addControl(control);
+});
 </script>
 <template>
-    <div class="w-full h-screen overflow-auto">
-        <div ref="mapContainer" class="w-full h-full" />
-    </div>
+  <div id="mapContainer" class="mx-auto" style="aspect-ratio: 16/9; width: 800px" />
 </template>

@@ -17,6 +17,7 @@
     "@stripe/stripe-js": "^1.46.0",
     "@vue-stripe/vue-stripe": "^4.4.4",
     "axios": "^1.1.2",
+    "leaflet": "^1.9.3",
     "vue": "^3.2.37",
     "vue-router": "4",
     "vuex": "^4.0.2"
