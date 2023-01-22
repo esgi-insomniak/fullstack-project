@@ -48,7 +48,33 @@ export const auth = {
           return Promise.reject(error);
         }
       );
-    }
+    },
+
+    forgotPassword({ commit }, values) {
+      return AuthService.forgotPassword(values).then(
+        response => {
+          commit("forgotPasswordSuccess"); //on success, commit forgotPasswordSuccess mutation
+          return Promise.resolve(response.data);
+        },
+        error => {
+          commit("forgotPasswordFailure"); //on failure, commit forgotPasswordFailure mutation
+          return Promise.reject(error);
+        }
+      );
+    },
+
+    accountRecovery({ commit }, values) {
+      return AuthService.accountRecovery(values).then(
+        response => {
+          commit("accountRecoverySuccess"); //on success, commit accountRecoverySuccess mutation
+          return Promise.resolve(response.data);
+        },
+        error => {
+          commit("accountRecoveryFailure"); //on failure, commit accountRecoveryFailure mutation
+          return Promise.reject(error);
+        }
+      );
+    },
   },
 
   mutations: {
@@ -70,6 +96,18 @@ export const auth = {
     },
     registerFailure(state) {
       state.loggedIn = false;
-    }
+    },
+    forgotPasswordSuccess(state) {
+      state.loggedIn = false;
+    },
+    forgotPasswordFailure(state) {
+      state.loggedIn = false;
+    },
+    accountRecoverySuccess(state) {
+      state.loggedIn = false;
+    },
+    accountRecoveryFailure(state) {
+      state.loggedIn = false;
+    },
   }
 }

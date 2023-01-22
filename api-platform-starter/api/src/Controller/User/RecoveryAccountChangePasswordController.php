@@ -58,7 +58,7 @@ class RecoveryAccountChangePasswordController extends AbstractController
 
         $email = (new TemplatedEmail())
             ->subject('Email de réinitialisation de mot de passe')
-            ->html("<p>votre vient d'être modifier.</p>")
+            ->html("<p>votre mot de passe vient d'être modifié.</p>")
             ->from($this->getParameter('sender_address'))
             ->to($user->getEmail());
 

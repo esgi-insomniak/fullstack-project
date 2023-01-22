@@ -27,6 +27,20 @@ class AuthService {
         coordinates: user.coordinates,
     });
   }
+
+  forgotPassword(values) {
+    return getAxiosInstance().post("users/recovery_account", {
+        email: values.email,
+    });
+  }
+
+  accountRecovery(values) {
+    return getAxiosInstance().post("users/recovery_account_change_password", {
+        recoveryToken: values.recoveryToken,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+    });
+  }
 }
 
 export default new AuthService();
