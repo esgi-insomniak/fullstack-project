@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\User\ConfirmationEmailController;
+use App\Controller\User\RecoveryAccountChangePasswordController;
+use App\Controller\User\RecoveryAccountController;
 use App\Controller\User\ValidateAccountController;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
@@ -61,6 +63,48 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
                                 "type" => "object",
                                 "properties" => [
                                     "confirmationCode" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            output: false,
+        ),
+        new Post(
+            uriTemplate: '/users/recovery_account',
+            defaults: ['_api_receive' => false],
+            controller: RecoveryAccountController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "email" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            output: false,
+        ),
+        new Post(
+            uriTemplate: '/users/recovery_account_change_password',
+            defaults: ['_api_receive' => false],
+            controller: RecoveryAccountChangePasswordController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "recoveryToken" => ["type" => "string"],
+                                    "password" => ["type" => "string"],
+                                    "confirmPassword" => ["type" => "string"],
                                 ],
                             ],
                         ],
@@ -245,13 +289,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function setHaveRecoverToken(bool $haveRecoverToken): self
-    {
-        $this->haveRecoverToken = $haveRecoverToken;
-
-        return $this;
-    }
-
     public function getConfirmationCode(): ?string
     {
         return $this->confirmationCode;
@@ -272,6 +309,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRecoveryToken(?string $recoveryToken): self
     {
         $this->recoveryToken = $recoveryToken;
+        $this->haveRecoverToken = $recoveryToken !== null;
 
         return $this;
     }
