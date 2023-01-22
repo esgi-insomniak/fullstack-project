@@ -14,36 +14,28 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\OrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(),
-        new Get(),
-        new Put(),
-        new Patch(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:order']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:order']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:order']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:order']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:order']],
+        ),
         new Delete(),
-    ],
-    normalizationContext: ['groups' => ['order:read:item', 'order:read:collection']],
-    denormalizationContext: ['groups' => ['order:create', 'order:update']],
-)]
-#[ApiResource(
-    uriTemplate: '/users/{id}/orders',
-    operations: [
-        new GetCollection()
-    ],
-    uriVariables: [
-        'orderer' => new Link(
-            fromProperty: 'id',
-            fromClass: User::class
-        )
-    ]
-)]
-#[ApiResource(
-    operations: [
         new Post(
             uriTemplate: '/payment/{id}',
             defaults: ['_api_receive' => false],
@@ -59,53 +51,96 @@ use Doctrine\ORM\Mapping as ORM;
             ],
             output: false,
         ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/orders',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'orders',
+                    fromClass: User::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:order']],
+        ),
+        new GetCollection(
+            uriTemplate: '/garages/{id}/orders',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'orders',
+                    fromClass: Garage::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:order']],
+        ),
+        new GetCollection(
+            uriTemplate: '/cars/{id}/orders',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'orders',
+                    fromClass: Car::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:order']],
+        ),
     ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],
+    denormalizationContext: ['groups' => ['item:post:order', 'item:put:order', 'item:patch:order']],
 )]
 class Order
 {
+    #[Groups(['collection:get:order', 'item:get:order'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $orderer = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Car $car = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?Garage $garage = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
     private ?float $totalPrice = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $appointmentDate = null;
 
+    #[Groups(['collection:get:order', 'item:get:order'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[Groups(['collection:get:order', 'item:get:order'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finalisedAt = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(nullable: true)]
     private array $stripe = [];
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::GUID, unique: true)]
     private ?string $uuid = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column]
     private ?bool $sold = null;
 

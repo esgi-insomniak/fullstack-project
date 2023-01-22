@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -14,42 +12,50 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\GarageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GarageRepository::class)]
 #[ApiResource(
-    shortName: 'garages',
     operations: [
         new GetCollection(
             paginationItemsPerPage: 10,
-            normalizationContext: ['groups' => ['garage:read:collection']],
+            normalizationContext: ['groups' => ['collection:get:garage']],
         ),
-        new Get(),
-        new Post(),
-        new Put(),
-        new Patch(),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:garage']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:garage']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:garage']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:garage']],
+        ),
         new Delete(),
     ],
-    denormalizationContext: ['groups' => ['garage:create', 'garage:update']],
+    normalizationContext: ['groups' => ['collection:get:garage', 'item:get:garage']],
+    denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
 )]
 class Garage
 {
+    #[Groups(['collection:get:garage', 'item:get:garage'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['car:read:item'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[Groups(['car:read:item'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
     #[ORM\Column(type: 'json')]
     private array $coordinates = [];
 
-    #[Groups(['car:read:item'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
     #[ORM\Column]
     private ?bool $isOpen = null;
 
@@ -59,7 +65,6 @@ class Garage
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
-    #[Groups(['garage:read:collection'])]
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
     private Collection $cars;
 

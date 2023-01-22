@@ -3,21 +3,52 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\StatusRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: StatusRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:status']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:status']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:status']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:status']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:status']],
+        ),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['collection:get:status', 'item:get:status']],
+    denormalizationContext: ['groups' => ['item:post:status', 'item:put:status', 'item:patch:status']],
+)]
 class Status
 {
+    #[Groups(['collection:get:status', 'item:get:status'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
     #[ORM\Column(length: 30)]
     private ?string $name = null;
 
+    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
     #[ORM\Column(length: 50)]
     private ?string $slug = null;
 

@@ -2,19 +2,17 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\CarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,94 +21,115 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Table(name: 'car')]
 #[UniqueEntity('slug')]
 #[ApiResource(
-    shortName: 'cars',
     operations: [
         new GetCollection(
-            paginationItemsPerPage: 2,
-            normalizationContext: ['groups' => ['car:read:collection']],
+            paginationItemsPerPage: 10,
+            normalizationContext: ['groups' => ['collection:get:car']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:car']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['car:read:item']],
+            normalizationContext: ['groups' => ['item:get:car']],
         ),
-        new Post(),
-        new Put(),
-        new Patch(),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:car']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:car']],
+        ),
         new Delete(),
+        new GetCollection(
+            uriTemplate: '/garages/{id}/cars',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'cars',
+                    fromClass: Garage::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:cars']],
+        ),
+        new GetCollection(
+            uriTemplate: '/car_identities/{id}/cars',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'cars',
+                    fromClass: CarIdentity::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:cars']],
+        ),
     ],
-    denormalizationContext: ['groups' => ['car:create', 'car:update']],
+    normalizationContext: ['groups' => ['collection:get:car', 'item:get:car']],
+    denormalizationContext: ['groups' => ['item:post:car', 'item:put:car', 'item:patch:car']],
 )]
-//paginate by 10 items per page "cars" collection
-
 class Car
 {
-    #[Groups(['car:read:item', 'car:read:collection', 'garage:read:item', 'garage:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column(length: 20)]
     private ?string $fuel = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column(nullable: true)]
     private ?int $power = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column]
     private ?int $weight = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column]
     private ?float $speeding = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column(nullable: true)]
     private ?float $consumption = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column]
     private ?float $price = null;
 
-    #[Groups(['car:read:item'])]
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Order::class)]
     private Collection $orders;
 
-    #[Groups(['car:read:item'])]
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column]
     private ?int $year = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column(type: 'json')]
     private array $options = [];
 
-    #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
     #[ORM\ManyToMany(targetEntity: Image::class)]
     private Collection $images;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column(length: 10)]
     private ?string $gearboxType = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column]
     private ?int $mileage = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update', 'car:read:collection'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CarIdentity $identity = null;
 
-    #[Groups(['car:read:item', 'car:create', 'car:update'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\ManyToOne(inversedBy: 'cars')]
     private ?Garage $garage = null;
 

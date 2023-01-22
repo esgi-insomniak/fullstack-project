@@ -3,48 +3,117 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\RecoveryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RecoveryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:recovery']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:recovery']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:recovery']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:recovery']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:recovery']],
+        ),
+        new Delete(),
+        new GetCollection(
+            uriTemplate: '/users/{id}/recoveries',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'recoveries',
+                    fromClass: User::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:recovery']],
+        ),
+        new GetCollection(
+            uriTemplate: '/garages/{id}/recoveries',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'recoveries',
+                    fromClass: Garage::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:recovery']],
+        ),
+        new GetCollection(
+            uriTemplate: '/cars/{id}/recoveries',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'recoveries',
+                    fromClass: Car::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:recovery']],
+        ),
+    ],
+    normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:recovery']],
+    denormalizationContext: ['groups' => ['item:post:recovery', 'item:put:recovery', 'item:patch:recovery']],
+)]
 class Recovery
 {
+    #[Groups(['collection:get:recovery', 'item:get:recovery'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery'])]
     #[ORM\ManyToOne(inversedBy: 'recoveries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Car $car = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery'])]
     #[ORM\ManyToOne(inversedBy: 'recoveries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $recover = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery'])]
     #[ORM\ManyToOne(inversedBy: 'recoveries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Garage $garage = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $carDescription = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
     #[ORM\Column]
-    private ?float $proposed_price = null;
+    private ?float $proposedPrice = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:put:recovery', 'item:patch:recovery'])]
     #[ORM\Column]
-    private ?float $total_price = null;
+    private ?float $totalPrice = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery'])]
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery'])]
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -113,48 +182,48 @@ class Recovery
 
     public function getProposedPrice(): ?float
     {
-        return $this->proposed_price;
+        return $this->proposedPrice;
     }
 
-    public function setProposedPrice(float $proposed_price): self
+    public function setProposedPrice(float $proposedPrice): self
     {
-        $this->proposed_price = $proposed_price;
+        $this->proposedPrice = $proposedPrice;
 
         return $this;
     }
 
     public function getTotalPrice(): ?float
     {
-        return $this->total_price;
+        return $this->totalPrice;
     }
 
-    public function setTotalPrice(float $total_price): self
+    public function setTotalPrice(float $totalPrice): self
     {
-        $this->total_price = $total_price;
+        $this->totalPrice = $totalPrice;
 
         return $this;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
