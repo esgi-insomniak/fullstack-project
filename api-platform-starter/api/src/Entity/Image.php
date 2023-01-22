@@ -3,32 +3,74 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\ImageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ImageRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:image']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:image']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:image']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:image']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:image']],
+        ),
+        new Delete(),
+        new GetCollection(
+            uriTemplate: '/cars/{id}/images',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'images',
+                    fromClass: Car::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:image']],
+        ),
+    ],
+    normalizationContext: ['groups' => ['collection:get:image', 'item:get:image']],
+    denormalizationContext: ['groups' => ['item:post:image', 'item:put:image', 'item:patch:image']],
+)]
 class Image
 {
+    #[Groups(['collection:get:image', 'item:get:image'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:image', 'item:get:image', 'item:post:image', 'item:put:image', 'item:patch:image'])]
     #[ORM\Column(length: 1500, unique: true)]
     private ?string $src = null;
 
+    #[Groups(['collection:get:image', 'item:get:image', 'item:post:image', 'item:put:image', 'item:patch:image'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $uploadedBy = null;
 
+    #[Groups(['collection:get:image', 'item:get:image'])]
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?\DateTimeImmutable $createdAt = null;
 
+    #[Groups(['collection:get:image', 'item:get:image'])]
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -61,24 +103,24 @@ class Image
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
-        $this->updated_at = $updated_at;
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

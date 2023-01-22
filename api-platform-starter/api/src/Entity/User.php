@@ -27,12 +27,22 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
 
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(processor: UserPasswordHasher::class),
-        new Get(),
-        new Put(processor: UserPasswordHasher::class),
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:user']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:user']],
+            processor: UserPasswordHasher::class
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:user']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:user']],
+            processor: UserPasswordHasher::class
+        ),
         new Patch(
-            denormalizationContext: ['groups' => ['user:update']],
+            denormalizationContext: ['groups' => ['item:patch:user']],
             processor: UserPasswordHasher::class
         ),
         new Delete(),
@@ -42,11 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
             controller: ConfirmationEmailController::class,
             openapiContext: [
                 'requestBody' => [
-                    'content' => [
-                        'application/ld+json' => [
-                            'schema' => [],
-                        ],
-                    ],
+                    'content' => [],
                 ],
             ],
             output: false,
@@ -114,15 +120,15 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
             output: false,
         )
     ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    normalizationContext: ['groups' => ['collection:get:user', 'item:get:user']],
+    denormalizationContext: ['groups' => ['item:post:user', 'item:put:user', 'item:patch:user']],
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity('email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Groups(['user:read'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -130,16 +136,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Assert\NotBlank]
     #[Assert\Email]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
-    #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['item:post:user', 'item:put:user', 'item:patch:user'])]
     private ?string $plainPassword = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -149,7 +155,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $recoveryToken;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    #[Groups(['user:read'])]
+    #[Groups(['item:get:user'])]
     private $haveRecoverToken = false;
 
     /**
@@ -158,30 +164,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $password = '';
 
-    #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(length: 50)]
     private ?string $firstName = null;
 
 
-    #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(length: 50)]
     private ?string $lastName = null;
 
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $verifiedAt = null;
 
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(type: 'json')]
     private array $coordinates;
 
-    #[Groups(['user:read'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
-    #[Groups(['user:read'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Column(type: 'datetime_immutable', nullable: true, options: ['default' => null])]
     private ?DateTimeImmutable $updatedAt = null;
 

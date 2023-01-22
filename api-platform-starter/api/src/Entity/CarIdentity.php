@@ -3,6 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\CarIdentityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,19 +17,51 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CarIdentityRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:carIdentity']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:carIdentity']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:carIdentity']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:carIdentity']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:carIdentity']],
+        ),
+        new Delete(),
+        new GetCollection(
+            uriTemplate: '/car_categories/{id}/car_identities',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'carIdentities',
+                    fromClass: CarCategory::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:carIdentity']],
+        ),
+    ],
+    normalizationContext: ['groups' => ['collection:get:carIdentity', 'item:get:carIdentity']],
+    denormalizationContext: ['groups' => ['item:post:carIdentity', 'item:put:carIdentity', 'item:patch:carIdentity']],
+)]
 class CarIdentity
 {
+    #[Groups(['collection:get:carIdentity', 'item:get:carIdentity'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:carIdentity', 'item:get:carIdentity', 'item:post:carIdentity', 'item:put:carIdentity', 'item:patch:carIdentity'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:carIdentity', 'item:get:carIdentity', 'item:post:carIdentity', 'item:put:carIdentity', 'item:patch:carIdentity'])]
     #[ORM\ManyToOne(inversedBy: 'carIdentities')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CarCategory $category = null;
