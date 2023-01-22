@@ -100,6 +100,16 @@ const routes = [
         path: '/garage',
         name: 'Garage',
         component: () => import('../views/Garage.vue'),
+    },
+    {
+        path: '/forgot_password',
+        name: 'ForgotPassword',
+        component: () => import('../views/ForgotPassword.vue'),
+    },
+    {
+        path: '/account_recovery/:token',
+        name: 'AccountRecovery',
+        component: () => import('../views/AccountRecovery.vue'),
     }
 ]
 

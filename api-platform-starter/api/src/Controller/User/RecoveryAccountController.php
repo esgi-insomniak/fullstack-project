@@ -49,7 +49,6 @@ class RecoveryAccountController extends AbstractController
                 ->to($user->getEmail());
 
             $this->mailer->send($email);
-            dump($this->mailer);die;
         }
 
         return $this->json([

@@ -34,6 +34,10 @@ const handleLogin = () => {
     });
 }
 
+const handleForgotPassword = () => {
+  router.push('/forgot_password');
+}
+
 onMounted(() => {
   if (loggedIn.value) {
     router.push('/home');
@@ -53,7 +57,7 @@ onMounted(() => {
           <FormKit type="password" name="password" label="Password" placeholder="Mot de passe"
             validation="required|password" v-model="password" />
         </FormKit>
-        <div class="text-blue-500 hover:underline hover:cursor-pointer">
+        <div class="text-blue-500 hover:underline hover:cursor-pointer" @click="handleForgotPassword">
           Mot de passe oublié ?
         </div>
 
