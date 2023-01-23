@@ -138,6 +138,11 @@ const routes = [
         path: '/account_recovery/:token',
         name: 'AccountRecovery',
         component: () => import('../views/AccountRecovery.vue'),
+    },
+    {
+        path: '/model',
+        name: 'Model',
+        component: () => import('../views/CarModel.vue'),
     }
 ]
 

@@ -5,6 +5,14 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    flexDirection: {
+        type: String,
+        default: 'flex-col',
+    },
+    positionFlex: {
+        type: String,
+        default: 'justify-center',
+    },
 })
 const selected = ref(0)
 const handleChange = (option) => {
@@ -14,9 +22,18 @@ const handleChange = (option) => {
 </script>  
 
 <template>
-    <div class="w-full px-4 py-16">
-        <div class="mx-auto w-full max-w-md">
-            <div class="space-y-2">
+    <div :class="[
+        'w-full',
+        { 'px-4 py-2': flexDirection === 'flex-col' }
+    ]">
+        <div class="mx-auto">
+            <div :class="[
+                'flex flex-wrap {{ positionFlex }}',
+                {
+                    'flex-row space-x-2': flexDirection === 'flex-row',
+                    'flex-col': flexDirection === 'flex-col',
+                }
+            ]">
                 <template v-for="(option, index) in options" :key="index">
                     <div :class="[
                         'relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none',

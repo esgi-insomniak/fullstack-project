@@ -83,7 +83,7 @@ const previousQuestion = (e) => {
         <div v-for="(question, index) in questions" :key="index" v-if="currentQuestion === index">
             <label class="block text-white font-medium">{{ question.name }}</label>
             <div v-if="question.type === 'radio'">
-                <RadioGroup :options="question.options" />
+                <RadioGroup :options="question.options" flex-direction="flex-col" />
             </div>
             <div v-if="question.type === 'select'">
                 <select
