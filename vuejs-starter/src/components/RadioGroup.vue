@@ -31,7 +31,7 @@ const handleChange = (option) => {
                 'flex flex-wrap {{ positionFlex }}',
                 {
                     'flex-row space-x-2': flexDirection === 'flex-row',
-                    'flex-col': flexDirection === 'flex-col',
+                    'flex-col space-y-2': flexDirection === 'flex-col',
                 }
             ]">
                 <template v-for="(option, index) in options" :key="index">

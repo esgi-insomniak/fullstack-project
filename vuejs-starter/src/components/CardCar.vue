@@ -14,14 +14,11 @@ const props = defineProps({
         required: true,
     },
 })
-const collapseInfo = ref(false);
-const handleCollapseInfo = () => {
-    collapseInfo.value = !collapseInfo.value;
-}
+
 </script>
 <template>
     <div class="w-full h-full flex flex-col items-center justify-start">
-        <div class="w-80 h-56 flex items-center justify-center" @click="handleCollapseInfo">
+        <div class="w-80 h-56 flex items-center justify-center cursor-pointer">
             <img :src="mainPicture.src"
                 class="w-full h-full object-cover bg-cover hover:scale-110 duration-150 ease-in-out" />
         </div>
@@ -29,9 +26,10 @@ const handleCollapseInfo = () => {
             <span class="font-bold text-sm">{{ name }}</span>
             <span class="font-bold text-sm">{{ category.name }}</span>
         </div>
-        <div v-show="!!collapseInfo" class="h-64 w-full bg-white">
-            Je suis l'info
+        <!--
+        <div v-show="!!collapseInfo" class="h-64 w-96 bg-white">
+            <span class="text-black">Je suis l'info</span>
         </div>
-
+        -->
     </div>
 </template>
