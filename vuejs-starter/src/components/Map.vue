@@ -83,7 +83,6 @@ loader.loadJawgPlaces().then((jawg) => {
   const map = new L.map('mapContainer').setView(props.coordinates, props.zoom);
 
   // display pointsToDisplay
-  console.log(props.pointsToDisplay);
   props.pointsToDisplay.forEach(point => {
     L.marker(point.coordinates, {icon: props.iconToDisplay}).addTo(map).bindPopup(point.name);
   });
@@ -93,7 +92,7 @@ loader.loadJawgPlaces().then((jawg) => {
       {
         attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank" class="jawg-attrib">&copy; <b>Jawg</b>Maps</a> | <a href="https://www.openstreetmap.org/copyright" title="OpenStreetMap is open data licensed under ODbL" target="_blank" class="osm-attrib">&copy; OSM contributors</a>',
         maxZoom: 22,
-        scale: 1,
+        scale: 2,
         tileSize: 256,
       }
   ));

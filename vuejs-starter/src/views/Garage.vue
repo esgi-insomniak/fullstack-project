@@ -58,19 +58,17 @@ import L from 'leaflet';
 const garages = ref([]);
 
 onBeforeMount(async () => {
-  garages.value = await GarageService.getGarages();
+  garages.value = await GarageService.getCollection()
 });
 
 const nextGarages = ({type, geometry, properties, bbox}) => {
   const coordinates = geometry.coordinates;
-
 };
 
 </script>
 <template>
   <Map
       v-if="garages.length > 0"
-      :click="clickT"
       :zoom="11"
       :icon-to-display="new L.icon({
         iconUrl: '/src/assets/bmw_logo.png',
