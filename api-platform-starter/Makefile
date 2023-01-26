@@ -35,6 +35,10 @@ schema: ## Update the database schema
 	docker compose exec php bin/console doctrine:schema:update --force
 drop-data:
 	docker compose exec php bin/console doctrine:schema:drop --force --full-database
+drop-database:
+	docker compose exec php bin/console doctrine:database:drop --force --if-exists
+create-database:
+	docker compose exec php bin/console doctrine:database:create
 bash: ## Open a bash shell in the php container
 	docker compose exec php sh
 composer: ## Run composer
