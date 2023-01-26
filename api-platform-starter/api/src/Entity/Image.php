@@ -18,13 +18,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:image']],
+            normalizationContext: ['groups' => ['collection:get:image', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:image']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:image']],
+            normalizationContext: ['groups' => ['item:get:image', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:image']],
@@ -41,15 +41,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Car::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:image']],
+            normalizationContext: ['groups' => ['collection:get:image', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:image', 'item:get:image']],
     denormalizationContext: ['groups' => ['item:post:image', 'item:put:image', 'item:patch:image']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Image
 {
-    #[Groups(['collection:get:image', 'item:get:image'])]
+    #[Groups(['collection:get:image', 'item:get:image', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

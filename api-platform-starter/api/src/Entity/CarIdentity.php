@@ -20,13 +20,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:carIdentity']],
+            normalizationContext: ['groups' => ['collection:get:carIdentity', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:carIdentity']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:carIdentity']],
+            normalizationContext: ['groups' => ['item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:carIdentity']],
@@ -43,15 +43,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: CarCategory::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:carIdentity']],
+            normalizationContext: ['groups' => ['collection:get:carIdentity', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:carIdentity', 'item:get:carIdentity']],
     denormalizationContext: ['groups' => ['item:post:carIdentity', 'item:put:carIdentity', 'item:patch:carIdentity']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class CarIdentity
 {
-    #[Groups(['collection:get:carIdentity', 'item:get:carIdentity'])]
+    #[Groups(['collection:get:carIdentity', 'item:get:carIdentity', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

@@ -28,14 +28,14 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:user']],
+            normalizationContext: ['groups' => ['collection:get:user', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:user']],
             processor: UserPasswordHasher::class
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:user']],
+            normalizationContext: ['groups' => ['item:get:user', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:user']],
@@ -122,13 +122,16 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
     ],
     normalizationContext: ['groups' => ['collection:get:user', 'item:get:user']],
     denormalizationContext: ['groups' => ['item:post:user', 'item:put:user', 'item:patch:user']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity('email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Groups(['collection:get:user', 'item:get:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

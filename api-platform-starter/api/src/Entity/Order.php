@@ -21,13 +21,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:order']],
+            normalizationContext: ['groups' => ['collection:get:order', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:order']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:order']],
+            normalizationContext: ['groups' => ['item:get:order', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:order']],
@@ -59,7 +59,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: User::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order']],
+            normalizationContext: ['groups' => ['collection:get:order', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/orders',
@@ -69,7 +69,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order']],
+            normalizationContext: ['groups' => ['collection:get:order', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/orders',
@@ -79,15 +79,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Car::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order']],
+            normalizationContext: ['groups' => ['collection:get:order', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],
     denormalizationContext: ['groups' => ['item:post:order', 'item:put:order', 'item:patch:order']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Order
 {
-    #[Groups(['collection:get:order', 'item:get:order'])]
+    #[Groups(['collection:get:order', 'item:get:order', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

@@ -19,13 +19,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:carCategory']],
+            normalizationContext: ['groups' => ['collection:get:carCategory', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:carCategory']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:carCategory']],
+            normalizationContext: ['groups' => ['item:get:carCategory', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:carCategory']],
@@ -37,10 +37,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     normalizationContext: ['groups' => ['collection:get:carCategory', 'item:get:carCategory']],
     denormalizationContext: ['groups' => ['item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class CarCategory
 {
-    #[Groups(['collection:get:carCategory', 'item:get:carCategory'])]
+    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -50,7 +53,7 @@ class CarCategory
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
-    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory'])]
+    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory', 'id'])]
     #[ORM\Column(length: 80, unique: true)]
     private ?string $slug = null;
 

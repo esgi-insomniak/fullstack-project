@@ -18,13 +18,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:recovery']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:recovery']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:recovery']],
+            normalizationContext: ['groups' => ['item:get:recovery', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:recovery']],
@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: User::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:recovery']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/recoveries',
@@ -51,7 +51,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:recovery']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/recoveries',
@@ -61,15 +61,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Car::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:recovery']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:recovery']],
     denormalizationContext: ['groups' => ['item:post:recovery', 'item:put:recovery', 'item:patch:recovery']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Recovery
 {
-    #[Groups(['collection:get:recovery', 'item:get:recovery'])]
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

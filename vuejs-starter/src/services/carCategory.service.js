@@ -1,9 +1,9 @@
 import { getAxiosInstance } from "../helpers/axios/config.js";
 
-class UserService {
+class CarCategoryService {
   async getCollection(params = null) {
     return getAxiosInstance()
-      .get("users", { params: params })
+      .get("car_categories", { params: params })
       .then((response) => {
         return response.data;
       });
@@ -11,23 +11,31 @@ class UserService {
 
   async get(id) {
     return getAxiosInstance()
-      .get(`users/${id}`)
+      .get(`car_categories/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 
-  async put(id, user) {
+  async post(carCategory) {
     return getAxiosInstance()
-      .put(`users/${id}`, user)
+      .post("car_categories", carCategory)
       .then((response) => {
         return response.data;
       });
   }
 
-  async patch(id, user) {
+  async put(id, carCategory) {
     return getAxiosInstance()
-      .patch(`users/${id}`, user)
+      .put(`car_categories/${id}`, carCategory)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async patch(id, carCategory) {
+    return getAxiosInstance()
+      .patch(`car_categories/${id}`, carCategory)
       .then((response) => {
         return response.data;
       });
@@ -35,11 +43,11 @@ class UserService {
 
   async delete(id) {
     return getAxiosInstance()
-      .delete(`users/${id}`)
+      .delete(`car_categories/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 }
 
-export default new UserService();
+export default new CarCategoryService();

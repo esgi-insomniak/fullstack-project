@@ -17,13 +17,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:status']],
+            normalizationContext: ['groups' => ['collection:get:status', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:status']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:status']],
+            normalizationContext: ['groups' => ['item:get:status', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:status']],
@@ -35,10 +35,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     normalizationContext: ['groups' => ['collection:get:status', 'item:get:status']],
     denormalizationContext: ['groups' => ['item:post:status', 'item:put:status', 'item:patch:status']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Status
 {
-    #[Groups(['collection:get:status', 'item:get:status'])]
+    #[Groups(['collection:get:status', 'item:get:status', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -48,7 +51,7 @@ class Status
     #[ORM\Column(length: 30)]
     private ?string $name = null;
 
-    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
+    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status', 'id'])]
     #[ORM\Column(length: 50)]
     private ?string $slug = null;
 

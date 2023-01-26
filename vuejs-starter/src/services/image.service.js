@@ -1,9 +1,9 @@
 import { getAxiosInstance } from "../helpers/axios/config.js";
 
-class UserService {
+class ImageService {
   async getCollection(params = null) {
     return getAxiosInstance()
-      .get("users", { params: params })
+      .get("images", { params: params })
       .then((response) => {
         return response.data;
       });
@@ -11,23 +11,39 @@ class UserService {
 
   async get(id) {
     return getAxiosInstance()
-      .get(`users/${id}`)
+      .get(`images/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 
-  async put(id, user) {
+  async getCarImages(id, params = null) {
     return getAxiosInstance()
-      .put(`users/${id}`, user)
+      .get(`cars/${id}/images`, { params: params })
       .then((response) => {
         return response.data;
       });
   }
 
-  async patch(id, user) {
+  async post(image) {
     return getAxiosInstance()
-      .patch(`users/${id}`, user)
+      .post("images", image)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async put(id, image) {
+    return getAxiosInstance()
+      .put(`images/${id}`, image)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async patch(id, image) {
+    return getAxiosInstance()
+      .patch(`images/${id}`, image)
       .then((response) => {
         return response.data;
       });
@@ -35,11 +51,11 @@ class UserService {
 
   async delete(id) {
     return getAxiosInstance()
-      .delete(`users/${id}`)
+      .delete(`images/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 }
 
-export default new UserService();
+export default new ImageService();
