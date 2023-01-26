@@ -11,17 +11,23 @@ const loader = new JawgJSLoader({ accessToken: 'rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4
 const formData = reactive({});
 const editMode = ref(true);
 const cars = ref([]);
+const me = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  coordinates: [],
+});
 
 const handleSendUpdate = async (form) => {
     const response = await UserService.Patch('me', form);
 };
 
 onMounted(async () => {
-    const me = await UserService.get('me');
-    formData.firstName = me.firstName;
-    formData.lastName = me.lastName;
-    formData.email = me.email;
-    formData.coordinates = me.coordinates;
+    me.value = await UserService.get('me');
+    formData.firstName = me.value.firstName;
+    formData.lastName = me.value.lastName;
+    formData.email = me.value.email;
+    formData.coordinates = me.value.coordinates;
 
     loader.loadJawgPlaces().then((JawgPlaces) => {
       let jawgPlaces = new JawgPlaces.Input({
@@ -30,9 +36,8 @@ onMounted(async () => {
       });
     });
 
-    cars.value = await CarService.loadCarIdentities();
-    console.log(cars.value);
-  });
+  cars.value = await CarService.loadCarIdentities();
+});
 </script>
 <template>
     <div class="mx-auto flex justify-center items-center h-full">
@@ -40,7 +45,7 @@ onMounted(async () => {
             <div
                 class="bg-[url('/public/bg_header2.jpg')] w-full h-[30vh] bg-center bg-cover relative rounded-t-lg shadow-xl shadow-slate-500">
                 <div class="absolute w-full flex justify-center -bottom-14">
-                    <Avatar name="Loan CLERIS" :color="{ background: 'bg-gray-900/80', text: 'text-white' }" />
+                    <Avatar :name="me.firstName + ' ' + me.lastName" :color="{ background: 'bg-gray-900/80', text: 'text-white' }" />
                     <div class="h-10 w-10 bottom-0 right-5 absolute rounded-full bg-white/10 p-3 items-center flex hover:bg-white/20 cursor-pointer z-10"
                         @click="editMode = !editMode">
                         <PencilIcon class="w-8 h-8" />
@@ -70,34 +75,6 @@ onMounted(async () => {
                         <span>BMW {{ car.name }}</span>
                       </div>
 
-                      <!--
-
-                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
-                          <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
-                          <span>BMW Serie 1 | 2022</span>
-                      </div>
-
-                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
-                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
-                        <span>BMW Serie 1 | 2022</span>
-                      </div>
-
-                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
-                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
-                        <span>BMW Serie 1 | 2022</span>
-                      </div>
-
-                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
-                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
-                        <span>BMW Serie 1 | 2022</span>
-                      </div>
-
-                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10">
-                        <img src="../../assets/bmw_serie_1.png" alt="" class="hover:scale-150 ease-in-out duration-500" />
-                        <span>BMW Serie 1 | 2022</span>
-                      </div>
-
-                      -->
                     </div>
                 </div>
             </div>

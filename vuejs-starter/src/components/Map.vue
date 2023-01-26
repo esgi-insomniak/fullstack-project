@@ -41,7 +41,7 @@ const props = defineProps({
       return ['streets', 'dark', 'light', 'terrain', 'sunny'].includes(value);
     }
   },
-  onClick: {
+  click: {
     type: Function,
     required: false,
     default: () => {},
@@ -63,6 +63,16 @@ const props = defineProps({
     required: false,
     default: () => [],
   },
+  iconToDisplay: {
+    type: Object,
+    required: false,
+    default: () => new L.icon({
+      iconUrl: '',
+      iconSize: [25, 41],
+      iconAnchor: [13, 41],
+      popupAnchor: [0, -41]
+    }),
+  },
 });
 
 
@@ -75,7 +85,7 @@ loader.loadJawgPlaces().then((jawg) => {
   // display pointsToDisplay
   console.log(props.pointsToDisplay);
   props.pointsToDisplay.forEach(point => {
-    L.marker(point.coordinates).addTo(map).bindPopup(point.name);
+    L.marker(point.coordinates, {icon: props.iconToDisplay}).addTo(map).bindPopup(point.name);
   });
 
   map.addLayer(new L.TileLayer(
@@ -102,7 +112,7 @@ loader.loadJawgPlaces().then((jawg) => {
       L: L,
       onFeatures: props.onSuccess,
       onError: props.onError,
-      onClick: props.onClick,
+      onClick: props.click,
     });
     map.addControl(control);
   }

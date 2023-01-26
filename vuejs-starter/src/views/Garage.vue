@@ -50,21 +50,38 @@ onMounted(() => {
 
 <script setup>
 import GarageService from "../services/garage.service.js";
-import {onMounted, ref, defineAsyncComponent} from "vue";
+import {onMounted, ref, defineAsyncComponent, onBeforeMount} from "vue";
+import Map from "../components/Map.vue";
+import L from 'leaflet';
 
-const MapLoader = defineAsyncComponent(() => import("../components/Map.vue"));
+//const MapLoader = defineAsyncComponent(() => import("../components/Map.vue"));
 const garages = ref([]);
 
-onMounted(async () => {
+onBeforeMount(async () => {
   garages.value = await GarageService.getGarages();
 });
 
+const nextGarages = ({type, geometry, properties, bbox}) => {
+  const coordinates = geometry.coordinates;
+
+};
+
 </script>
 <template>
-  <MapLoader :zoom="11" :points-to-display="garages.map(garage => {
+  <Map
+      v-if="garages.length > 0"
+      :click="clickT"
+      :zoom="11"
+      :icon-to-display="new L.icon({
+        iconUrl: '/src/assets/bmw_logo.png',
+        iconSize: [35, 35],
+        iconAnchor: [13, 41],
+        popupAnchor: [0, -41]
+      })"
+      :points-to-display="garages.map(garage => {
     return {
       name: garage.name,
-      coordinates: [garage.coordinates[0], garage.coordinates[1]]
+      coordinates: [garage.coordinates[0], garage.coordinates[1]],
     }
   })" />
 </template>
