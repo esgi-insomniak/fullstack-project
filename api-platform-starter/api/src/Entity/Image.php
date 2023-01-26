@@ -58,7 +58,7 @@ class Image
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['collection:get:image', 'item:get:image', 'item:post:image', 'item:put:image', 'item:patch:image'])]
+    #[Groups(['collection:get:image', 'item:get:image', 'item:post:image', 'item:put:image', 'item:patch:image', 'id'])]
     #[ORM\Column(length: 1500, unique: true)]
     private ?string $src = null;
 

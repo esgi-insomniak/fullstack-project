@@ -72,7 +72,7 @@ class CarIdentity
     #[ORM\OneToMany(mappedBy: 'identity', targetEntity: Car::class, orphanRemoval: true)]
     private Collection $cars;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:carIdentity', 'item:get:carIdentity'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Image $mainPicture = null;

@@ -4,7 +4,6 @@ import { onMounted, reactive, ref } from 'vue';
 import { PencilIcon } from '@heroicons/vue/24/outline';
 import UserService from "../../services/user.service.js";
 import JawgJSLoader from '@jawg/js-loader';
-import CarService from "../../services/car.service.js";
 
 const loader = new JawgJSLoader({ accessToken: 'rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ' });
 
@@ -19,7 +18,7 @@ const me = ref({
 });
 
 const handleSendUpdate = async (form) => {
-    const response = await UserService.Patch('me', form);
+    const response = await UserService.patch('me', form);
 };
 
 onMounted(async () => {
@@ -28,15 +27,7 @@ onMounted(async () => {
     formData.lastName = me.value.lastName;
     formData.email = me.value.email;
     formData.coordinates = me.value.coordinates;
-
-    loader.loadJawgPlaces().then((JawgPlaces) => {
-      let jawgPlaces = new JawgPlaces.Input({
-        input: '#address',
-        searchOnTyping: true
-      });
-    });
-
-  cars.value = await CarService.loadCarIdentities();
+    //formData.address = me.value.address;
 });
 </script>
 <template>
@@ -63,19 +54,9 @@ onMounted(async () => {
                     </FormKit>
                 </div>
                 <div class="w-3/4">
-
                     <h2 class="text-2xl font-bold text-white/80 mt-10 mb-5">
                       Mes Favoris
                     </h2>
-
-                    <div class="grid grid-flow-row md:grid-cols-2 sm:grid-cols-1 gap-2">
-
-                      <div class="object-cover flex items-center flex-col text-center rounded-lg bg-white/10" v-for="car in cars">
-                        <img :src="car.mainPicture.src" :alt="car.name" class="hover:scale-150 ease-in-out duration-500" />
-                        <span>BMW {{ car.name }}</span>
-                      </div>
-
-                    </div>
                 </div>
             </div>
         </div>
