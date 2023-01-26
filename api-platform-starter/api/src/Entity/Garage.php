@@ -19,14 +19,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            paginationItemsPerPage: 10,
-            normalizationContext: ['groups' => ['collection:get:garage']],
+            normalizationContext: ['groups' => ['collection:get:garage', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garage']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:garage']],
+            normalizationContext: ['groups' => ['item:get:garage', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garage']],
@@ -38,10 +37,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     normalizationContext: ['groups' => ['collection:get:garage', 'item:get:garage']],
     denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Garage
 {
-    #[Groups(['collection:get:garage', 'item:get:garage'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

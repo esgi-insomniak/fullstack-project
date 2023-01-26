@@ -23,14 +23,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            paginationItemsPerPage: 10,
-            normalizationContext: ['groups' => ['collection:get:car']],
+            normalizationContext: ['groups' => ['collection:get:car', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:car']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:car']],
+            normalizationContext: ['groups' => ['item:get:car', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:car']],
@@ -47,7 +46,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:cars']],
+            normalizationContext: ['groups' => ['collection:get:car', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/car_identities/{id}/cars',
@@ -57,21 +56,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: CarIdentity::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:cars']],
+            normalizationContext: ['groups' => ['collection:get:car', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:car', 'item:get:car']],
     denormalizationContext: ['groups' => ['item:post:car', 'item:put:car', 'item:patch:car']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Car
 {
-    #[Groups(['collection:get:car', 'item:get:car'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car', 'id'])]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
 
@@ -113,6 +115,7 @@ class Car
     #[ORM\Column(type: 'json')]
     private array $options = [];
 
+    #[Groups(['collection:get:car', 'item:get:car'])]
     #[ORM\ManyToMany(targetEntity: Image::class)]
     private Collection $images;
 

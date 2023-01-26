@@ -1,9 +1,9 @@
 import { getAxiosInstance } from "../helpers/axios/config.js";
 
-class UserService {
+class StatusService {
   async getCollection(params = null) {
     return getAxiosInstance()
-      .get("users", { params: params })
+      .get("statuses", { params: params })
       .then((response) => {
         return response.data;
       });
@@ -11,23 +11,31 @@ class UserService {
 
   async get(id) {
     return getAxiosInstance()
-      .get(`users/${id}`)
+      .get(`statuses/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 
-  async put(id, user) {
+  async post(status) {
     return getAxiosInstance()
-      .put(`users/${id}`, user)
+      .post("statuses", status)
       .then((response) => {
         return response.data;
       });
   }
 
-  async patch(id, user) {
+  async put(id, status) {
     return getAxiosInstance()
-      .patch(`users/${id}`, user)
+      .put(`statuses/${id}`, status)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async patch(id, status) {
+    return getAxiosInstance()
+      .patch(`statuses/${id}`, status)
       .then((response) => {
         return response.data;
       });
@@ -35,11 +43,11 @@ class UserService {
 
   async delete(id) {
     return getAxiosInstance()
-      .delete(`users/${id}`)
+      .delete(`statuses/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 }
 
-export default new UserService();
+export default new StatusService();

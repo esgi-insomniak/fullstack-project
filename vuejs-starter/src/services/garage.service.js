@@ -1,9 +1,9 @@
 import { getAxiosInstance } from "../helpers/axios/config.js";
 
-class UserService {
+class GarageService {
   async getCollection(params = null) {
     return getAxiosInstance()
-      .get("users", { params: params })
+      .get("garages", { params: params })
       .then((response) => {
         return response.data;
       });
@@ -11,23 +11,31 @@ class UserService {
 
   async get(id) {
     return getAxiosInstance()
-      .get(`users/${id}`)
+      .get(`garages/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 
-  async put(id, user) {
+  async post(garage) {
     return getAxiosInstance()
-      .put(`users/${id}`, user)
+      .post("garages", garage)
       .then((response) => {
         return response.data;
       });
   }
 
-  async patch(id, user) {
+  async put(id, garage) {
     return getAxiosInstance()
-      .patch(`users/${id}`, user)
+      .put(`garages/${id}`, garage)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async patch(id, garage) {
+    return getAxiosInstance()
+      .patch(`garages/${id}`, garage)
       .then((response) => {
         return response.data;
       });
@@ -35,11 +43,11 @@ class UserService {
 
   async delete(id) {
     return getAxiosInstance()
-      .delete(`users/${id}`)
+      .delete(`garages/${id}`)
       .then((response) => {
         return response.data;
       });
   }
 }
 
-export default new UserService();
+export default new GarageService();
