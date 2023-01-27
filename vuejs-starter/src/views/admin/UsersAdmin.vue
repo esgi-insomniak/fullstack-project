@@ -1,20 +1,14 @@
 <script setup>
-import {getAxiosInstance} from "../../helpers/axios/config.js";
 import { ref, onMounted } from 'vue';
+import userService from "../../services/user.service";
 
 const users = ref([]);
 const loading = ref(true);
 const currentPage = ref(1);
 
 onMounted(async () => {
-    await getAxiosInstance().get('/users?page='+currentPage.value)
-        .then(response => {
-            users.value = response.data;
-            loading.value = false;
-        })
-        .catch(error => {
-            console.log(error)
-        });
+    users.value = await userService.getCollection({page: currentPage.value});
+    loading.value = false;
 });
 console.log(users);
 const editUser = (id) => {
@@ -22,14 +16,12 @@ const editUser = (id) => {
 };
 
 const deleteUser = async (id) => {
-  await getAxiosInstance().delete('/users/' + id)
-      .then(response => {
-          console.log(response);
-      })
-      .catch(error => {
-          alert('L\'utilisateur ne peut être supprimer, il est lié à une commande')
-          console.log(error)
-      });
+  await userService.delete(id).then(response => {
+    console.log(response);
+  }).catch(error => {
+    alert('L\'utilisateur ne peut être supprimer, il est lié à une commande')
+    console.log(error)
+  });
 };
 
 const createUser = () => {
@@ -39,27 +31,23 @@ const createUser = () => {
 const previousPage = async () => {
     if(currentPage.value > 1) {
         currentPage.value--;
-        await getAxiosInstance().get('/users?page='+currentPage.value)
-            .then(response => {
-                users.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+        await userService.getCollection({page: currentPage.value}).then(response => {
+            users.value = response;
+            loading.value = false;
+        }).catch(error => {
+            console.log(error)
+        });
     }
 };
 
 const nextPage = async () => {
     currentPage.value++;
-    await getAxiosInstance().get('/users?page='+currentPage.value)
-        .then(response => {
-            users.value = response.data;
-            loading.value = false;
-        })
-        .catch(error => {
-            console.log(error)
-        });
+    await userService.getCollection({page: currentPage.value}).then(response => {
+        users.value = response;
+        loading.value = false;
+    }).catch(error => {
+        console.log(error)
+    });
 };
 </script>
 

@@ -1,6 +1,8 @@
 <script setup>
-    import {getAxiosInstance} from "../../helpers/axios/config.js";
     import { ref, onMounted } from 'vue';
+    import carService from "../../services/car.service";
+    import userService from "../../services/user.service";
+    import orderService from "../../services/order.service";
 
     const users = ref([]);
     const voiture = ref([]);
@@ -10,32 +12,9 @@
     const currentPage = ref(1);
 
     onMounted(async () => {
-        await getAxiosInstance().get('/users')
-            .then(response => {
-                users.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
-        
-        await getAxiosInstance().get('/cars')
-            .then(response => {
-                voiture.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
-        
-        await getAxiosInstance().get('/orders')
-            .then(response => {
-                orders.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+        users.value = await userService.getCollection();
+        voiture.value = await carService.getCarCollection();
+        orders.value = await orderService.getCollection();
     });
 </script>
 <template>
@@ -118,8 +97,8 @@
                     <tbody>
                         <tr v-for="order in orders.slice(0, limit)" :key="order.id">
                             <th scope="row">{{ order.id }}</th>
-                            <td>{{ order.orderer }}</td>
-                            <td>{{ order.car }}</td>
+                            <td>{{ order.orderer.id }}</td>
+                            <td>{{ order.car.id }}</td>
                             <td>{{ order.finalisedAt }}</td>
                             <td>{{ order.totalPrice }}</td>
                         </tr>

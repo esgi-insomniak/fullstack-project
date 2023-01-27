@@ -1,28 +1,20 @@
 <script setup>
-    import { getAxiosInstance } from "../../helpers/axios/config.js";
     import { ref, onMounted } from 'vue';
+    import orderService from "../../services/order.service";
 
     const orders = ref([]);
     const loading = ref(true);
     const currentPage = ref(1);
 
     onMounted(async () => {
-        await getAxiosInstance().get('/orders?page=' + currentPage.value)
-            .then(response => {
-                orders.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+        orders.value = await orderService.getCollection({page: currentPage.value});
+        loading.value = false;
     });
 
     const deleteOrders = async (id) => {
-    await getAxiosInstance().delete('/orders/' + id)
-        .then(response => {
+        await orderService.delete(id).then(response => {
             console.log(response);
-        })
-        .catch(error => {
+        }).catch(error => {
             alert('La commande ne peut être supprimer, elle est lié à une voiture et/ou un utilisateur')
             console.log(error)
         });
@@ -31,27 +23,23 @@
     const previousPage = async () => {
         if (currentPage.value > 1) {
             currentPage.value--;
-            await getAxiosInstance().get('/orders?page=' + currentPage.value)
-                .then(response => {
-                    orders.value = response.data;
-                    loading.value = false;
-                })
-                .catch(error => {
-                    console.log(error)
-                });
+            await orderService.getCollection({page: currentPage.value}).then(response => {
+                orders.value = response;
+                loading.value = false;
+            }).catch(error => {
+                console.log(error)
+            });
         }
     };
 
     const nextPage = async () => {
         currentPage.value++;
-        await getAxiosInstance().get('/orders?page=' + currentPage.value)
-            .then(response => {
-                orders.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+        await orderService.getCollection({page: currentPage.value}).then(response => {
+            orders.value = response;
+            loading.value = false;
+        }).catch(error => {
+            console.log(error)
+        });
     };
 </script>
 
@@ -75,11 +63,11 @@
         <tbody>
             <tr v-for="order in orders" :key="order.id">
                 <th scope="row">{{ order.id }}</th>
-                <td>{{ order.orderer }}</td>
-                <td>{{ order.car }}</td>
+                <td>{{ order.orderer.id }}</td>
+                <td>{{ order.car.id }}</td>
                 <td>{{ order.finalisedAt }}</td>
                 <td>{{ order.totalPrice }}</td>
-                <td>{{ order.status }}</td>
+                <td>{{ order.status.slug }}</td>
                 <td>
                     <button @click="">Edit</button>
                     <button @click="deleteOrders(order.id)">Delete</button>

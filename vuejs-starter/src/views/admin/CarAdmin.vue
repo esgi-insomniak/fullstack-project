@@ -1,57 +1,45 @@
 <script setup>
-    import {getAxiosInstance} from "../../helpers/axios/config.js";
     import { ref, onMounted } from 'vue';
+    import carService from "../../services/car.service";
 
     const cars = ref([]);
     const loading = ref(true);
     const currentPage = ref(1);
 
     onMounted(async () => {
-        await getAxiosInstance().get('/cars?page='+currentPage.value)
-            .then(response => {
-                cars.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+        cars.value = await carService.getCarCollection({page: currentPage.value});
+        loading.value = false;
     });
 
     const deleteCar = async (id) => {
-    await getAxiosInstance().delete('/cars/' + id)
-        .then(response => {
+        await carService.deleteCar(id).then(response => {
             console.log(response);
-        })
-        .catch(error => {
+        }).catch(error => {
             alert('La voiture ne peut être supprimer, elle est lié à une commande')
             console.log(error)
-        });
+        })
     };
 
     const previousPage = async () => {
         if(currentPage.value > 1) {
             currentPage.value--;
-            await getAxiosInstance().get('/cars?page='+currentPage.value)
-                .then(response => {
-                    cars.value = response.data;
-                    loading.value = false;
-                })
-                .catch(error => {
-                    console.log(error)
-                });
+            await carService.getCarCollection({page: currentPage.value}).then(response => {
+                cars.value = response;
+                loading.value = false;
+            }).catch(error => {
+                console.log(error)
+            })
         }
     };
 
     const nextPage = async () => {
         currentPage.value++;
-        await getAxiosInstance().get('/cars?page='+currentPage.value)
-            .then(response => {
-                cars.value = response.data;
-                loading.value = false;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+        await carService.getCarCollection({page: currentPage.value}).then(response => {
+            cars.value = response;
+            loading.value = false;
+        }).catch(error => {
+            console.log(error)
+        })
     };
 </script>
 
