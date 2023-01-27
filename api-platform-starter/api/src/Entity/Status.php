@@ -55,6 +55,18 @@ class Status
     #[ORM\Column(length: 50)]
     private ?string $slug = null;
 
+    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => '100%'])]
+    private ?string $width = null;
+
+    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
+    #[ORM\Column(type: 'string', length: 30, options: ['default' => 'bg-blue-500/60'])]
+    private ?string $bgColor = null;
+
+    #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private ?bool $canCancel = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -80,6 +92,42 @@ class Status
     public function setSlug(string $slug): self
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getWidth(): ?string
+    {
+        return $this->width;
+    }
+
+    public function setWidth(string $width): self
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getBgColor(): ?string
+    {
+        return $this->bgColor;
+    }
+
+    public function setBgColor(string $bgColor): self
+    {
+        $this->bgColor = $bgColor;
+
+        return $this;
+    }
+
+    public function getCanCancel(): ?bool
+    {
+        return $this->canCancel;
+    }
+
+    public function setCanCancel(bool $canCancel): self
+    {
+        $this->canCancel = $canCancel;
 
         return $this;
     }
