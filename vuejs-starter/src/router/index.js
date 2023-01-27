@@ -92,6 +92,34 @@ const routes = [
         ]
     },
     {
+        // admin
+        path: '/admin',
+        name: 'Admin',
+        component: () => import('../views/admin/LayoutAdmin.vue'),
+        children: [
+            {
+                path: 'dashboard',
+                name: 'dashboard',
+                component: () => import('../views/admin/Dashboard.vue'),
+            },
+            {
+                path: 'users',
+                name: 'users',
+                component: () => import('../views/admin/UsersAdmin.vue'),
+            },
+            {
+                path: 'cars',
+                name: 'cars',
+                component: () => import('../views/admin/CarAdmin.vue'),
+            },
+            {
+                path: 'orders',
+                name: 'orders',
+                component: () => import('../views/admin/OrderAdmin.vue'),
+            }
+        ]
+    },
+    {
         path: '/services',
         name: 'Services',
         component: () => import('../views/Services.vue'),

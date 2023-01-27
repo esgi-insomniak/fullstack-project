@@ -23,13 +23,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:car', 'id']],
+            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:car']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:car', 'id']],
+            normalizationContext: ['groups' => ['item:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:car']],
@@ -46,7 +46,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:car', 'id']],
+            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/car_identities/{id}/cars',
@@ -56,7 +56,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: CarIdentity::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:car', 'id']],
+            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:car', 'item:get:car']],
