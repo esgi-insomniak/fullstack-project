@@ -21,13 +21,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:order', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:order']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:order', 'id']],
+            normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:order']],
@@ -59,7 +59,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: User::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/orders',
@@ -69,7 +69,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/orders',
@@ -79,7 +79,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Car::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],

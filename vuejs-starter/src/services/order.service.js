@@ -35,7 +35,7 @@ class OrderService {
 
   async getUserOrders(id, params = null) {
     return getAxiosInstance()
-      .get(`users/${id}/orders?populateUser=true`, { params: params })
+      .get(`users/${id}/orders`, { params: params })
       .then((response) => {
         return response.data;
       });
