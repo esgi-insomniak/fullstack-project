@@ -25,6 +25,7 @@ class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         coordinates: user.coordinates,
+        address: user.address,
     });
   }
 

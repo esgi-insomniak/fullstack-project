@@ -77,9 +77,9 @@ const nextGarages = ({type, geometry, properties, bbox}) => {
         popupAnchor: [0, -41]
       })"
       :points-to-display="garages.map(garage => {
-    return {
-      name: garage.name,
-      coordinates: [garage.coordinates[0], garage.coordinates[1]],
-    }
+        return {
+          name: garage.name,
+          coordinates: garage.coordinates,
+        }
   })" />
 </template>

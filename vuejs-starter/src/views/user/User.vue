@@ -3,9 +3,7 @@ import Avatar from '../../components/Avatar.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { PencilIcon } from '@heroicons/vue/24/outline';
 import UserService from "../../services/user.service.js";
-import JawgJSLoader from '@jawg/js-loader';
-
-const loader = new JawgJSLoader({ accessToken: 'rFPvpCTSLFoCgow6L3gmxotGfuCGOdg4IJUasbdb7JsGs6pgek324aK6hnAZx2kJ' });
+import Map from "../../components/Map.vue";
 
 const formData = reactive({});
 const editMode = ref(true);
@@ -15,11 +13,26 @@ const me = ref({
   lastName: '',
   email: '',
   coordinates: [],
+  address: '',
 });
 
 const handleSendUpdate = async (form) => {
     const response = await UserService.patch('me', form);
+    console.log(response);
+    if (response) {
+      editMode.value = false;
+    }
 };
+
+const handleMapClick = (feature) => {
+  formData.coordinates = feature.geometry.coordinates;
+  formData.address = feature.properties.label;
+};
+
+const handleMapError = (e) => {
+  console.log(e);
+};
+
 
 onMounted(async () => {
     me.value = await UserService.get('me');
@@ -27,7 +40,7 @@ onMounted(async () => {
     formData.lastName = me.value.lastName;
     formData.email = me.value.email;
     formData.coordinates = me.value.coordinates;
-    //formData.address = me.value.address;
+    formData.address = me.value.address;
 });
 </script>
 <template>
@@ -43,15 +56,51 @@ onMounted(async () => {
                     </div>
                 </div>
             </div>
-            <div class="w-full flex flex-col items-center py-5">
-                <div class="w-1/3">
+            <div class="w-full flex flex-col items-center p-5 mt-[75px]">
+                <div class="flex flex-row items-center">
                     <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour" :disabled="editMode">
-                        <FormKit type="text" name="firstName" label="Prénom" />
-                        <FormKit type="text" name="lastName" label="Nom" />
-                        <FormKit type="text" name="email" label="Email" />
-                        <FormKit type="text" name="phone" label="Téléphone" />
-                        <FormKit type="text" name="address" id="address" label="Adresse" />
+                        <FormKit
+                            type="text"
+                            name="firstName"
+                            label="Prénom"
+                            placeholder="Karl"
+                            validation="required|alpha"
+                        />
+                        <FormKit
+                            type="text"
+                            name="lastName"
+                            label="Nom"
+                            placeholder="Marques"
+                            validation="required|alpha"
+                        />
+                        <FormKit
+                            type="text"
+                            name="email"
+                            label="Email"
+                            placeholder="exemple@email.here"
+                            validation="required|email"
+                        />
+                        <FormKit
+                            type="text"
+                            name="tel"
+                            label="Numéro de téléphone"
+                            placeholder="xx-xx-xx-xx-xx"
+                            validation="['matches', /^\d{2}-\d{2}-\d{2}-\d{2}-\d{2}$/]]"
+                        />
                     </FormKit>
+                    <div class="m-3">
+                      <Map
+                          :default-point="{
+                              name: me.address,
+                              coordinates: me.coordinates.reverse(),
+                          }"
+                          :zoom="11"
+                          :width="'350px'"
+                          :height="'350px'"
+                          @on-map-click="handleMapClick"
+                          @on-map-error="handleMapError"
+                      />
+                    </div>
                 </div>
                 <div class="w-3/4">
                     <h2 class="text-2xl font-bold text-white/80 mt-10 mb-5">

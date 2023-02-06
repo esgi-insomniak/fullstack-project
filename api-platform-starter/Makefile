@@ -27,7 +27,7 @@ fixtures: ## Load the fixtures
 fixtures-purge: ## Purge the database and load the fixtures
 	docker compose exec php bin/console doctrine:fixtures:load --purge-with-truncate --no-interaction
 migration: ## Run the migrations and migrate them
-	docker compose exec php bin/console make:migration:diff
+	docker compose exec php bin/console doctrine:migration:diff
 	make migrate
 migrate: ## Migrate the database
 	docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
