@@ -206,6 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
         $this->haveRecoverToken = false;
+        $this->roles = ['ROLE_USER'];
     }
 
     public function getId(): ?int

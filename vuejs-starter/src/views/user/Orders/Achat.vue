@@ -1,16 +1,33 @@
 <script setup>
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted, ref } from 'vue';
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import OrderService from "../../../services/order.service.js";
 
+const route = useRoute();
 const orders = reactive([]);
+const slug = ref(route.params.slug);
 
 onMounted(async () => {
     orders.values = await OrderService.getUserOrders('me');
 });
 
+onBeforeRouteUpdate(async (to) => {
+    slug.value = to.params.slug;
+});
+
+const filterOrders = () => {
+    if (slug.value && slug.value !== 'all') {
+        return Object.values(orders.values).filter((order) => order.progression === slug.value);
+    }
+    return orders.values;
+};
+
 </script>
 <template>
-    <div v-for="order in orders.values" class="py-3">
+    <div class="bg-blue-500/60 " />
+    <div class="bg-yellow-500/60" />
+    <div class="bg-green-500/60" />
+    <div v-for="order in filterOrders()" class="py-3">
         <div class="w-full h-52 rounded-lg bg-white/20 flex shadow-inner shadow-slate-200">
             <div class="relative w-1/5 h-full">
                 <div class="absolute -left-32 -top-5 h-52 w-96 hover:scale-110 duration-300 ease-in-out bg-cover">

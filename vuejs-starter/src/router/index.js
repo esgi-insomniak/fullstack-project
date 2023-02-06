@@ -68,7 +68,7 @@ const routes = [
                 component: () => import('../views/user/Orders/LayoutOrders.vue'),
                 children: [
                     {
-                        path: 'orders',
+                        path: 'orders/:slug',
                         name: 'UserOrders',
                         component: () => import('../views/user/Orders/Achat.vue'),
                     },
