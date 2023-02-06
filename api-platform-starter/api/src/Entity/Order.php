@@ -135,6 +135,10 @@ class Order
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
+    #[ORM\Column(nullable: false, options: ['default' => 'in-progress'])]
+    private ?string $progression = null;
+
     #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(nullable: true)]
     private array $stripe = [];
@@ -256,6 +260,18 @@ class Order
     public function setStatus(?Status $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getProgression(): string
+    {
+        return $this->progression;
+    }
+
+    public function setProgression(string $progression): self
+    {
+        $this->progression = $progression;
 
         return $this;
     }
