@@ -149,6 +149,7 @@ const loadMap = (jawg) => {
 onMounted(async () => {
   loadMap(await Map.getInstance());
 });
+
 </script>
 
 <template>

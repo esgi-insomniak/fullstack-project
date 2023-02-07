@@ -49,7 +49,7 @@ class CarCategory
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory'])]
+    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory', 'id'])]
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
