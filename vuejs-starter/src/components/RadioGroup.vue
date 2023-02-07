@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 const props = defineProps({
     options: {
         type: Array,
@@ -16,9 +16,17 @@ const props = defineProps({
 })
 const selected = ref(0)
 const handleChange = (option) => {
-    selected.value = option.id
+    if (selected.value === option.id) {
+        selected.value = 0
+        emit('onSelected', undefined)
+        return
+    }
+    else {
+        selected.value = option.id
+        emit('onSelected', option.id)
+    }
 }
-
+const emit = defineEmits(['onSelected'])
 </script>  
 
 <template>
@@ -49,7 +57,7 @@ const handleChange = (option) => {
                                     <p class="font-medium"
                                         :class="[selected === option.id ? 'text-white' : 'text-gray-900']">
                                         {{
-                                            option.label
+                                            option.label || option.name
                                         }}
                                     </p>
                                 </div>
