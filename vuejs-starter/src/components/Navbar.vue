@@ -9,7 +9,6 @@ const store = useStore();
 const isLoggedIn = computed(() => store.getters['auth/isLoggedIn'])
 const navLink = reactive([
     { name: 'Les modèles', href: '/model', current: false },
-    { name: 'Achat', href: '/achat', current: false },
     { name: 'Electrique & Hybride Rechargeable', href: '/e-brid', current: false },
     { name: 'Services', href: '/services', current: false },
     { name: 'Nos concessionaires', href: '/garage', current: false },

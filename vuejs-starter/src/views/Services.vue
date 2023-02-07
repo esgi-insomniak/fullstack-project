@@ -80,29 +80,30 @@ const previousQuestion = (e) => {
 
 <template>
     <form class="p-6 rounded-lg">
-        <div v-for="(question, index) in questions" :key="index" v-if="currentQuestion === index">
-            <label class="block text-white font-medium">{{ question.name }}</label>
-            <div v-if="question.type === 'radio'">
-                <RadioGroup :options="question.options" />
+        <template v-for="(question, index) in questions" :key="index">
+            <div v-if="currentQuestion === index">
+                <label class="block text-white font-medium">{{ question.name }}</label>
+                <div v-if="question.type === 'radio'">
+                    <RadioGroup :options="question.options" flex-direction="flex-col" />
+                </div>
+                <div v-if="question.type === 'select'">
+                    <select
+                        class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
+                        <option v-for="option in question.options" :key="option.value" :value="option.value">
+                            {{ option.label }}
+                        </option>
+                    </select>
+                </div>
+                <div v-if="question.type === 'number'">
+                    <input type="number"
+                        class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
+                </div>
+                <div v-if="question.type === 'datetime'">
+                    <input type="datetime-local"
+                        class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
+                </div>
             </div>
-            <div v-if="question.type === 'select'">
-                <select
-                    class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
-                    <option v-for="option in question.options" :key="option.value" :value="option.value">
-                        {{ option.label }}
-                    </option>
-                </select>
-            </div>
-            <div v-if="question.type === 'number'">
-                <input type="number"
-                    class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
-            </div>
-            <div v-if="question.type === 'datetime'">
-                <input type="datetime-local"
-                    class="block p-3 w-full mt-1 border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-none">
-            </div>
-
-        </div>
+        </template>
         <div class="text-center mt-6">
             <button v-if="currentQuestion > 0" @click="previousQuestion"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md">Previous</button>
