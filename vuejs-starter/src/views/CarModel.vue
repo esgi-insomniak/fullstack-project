@@ -4,14 +4,16 @@ import Filter from '../components/Filter.vue';
 import { onMounted, ref } from 'vue'
 import CardCar from '../components/CardCar.vue';
 import CarService from '../services/car.service.js';
+import SkeletonModelCars from '../components/Skeleton/SkeletonModelCars.vue';
 
 const carCategories = ref([])
 const allCars = ref([]);
 const collapseInfo = ref({
-    id: '',
+    id: 0,
     open: false
 });
 const filteredCars = ref([]);
+const isLoading = ref(true);
 const handleCollapseInfo = (carId) => {
     collapseInfo.value = {
         id: carId,
@@ -20,12 +22,13 @@ const handleCollapseInfo = (carId) => {
 }
 const getCarsByCategory = (category) => {
     if (category === undefined) filteredCars.value = allCars.value
-    else filteredCars.value = allCars.value.filter(car => car.identity.category.id === category)
+    else filteredCars.value = allCars.value.filter(car => car.category.id === category)
 }
 onMounted(async () => {
-    allCars.value = await CarService.getCarCollection()
+    allCars.value = await CarService.getCarIdentityCollection()
     carCategories.value = await CarService.getCarCategoryCollection()
     getCarsByCategory()
+    if (allCars.value.length > 0) isLoading.value = false
 })
 </script>
 <template>
@@ -39,19 +42,19 @@ onMounted(async () => {
             </div>
         </div>
         <div class="grid grid-flow-dense grid-cols-3 gap-2">
-            <template v-for="car in filteredCars">
-                <CardCar :mainPicture="car.identity.mainPicture.src" :category="car.identity.category"
-                    :name="car.identity.name" @click="handleCollapseInfo(car.slug)" />
+            <template v-for="car in filteredCars" v-if="!isLoading">
+                <CardCar :mainPicture="car.mainPicture.src" :category="car.category" :name="car.name"
+                    @click="handleCollapseInfo(car.id)" />
                 <div class="col-span-3 h-80 relative flex flex-col justify-center items-center mt-5"
-                    v-show="collapseInfo.id === car.slug && collapseInfo.open === true">
+                    v-show="collapseInfo.id === car.id && collapseInfo.open === true">
                     <div class="w-1/2 h-1/2 flex justify-center">
-                        <img :src="car.identity.mainPicture.src" :alt="car.identity.name" class="absolute -top-28">
+                        <img :src="car.mainPicture.src" :alt="car.name" class="absolute -top-28">
                     </div>
                     <div class="rounded-md w-full h-full grid grid-flow-row grid-cols-3 gap-2 p-3">
                         <div class="flex flex-col space-y-2 justify-end bg-white/30 rounded-md h-full p-2">
                             <div class="flex space-x-2">
-                                <span>{{ car.identity.category.id }}</span>
-                                <span>BMW Serie {{ car.identity.name }}</span>
+                                <span>{{ car.category.id }}</span>
+                                <span>BMW Serie {{ car.name }}</span>
                             </div>
                             <button>En savoir plus</button>
                         </div>
@@ -64,6 +67,9 @@ onMounted(async () => {
                         <div class="flex flex-col space-y-2 justify-end bg-white/30 rounded-md h-full p-2" />
                     </div>
                 </div>
+            </template>
+            <template v-else="isLoading">
+                <SkeletonModelCars v-for="i in Array(6)" />
             </template>
         </div>
     </div>
