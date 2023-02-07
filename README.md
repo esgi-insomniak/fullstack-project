@@ -69,7 +69,8 @@ Api platform utilise un swagger pour la documentation et le testing de l'api.
    Dans le dossier 'vuejs-starter', créer un fichier '.env.local' et y renseigner les variables d'environnement suivantes :
    ```bash
     VITE_API_URL=https://localhost/
-    VITE_API_JAWG_ACCESS_TOKEN={Your_Own_Token}
+    VITE_ALLOW_ORIGIN=https://localhost/
+    VITE_JAWGS_API_KEY={Your_Own_Token}
     ```
     Pour obtenir un token Jawg, vous pouvez vous rendre sur le site suivant : [Jawg IO](https://www.jawg.io/)
 
