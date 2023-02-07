@@ -7,7 +7,17 @@ module.exports = {
     './src/**/*.js',
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        shine: "shine 1s",
+      },
+      keyframes: {
+        shine: {
+          "0%": { opacity: 0.5, left: "-125%" },
+          "100%": { left: "125%" },
+        },
+      },
+    },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar-hide')],
 }

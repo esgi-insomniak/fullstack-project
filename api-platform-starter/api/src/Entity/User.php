@@ -201,6 +201,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'recover', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
+    #[ORM\Column(length: 60, nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $phone = null;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
@@ -459,6 +466,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->recoveries->removeElement($recovery) && $recovery->getRecover() === $this) {
             $recovery->setRecover(null);
         }
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

@@ -1,17 +1,13 @@
 <script setup>
-import JawgJSLoader from "@jawg/js-loader";
+import Map from "../helpers/map/map.js";
 import L from 'leaflet'
+import { onMounted } from "vue";
 
 const props = defineProps({
   id: {
     type: String,
     required: false,
     default: 'mapContainer',
-  },
-  coordinates: {
-    type: Array,
-    required: false,
-    default: () => [48.8588897,2.320041],
   },
   zoom: {
     type: Number,
@@ -58,6 +54,16 @@ const props = defineProps({
       console.error('Error while loading the map');
     },
   },
+  defaultPoint: {
+    type: Object,
+    required: false,
+    default: () => {
+      return {
+        name: 'Paris',
+        coordinates: [48.8588897,2.320041],
+      };
+    },
+  },
   pointsToDisplay: {
     type: Array,
     required: false,
@@ -74,18 +80,36 @@ const props = defineProps({
     }),
   },
 });
-
-
 const token = import.meta.env.VITE_JAWGS_API_KEY;
-const loader = new JawgJSLoader({ accessToken: token });
+const emit = defineEmits(['onMapSuccess', 'onMapError', 'onMapClick']);
 
-loader.loadJawgPlaces().then((jawg) => {
-  const map = new L.map('mapContainer').setView(props.coordinates, props.zoom);
+const loadMap = (jawg) => {
+  const map = new L.map(props.id)
+      .setView([0, 0], props.zoom)
+      .setMaxBounds([
+        [-90, -180],
+        [90, 180],
+      ])
+  ;
 
   // display pointsToDisplay
   props.pointsToDisplay.forEach(point => {
-    L.marker(point.coordinates, {icon: props.iconToDisplay}).addTo(map).bindPopup(point.name);
+    const marker = L.marker(point.coordinates, {
+      icon: props.iconToDisplay,
+      uniqueId: point.uniqueId ?? null,
+    })
+        .addTo(map);
+
+    if(point.name)
+      marker.bindPopup(point.name);
+    if(point.onClick)
+      marker.on('click', point.onClick);
   });
+
+  if (props.defaultPoint.coordinates && props.defaultPoint.coordinates.length === 2 && props.defaultPoint.name) {
+    map.setView(props.defaultPoint.coordinates, props.zoom);
+    L.marker(props.defaultPoint.coordinates).addTo(map).bindPopup(props.defaultPoint.name);
+  }
 
   map.addLayer(new L.TileLayer(
       `https://tile.jawg.io/jawg-${props.style}/{z}/{x}/{y}.png?access-token=${token}`,
@@ -106,24 +130,30 @@ loader.loadJawgPlaces().then((jawg) => {
         outlineColor: 'rgb(172,59,246)',
         show: true,
       },
+      transition: {
+        type: 'hybrid'
+      },
+      placeholder: 'Cherchez une ville',
       size: 5,
       sources: 'wof',
       L: L,
-      onFeatures: props.onSuccess,
-      onError: props.onError,
-      onClick: props.click,
+      onFeatures: (success) => emit('onMapSuccess', success),
+      onError: (error) => emit('onMapError', error),
+      onClick: (feature) => emit('onMapClick', feature),
     });
     map.addControl(control);
   }
+
+}
+
+onMounted(async () => {
+  loadMap(await Map.getInstance());
 });
 
 </script>
 
 <template>
-  <div
-    :id="id"
-    :style="{ width: width, height: height }"
-  ></div>
+  <div class="rounded shadow-lg" :id="id" :style="{ width: width, height: height }"></div>
 </template>
 
 <style scoped>
