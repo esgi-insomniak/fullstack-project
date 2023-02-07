@@ -5,28 +5,30 @@ import { PencilIcon } from '@heroicons/vue/24/outline';
 import UserService from "../../services/user.service.js";
 import Map from "../../components/Map.vue";
 
-const formData = reactive({});
-const editMode = ref(true);
-const cars = ref([]);
-const me = ref({
+const defaultData = {
   firstName: '',
   lastName: '',
   email: '',
   coordinates: [],
   address: '',
+};
+const formData = reactive({
+  data : defaultData
 });
+const editMode = ref(true);
+const cars = ref([]);
+const me = ref(defaultData);
 
 const handleSendUpdate = async (form) => {
     const response = await UserService.patch('me', form);
-    console.log(response);
     if (response) {
       editMode.value = false;
     }
 };
 
 const handleMapClick = (feature) => {
-  formData.coordinates = feature.geometry.coordinates;
-  formData.address = feature.properties.label;
+  formData.data.coordinates = feature.geometry.coordinates;
+  formData.data.address = feature.properties.label;
 };
 
 const handleMapError = (e) => {
@@ -36,11 +38,13 @@ const handleMapError = (e) => {
 
 onMounted(async () => {
     me.value = await UserService.get('me');
-    formData.firstName = me.value.firstName;
-    formData.lastName = me.value.lastName;
-    formData.email = me.value.email;
-    formData.coordinates = me.value.coordinates;
-    formData.address = me.value.address;
+    formData.data = {
+      firstName: me.value.firstName,
+      lastName: me.value.lastName,
+      email: me.value.email,
+      coordinates: me.value.coordinates,
+      address: me.value.address,
+    };
 });
 </script>
 <template>
@@ -58,7 +62,7 @@ onMounted(async () => {
             </div>
             <div class="w-full flex flex-col items-center p-5 mt-[75px]">
                 <div class="flex flex-row items-center">
-                    <FormKit type="form" @submit="handleSendUpdate" v-model="formData" submitLabel="Mettre à jour" :disabled="editMode">
+                    <FormKit type="form" @submit="handleSendUpdate" v-model="formData.data" submitLabel="Mettre à jour" :disabled="editMode">
                         <FormKit
                             type="text"
                             name="firstName"

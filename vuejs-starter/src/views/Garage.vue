@@ -1,85 +1,98 @@
-<!-- <script setup>
-import L from 'leaflet'
-import { onMounted } from 'vue'
-
-const accessToken = import.meta.env.VITE_API_JAWG_ACCESS_TOKEN
-const bmwShops = [
-    {
-        id: 1,
-        name: 'BMW Shop 1',
-        address: '123 Main St',
-        latitude: 37.7749,
-        longitude: -122.4194
-    },
-    {
-        id: 2,
-        name: 'BMW Shop 2',
-        address: '456 Market St',
-        latitude: 37.7902,
-        longitude: -122.4018
-    }
-]
-onMounted(() => {
-    // Create the map and set the view to the first BMW shop
-    map = L.map('mapContainer').setView([bmwShops[0].latitude, bmwShops[0].longitude], 13)
-
-    // Add the Jawg Maps tile layer to the map
-    L.tileLayer(`https://{s}.tile.jawg.io/{style}/{z}/{x}/{y}{r}.png?access-token=${accessToken}`, {
-        style: 'streets',
-        attribution: '<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a>',
-        subdomains: 'abcd',
-        minZoom: 0,
-        maxZoom: 22,
-        ext: 'jpg'
-    }).addTo(map)
-
-    // Add a marker for each BMW shop
-    bmwShops.forEach(shop => {
-        L.marker([shop.latitude, shop.longitude]).addTo(map)
-    })
-})
-
-</script>
-
-<template>
-    <div class="w-full h-screen overflow-auto">
-        <div ref="mapContainer" class="w-full h-full" />
-    </div>
-</template>
- -->
-
 <script setup>
 import GarageService from "../services/garage.service.js";
-import {onMounted, ref, defineAsyncComponent, onBeforeMount} from "vue";
+import {onMounted, ref} from "vue";
 import Map from "../components/Map.vue";
 import L from 'leaflet';
+import UserService from "../services/user.service.js";
 
-//const MapLoader = defineAsyncComponent(() => import("../components/Map.vue"));
 const garages = ref([]);
+const me = ref(null);
 
-onBeforeMount(async () => {
+const handleGarageIconClick = (e) => {
+  const id = e.target.options.uniqueId;
+  selectGarageById(id);
+};
+
+const handleGarageClick = (garage) => {
+  selectGarageById(garage.id);
+};
+
+const selectGarageById = (id) => {
+  garages.value.forEach(g => {
+    g.selected = g.id === id;
+  });
+};
+
+const scrollToSelectedGarage = (el) => {
+  if (!el || !el instanceof HTMLElement) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+onMounted(async () => {
+  me.value = await UserService.get("me");
+  me.value.coordinates = me.value.coordinates.reverse();
   garages.value = await GarageService.getCollection()
 });
 
-const nextGarages = ({type, geometry, properties, bbox}) => {
-  const coordinates = geometry.coordinates;
-};
-
 </script>
 <template>
-  <Map
-      v-if="garages.length > 0"
-      :zoom="11"
-      :icon-to-display="new L.icon({
-        iconUrl: '/src/assets/bmw_logo.png',
-        iconSize: [35, 35],
-        iconAnchor: [13, 41],
-        popupAnchor: [0, -41]
-      })"
-      :points-to-display="garages.map(garage => {
-        return {
-          name: garage.name,
-          coordinates: garage.coordinates,
-        }
-  })" />
+  <div class="grid grid-cols-2 gap-4">
+    <div class="flex flex-row" v-if="garages.length > 0">
+      <Map
+          :zoom="8"
+          :icon-to-display="new L.icon({
+            iconUrl: '/src/assets/bmw_logo.png',
+            iconSize: [35, 35],
+            iconAnchor: [13, 41],
+            popupAnchor: [0, -41],
+          })"
+          :points-to-display="garages.map(garage => {
+            return {
+              name: garage.name,
+              coordinates: garage.coordinates,
+              uniqueId: garage.id,
+              onClick: handleGarageIconClick
+            }
+          })"
+          :default-point="{
+            name: me.address,
+            coordinates: me.coordinates
+          }"
+      />
+
+      <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700 max-h-[600px] overflow-auto scrollbar-hide">
+        <li
+            class="p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+            v-for="garage in garages"
+            :key="garage.id"
+            :class="{'bg-gray-50 dark:bg-gray-800': garage.selected}"
+            :data-selected="garage.selected"
+            :ref="el => (garage.selected) ? scrollToSelectedGarage(el) : null"
+            @click="selectGarageById(garage.id)"
+        >
+          <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0">
+              <img class="w-8 h-8 rounded-full" src="/bmw_logo.png" :alt="garage.name">
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate dark:text-white">{{ garage.name }}</p>
+              <p class="text-sm text-gray-500 truncate dark:text-gray-400">email@flowbite.com</p>
+            </div>
+            <div
+                class="inline-flex items-center text-base font-semibold"
+                :class="{
+                    'text-green-500': garage.isOpen,
+                    'text-red-500': !garage.isOpen,
+                }"
+                v-text="garage.isOpen ? 'OUVERT' : 'FERMÉ'"
+            >
+            </div>
+          </div>
+        </li>
+      </ul>
+
+
+
+    </div>
+  </div>
 </template>
