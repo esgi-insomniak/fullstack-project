@@ -79,9 +79,18 @@ console.log(answers.value)
 </script>
 
 <template>
-    <div class="h-[88vh] w-full py-10">
-        <div class="flex flex-col px-64 h-full overflow-scroll" v-if="currentQuestion !== questions.lenght + 1">
-            <FormKit type="form" @submit="nextQuestion"
+    <div class="h-[88vh] w-full flex justify-center items-center">
+        <div class="flex flex-col h-full overflow-scroll justify-center items-center w-[70vw] relative"
+            v-if="currentQuestion < questions.length + 1">
+            <div class="absolute top-16 flex items-center justify-start w-full space-x-5">
+                <button @click="previousQuestion" v-if="currentQuestion !== 1" class="left-56">
+                    Question précédente
+                </button>
+                <span class="font-bold text-xl">
+                    Etape {{ currentQuestion }}/{{ questions.length }}
+                </span>
+            </div>
+            <FormKit type="form" @submit="nextQuestion" form-class="w-full"
                 :submit-label="currentQuestion === questions.length ? 'Demande de RDV' : 'Question suivante'">
                 <template v-for="question in questions">
                     <FormKit :type="question.type" :name="question.name" :label="question.label"
@@ -89,9 +98,8 @@ console.log(answers.value)
                 </template>
             </FormKit>
         </div>
-        <div v-show="currentQuestion === questions.length + 1">
+        <div v-else>
             Questionnaire terminer
-
         </div>
     </div>
 
