@@ -49,9 +49,19 @@ class OrderService {
       });
   }
 
-  async postPayment(id) {
+  async postStripeCheckout(id) {
     return getAxiosInstance()
-      .post("payment", id)
+      .post(`orders/${id}/checkout`)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
+  async postOrderPaymentValidation(id, sessionId) {
+    return getAxiosInstance()
+      .post(`orders/${id}/payment_validation`, {
+        sessionId,
+      })
       .then((response) => {
         return response.data;
       });

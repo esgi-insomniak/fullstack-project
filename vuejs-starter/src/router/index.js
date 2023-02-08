@@ -37,21 +37,6 @@ const routes = [
         component: () => import('../views/Logout.vue'),
     },
     {
-        path: '/order',
-        name: 'order',
-        component: () => import('../views/order/Order.vue'),
-    },
-    {
-        path: '/success',
-        name: 'success',
-        component: () => import('../views/order/Success.vue'),
-    },
-    {
-        path: '/cancel',
-        name: 'cancel',
-        component: () => import('../views/order/Cancel.vue'),
-    },
-    {
         // user 
         path: '/me',
         name: 'User',
@@ -83,6 +68,11 @@ const routes = [
                         component: () => import('../views/user/Orders/Sales.vue'),
                     }
                 ]
+            },
+            {
+                path: 'orders/:orderId/success/:sessionId',
+                name: 'UserOrdersSuccess',
+                component: () => import('../views/user/Orders/AchatSuccess.vue'),
             },
             {
                 path: 'profile',
