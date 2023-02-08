@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Controller\PaymentController;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -11,6 +10,8 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\Order\OrderPaymentValidationController;
+use App\Controller\Order\StripeCheckoutController;
 use App\Repository\OrderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -37,9 +38,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(),
         new Post(
-            uriTemplate: '/payment/{id}',
+            uriTemplate: '/orders/{id}/checkout',
             defaults: ['_api_receive' => false],
-            controller: PaymentController::class,
+            controller: StripeCheckoutController::class,
             openapiContext: [
                 'requestBody' => [
                     'content' => [
@@ -50,6 +51,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 ],
             ],
             output: false,
+        ),
+        new Post(
+            uriTemplate: '/orders/{id}/payment_validation',
+            defaults: ['_api_receive' => false],
+            controller: OrderPaymentValidationController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "sessionId" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ),
         new GetCollection(
             uriTemplate: '/users/{id}/orders',
@@ -139,7 +159,6 @@ class Order
     #[ORM\Column(nullable: false, options: ['default' => 'in-progress'])]
     private ?string $progression = null;
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(nullable: true)]
     private array $stripe = [];
 
