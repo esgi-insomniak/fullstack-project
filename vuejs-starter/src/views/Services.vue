@@ -30,7 +30,7 @@ const questions = ref([
         ], step: 5, name: 'gearbox'
     },
     {
-        label: 'Choisissez votre concession', type: 'select ', options: [], step: 6, name: 'concession'
+        label: 'Choisissez votre concession', type: 'select', options: [], step: 6, name: 'concession'
     },
     { label: 'Selectionnez un créneau qui vous convient:', type: 'datetime-local', step: 7, name: 'appointement' }
 ])
@@ -49,7 +49,7 @@ onMounted(async () => {
     questions.value[1].options = models.map(model => {
         return { label: model.name, value: model.id }
     })
-    const garages = await GarageService.getCollection()
+    const garages = await GarageService.getCollection({ itemsPerPage: 50 })
     questions.value[5].options = garages.map(garage => {
         return { label: garage.name, value: garage.id }
     })

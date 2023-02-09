@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(),
         new GetCollection(
-            uriTemplate: '/garages/{id}/garageSchudleEvents',
+            uriTemplate: '/garages/{id}/garage_schudle_events',
             uriVariables: [
                 'id' => new Link(
                     fromProperty: 'garageSchudleEvents',
