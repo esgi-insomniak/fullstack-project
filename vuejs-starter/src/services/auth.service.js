@@ -1,4 +1,3 @@
-import axios from "axios";
 import { getAxiosInstance } from "../helpers/axios/config.js";
 
 class AuthService {
@@ -8,14 +7,14 @@ class AuthService {
         .then((response_authentication_token) => {
           if (response_authentication_token.data.token) {
             const token = response_authentication_token.data.token;
-            localStorage.setItem("user", JSON.stringify({token: token}));
+            sessionStorage.setItem("user", JSON.stringify({token: token}));
           }
           return response_authentication_token.data;
         });
   }
 
   logout() {
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
   }
 
   register(user) {
