@@ -70,11 +70,15 @@ class Garage
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
     private Collection $cars;
 
+    #[ORM\OneToMany(mappedBy: 'associateGarage', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
+    private Collection $garageSchudleEvents;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
         $this->cars = new ArrayCollection();
+        $this->garageSchudleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -201,6 +205,36 @@ class Garage
         // set the owning side to null (unless already changed)
         if ($this->cars->removeElement($car) && $car->getGarage() === $this) {
             $car->setGarage(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateGarage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateGarage() === $this) {
+                $garageSchudleEvent->setAssociateGarage(null);
+            }
         }
 
         return $this;

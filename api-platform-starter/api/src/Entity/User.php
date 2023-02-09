@@ -208,12 +208,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $phone = null;
 
+    #[ORM\OneToMany(mappedBy: 'associateUser', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
+    private Collection $garageSchudleEvents;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
         $this->haveRecoverToken = false;
         $this->roles = ['ROLE_USER'];
+        $this->garageSchudleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -490,6 +494,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateUser() === $this) {
+                $garageSchudleEvent->setAssociateUser(null);
+            }
+        }
 
         return $this;
     }
