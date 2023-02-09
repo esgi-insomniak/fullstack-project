@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from 'vue'
-const questions = [
+import { ref, onMounted } from 'vue'
+import carService from '../services/car.service';
+import GarageService from '../services/garage.service';
+const questions = ref([
     {
         label: 'Pour quelle raison souhaitez vous prendre RDV ?', type: 'radio', options: [
             { label: 'Révision', value: 'revision', id: 1 },
@@ -10,30 +12,7 @@ const questions = [
         ], step: 1, name: 'reason'
     },
     {
-        label: 'Quel est le modèle de votre véhicule ?', type: 'select', step: 2, options: [
-            { label: 'Audi', value: 'audi' },
-            { label: 'BMW', value: 'bmw' },
-            { label: 'Citroen', value: 'citroen' },
-            { label: 'Fiat', value: 'fiat' },
-            { label: 'Ford', value: 'ford' },
-            { label: 'Honda', value: 'honda' },
-            { label: 'Hyundai', value: 'hyundai' },
-            { label: 'Kia', value: 'kia' },
-            { label: 'Lexus', value: 'lexus' },
-            { label: 'Mazda', value: 'mazda' },
-            { label: 'Mercedes', value: 'mercedes' },
-            { label: 'Mini', value: 'mini' },
-            { label: 'Nissan', value: 'nissan' },
-            { label: 'Opel', value: 'opel' },
-            { label: 'Peugeot', value: 'peugeot' },
-            { label: 'Renault', value: 'renault' },
-            { label: 'Seat', value: 'seat' },
-            { label: 'Skoda', value: 'skoda' },
-            { label: 'Suzuki', value: 'suzuki' },
-            { label: 'Toyota', value: 'toyota' },
-            { label: 'Volkswagen', value: 'volkswagen' },
-            { label: 'Volvo', value: 'volvo' },
-        ], name: 'model'
+        label: 'Quel est le modèle de votre véhicule ?', type: 'select', step: 2, options: [], name: 'model'
     },
     { label: 'Quel est le kilométrage de votre véhicule ?', type: 'number', step: 3, name: 'kilometrage' },
     {
@@ -51,18 +30,10 @@ const questions = [
         ], step: 5, name: 'gearbox'
     },
     {
-        label: 'Quel est le type de carrosserie de votre véhicule ?', type: 'select', options: [
-            { label: 'Berline', value: 'berline' },
-            { label: 'Break', value: 'break' },
-            { label: 'Coupé', value: 'coupe' },
-            { label: 'Cabriolet', value: 'cabriolet' },
-            { label: '4x4', value: '4x4' },
-            { label: 'Monospace', value: 'monospace' },
-            { label: 'Utilitaire', value: 'utilitaire' },
-        ], step: 6, name: 'body'
+        label: 'Choisissez votre concession', type: 'select ', options: [], step: 6, name: 'concession'
     },
     { label: 'Selectionnez un créneau qui vous convient:', type: 'datetime-local', step: 7, name: 'appointement' }
-]
+])
 const answers = ref([])
 const currentQuestion = ref(1)
 const nextQuestion = (userChoice) => {
@@ -73,8 +44,17 @@ const previousQuestion = (e) => {
     e.preventDefault()
     currentQuestion.value--
 }
-
-console.log(answers.value)
+onMounted(async () => {
+    const models = await carService.getCarIdentityCollection()
+    questions.value[1].options = models.map(model => {
+        return { label: model.name, value: model.id }
+    })
+    const garages = await GarageService.getCollection()
+    questions.value[5].options = garages.map(garage => {
+        return { label: garage.name, value: garage.id }
+    })
+})
+console.log(questions)
 
 </script>
 
