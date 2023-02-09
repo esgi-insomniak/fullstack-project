@@ -119,6 +119,14 @@ class GarageSchudleEvent
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $gearbox = null;
 
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'id'])]
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent'])]
+    #[ORM\ManyToOne(inversedBy: 'garageSchudleEvents')]
+    private ?Order $associateOrder = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -264,6 +272,30 @@ class GarageSchudleEvent
     public function setGearbox(?string $gearbox): self
     {
         $this->gearbox = $gearbox;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getAssociateOrder(): ?Order
+    {
+        return $this->associateOrder;
+    }
+
+    public function setAssociateOrder(?Order $associateOrder): self
+    {
+        $this->associateOrder = $associateOrder;
 
         return $this;
     }

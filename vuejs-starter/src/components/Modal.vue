@@ -60,11 +60,14 @@ const props = defineProps({
                                             class="text-lg font-medium leading-6 text-gray-900">{{
                                                 props.title
                                             }}</DialogTitle>
-                                        <div v-if="props.content" class="mt-2">
-                                            <div class="text-sm text-gray-500" v-html="props.content"/>
+                                        <div class="mt-2">
+                                            <div class="text-sm text-gray-500" v-html="props.content" />
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div>
+                                <slot />
                             </div>
                             <div v-if="props.buttons" class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                 <button v-for="(button, index) in props.buttons" :key="index" type="button"

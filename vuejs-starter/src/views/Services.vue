@@ -78,51 +78,19 @@ const previousQuestion = (e) => {
     e.preventDefault()
     currentQuestion.value--
 }
-const garageDisponibilitySchedule = [
-    {
-        'start': '08:00',
-        'end': '10:00'
-    },
-    {
-        'start': '10:00',
-        'end': '12:00'
-    },
-    {
-        'start': '14:00',
-        'end': '16:00'
-    },
-    {
-        'start': '16:00',
-        'end': '18:00'
-    }
-];
+
 const getGaragesEvents = async (concessionId) => {
-    const tomorrow = moment().add(1, 'days').startOf('day');
-    const params = {
-        "dateStart[after]": tomorrow.toISOString(),
-        "dateEnd[before]": tomorrow.add(7, 'days').toISOString(),
-    };
-    const events = await GarageSchudleEventService.getGarageEvents(concessionId, params);
-    const eventsDateStart = events.map(event => moment(event.dateStart).toISOString());
-    questions.value[6].options = [];
-    questions.value[6].options.push({ label: 'Choisir un créneau', value: null });
-    for (let i = 1; i < 8; i++) {
-        const day = moment().add(i, 'days');
-        for (let j = 0; j < garageDisponibilitySchedule.length; j++) {
-            if (day.day() === 0 || day.day() === 6) {
-                continue;
-            }
-            const disponibility = garageDisponibilitySchedule[j];
-            const start = moment(day).set('hour', disponibility.start.split(':')[0]).set('minute', 0).set('second', 0).set('millisecond', 0);
-            const end = moment(day).set('hour', disponibility.end.split(':')[0]).set('minute', 0).set('second', 0).set('millisecond', 0);
-            const disponibilityLabel = `${day.format('dddd MM/DD')} : ${start.format('HH:mm')} - ${end.format('HH:mm')}`;
-            if (eventsDateStart.includes(start.toISOString())) {
-                continue;
-            }
-            questions.value[6].options.push({ label: disponibilityLabel, value: start.toISOString() });
-        }
-    }
+    const fromDate = moment().add(1, 'days').startOf('day');
+    const toDate = moment().add(7, 'days').startOf('day');
+    const disponibilities = await GarageSchudleEventService.getCalendarDisponibilities(concessionId, fromDate, toDate);
+    
+    questions.value[6].options = disponibilities.reduce((acc, day) => {
+        return [...acc, ...day.disponibilities]
+    }, []).filter(dispo => dispo.isDisponible).map(dispo => {
+        return { label: dispo.label, value: dispo.start }
+    })
 }
+
 const sendFormData = async () => {
     const user = await UserService.get('me');
     const garageSchudleEvent = {
@@ -135,6 +103,7 @@ const sendFormData = async () => {
         kilometers: answers.value[2].kilometrage,
         fuel: answers.value[3].fuel,
         gearbox: answers.value[4].gearbox,
+        type: 'demande-de-service'
     };
     await GarageSchudleEventService.post(garageSchudleEvent);
 }
@@ -149,9 +118,6 @@ onMounted(async () => {
         return { label: garage.name, value: garage.id }
     })
 })
-
-
-
 </script>
 
 <template>

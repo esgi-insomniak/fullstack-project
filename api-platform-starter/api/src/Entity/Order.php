@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Put;
 use App\Controller\Order\OrderPaymentValidationController;
 use App\Controller\Order\StripeCheckoutController;
 use App\Repository\OrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -169,6 +171,14 @@ class Order
     #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column]
     private ?bool $sold = null;
+
+    #[ORM\OneToMany(mappedBy: 'associateOrder', targetEntity: GarageSchudleEvent::class)]
+    private Collection $garageSchudleEvents;
+
+    public function __construct()
+    {
+        $this->garageSchudleEvents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -327,6 +337,36 @@ class Order
     public function setSold(bool $sold): self
     {
         $this->sold = $sold;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateOrder() === $this) {
+                $garageSchudleEvent->setAssociateOrder(null);
+            }
+        }
 
         return $this;
     }

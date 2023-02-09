@@ -2,12 +2,19 @@
 import { reactive, onMounted, ref } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import OrderService from "../../../services/order.service.js";
+import GarageSchudleEventService from '../../../services/schudle.service.js';
+import StatusService from "../../../services/status.service.js";
 import Modal from "../../../components/Modal.vue";
-import { ExclamationTriangleIcon, CurrencyEuroIcon } from '@heroicons/vue/24/outline';
+import { ExclamationTriangleIcon, CurrencyEuroIcon, CalendarIcon } from '@heroicons/vue/24/outline';
+import moment from 'moment/dist/moment';
+import fr from 'moment/dist/locale/fr';
+moment.locale('fr', fr);
 
 const route = useRoute();
 const orders = reactive([]);
 const slug = ref(route.params.slug);
+const selectedAppointment = ref(null);
+const schudleDisponibilities = ref([]);
 
 onMounted(async () => {
     orders.values = await OrderService.getUserOrders('me');
@@ -44,8 +51,30 @@ const cancelOrder = async (order) => {
     toggleModal();
 };
 
+const takeAppointment = async (order) => {
+    if (order.progression !== 'in-progress' || order.status.slug !== 'waiting-for-appointment' || !selectedAppointment.value) return
+    const garageSchudleEvent = {
+        dateStart: moment(selectedAppointment.value.start).toISOString(),
+        dateEnd: moment(selectedAppointment.value.end).toISOString(),
+        associateGarage: `garages/${order.garage.id}`,
+        associateUser: `users/${order.orderer.id}`,
+        associateOrder: `orders/${order.id}`,
+        type: 'commande'
+    };
+    await GarageSchudleEventService.post(garageSchudleEvent);
+    const status = (await StatusService.getCollection({ slug: 'appointment-taken' }))[0];
+    orders.values = orders.values.map((o) => {
+        if (o.id === order.id) {
+            o.status = status;
+        }
+        return o;
+    });
+    toggleModal();
+};
+
 const loadCancelModal = (order) => {
     if (!order.status.canCancel || order.progression !== 'in-progress') return
+    modalProps.id = 'cancel-order-modal';
     modalProps.title = 'Annuler la commande ?';
     modalProps.content = 'Si vous annulez la commande, vous ne pourrez plus revenir en arrière. Voulez-vous vraiment annuler la commande ?'
     modalProps.icon = {
@@ -69,6 +98,7 @@ const loadCancelModal = (order) => {
 };
 
 const loadDetailsModal = (order) => {
+    modalProps.id = 'order-details-modal';
     modalProps.title = 'Détails de la commande';
     modalProps.content = `Order number: ${order.id}<br>Année: ${order.car.year}<br>Status: ${order.status.name}<br>Montant: ${order.car.price} €`;
     modalProps.icon = null;
@@ -84,6 +114,7 @@ const loadDetailsModal = (order) => {
 
 const loadPaymentModal = (order) => {
     if (order.progression !== 'in-progress' || order.status.slug !== 'waiting-for-payment') return
+    modalProps.id = 'order-payment-modal';
     modalProps.title = 'Payer la commande';
     modalProps.content = null;
     modalProps.icon = {
@@ -106,6 +137,36 @@ const loadPaymentModal = (order) => {
     toggleModal();
 }
 
+const loadAppointmentModal = async (order) => {
+    if (order.progression !== 'in-progress' || order.status.slug !== 'waiting-for-appointment') return
+    selectedAppointment.value = null;
+    const fromDate = moment().add(1, 'days').startOf('day');
+    const toDate = moment().add(7, 'days').startOf('day');
+    schudleDisponibilities.value = await GarageSchudleEventService.getCalendarDisponibilities(order.garage.id, fromDate, toDate);
+    modalProps.id = 'order-appointment-modal';
+    modalProps.title = 'Prendre rendez-vous';
+    modalProps.content = null;
+    modalProps.order = order;
+    modalProps.icon = {
+        type: CalendarIcon,
+        bgColor: 'bg-blue-100',
+        textColor: 'text-blue-600'
+    };
+    modalProps.buttons = [
+        {
+            text: 'Fermer',
+            class: 'mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm',
+            action: toggleModal
+        },
+        {
+            text: 'Prendre rendez-vous',
+            class: 'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm bg-green-600 hover:bg-green-700 focus:ring-green-500',
+            action: async () => takeAppointment(order)
+        }
+    ]
+    toggleModal();
+}
+
 const toggleModal = () => {
     modalProps.open = !modalProps.open
 };
@@ -118,7 +179,41 @@ const modalProps = reactive({
 </script>
 
 <template>
-    <Modal v-bind="{ ...modalProps }" />
+    <Modal v-bind="{ ...modalProps }">
+        <div v-if="modalProps.id === 'order-appointment-modal'" v-for="day in schudleDisponibilities"
+            :key="day.dayInfo">
+            <span class="ml-6 text-2xl text-black">{{ day.dayInfo }}</span>
+            <div v-for="(disponibility, idx) in day.disponibilities" :key="disponibility.label"
+                class="flex justify-center flex-col">
+                <div v-if="idx % 2" class="flex flex-row justify-center">
+                    <div class="flex justify-center mx-5 my-2">
+                        <button class="text-white font-bold py-2 px-4 rounded" type="button"
+                            :value="day.disponibilities[idx - 1].start"
+                            :class="[
+                                day.disponibilities[idx - 1].isDisponible ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-500',
+                                {'bg-green-500 hover:bg-green-700': selectedAppointment && selectedAppointment.start === day.disponibilities[idx - 1].start}
+                            ]"
+                            :disabled="!day.disponibilities[idx - 1].isDisponible"
+                            @click="selectedAppointment = day.disponibilities[idx - 1]">
+                            {{ day.disponibilities[idx - 1].horaire }}
+                        </button>
+                    </div>
+                    <div class="flex justify-center mx-5 my-2">
+                        <button class="text-white font-bold py-2 px-4 rounded" type="button"
+                            :value="day.disponibilities[idx].start"
+                            :class="[
+                                day.disponibilities[idx].isDisponible ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-500',
+                                {'bg-green-500 hover:bg-green-700': selectedAppointment && selectedAppointment.start === day.disponibilities[idx].start}
+                            ]"
+                            :disabled="!day.disponibilities[idx].isDisponible"
+                            @click="selectedAppointment = day.disponibilities[idx]">
+                            {{ day.disponibilities[idx].horaire }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Modal>
     <div class="bg-blue-500/60 " />
     <div class="bg-yellow-500/60" />
     <div class="bg-green-500/60" />
@@ -142,6 +237,10 @@ const modalProps = reactive({
                             v-on:click="loadPaymentModal(order)"
                             class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-700 rounded h-auto text-center hover:cursor-pointer w-[80%] max-w-[200px]">
                             Payer en ligne</div>
+                        <div v-if="order.progression === 'in-progress' && order.status.slug === 'waiting-for-appointment'"
+                            v-on:click="loadAppointmentModal(order)"
+                            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 border border-green-700 rounded h-auto text-center hover:cursor-pointer w-[80%] max-w-[200px]">
+                            Prendre rendez-vous</div>
                     </div>
                     <div class="flex flex-col w-2/6 h-full justify-between items-center">
                         <div v-on:click="loadDetailsModal(order)"
@@ -156,9 +255,9 @@ const modalProps = reactive({
                 <div class="flex w-full justify-between text-right">
                     <span class="min-w-[3rem]" />
                     <span class="min-w-[3rem]">Commandé</span>
-                    <span class="min-w-[3rem]">Rendez-vous</span>
                     <span class="min-w-[3rem]">Payé</span>
                     <span class="min-w-[3rem]">Contrôle technique</span>
+                    <span class="min-w-[3rem]">Rendez-vous</span>
                     <span class="min-w-[3rem]">Livraison</span>
                     <span class="min-w-[3rem]">Livré</span>
                 </div>
