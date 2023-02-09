@@ -6,6 +6,8 @@ import GarageSchudleEventService from '../services/schudle.service.js';
 import UserService from '../services/user.service.js';
 import moment from 'moment/dist/moment';
 import fr from 'moment/dist/locale/fr';
+//import { generateICalendar } from '../helpers/index.js';
+//import QRCode from 'qrcode';
 moment.locale('fr', fr);
 const questions = ref([
     {
@@ -48,8 +50,26 @@ const nextQuestion = (userChoice) => {
         });
     } else if (currentQuestion.value === questions.value.length) {
         Promise.resolve().then(() => {
-            sendFormData();
-        });
+            sendFormData()
+            // .then(() => {
+            //     const ics = generateICalendar({
+            //         title: 'Rendez-vous chez votre concessionnaire',
+            //         description: 'Rendez-vous chez votre concessionnaire',
+            //         location: 'ICI C\'EST PARIS',
+            //         start: moment(answers.value[6].appointement).set('minute', 0).set('second', 0).set('millisecond', 0).toISOString(),
+            //         end: moment(answers.value[6].appointement).set('minute', 0).set('second', 0).set('millisecond', 0).add(1, 'hour').toISOString(),
+            //     })
+            //     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+            //     // QRCode.toCanvas(document.getElementById('calendar'), URL.createObjectURL(blob), { width: 200 }, function (error) {
+            //     //     if (error) console.error(error)
+            //     //     console.log('success!');
+            //     // })
+            //     const link = document.createElement('a');
+            //     link.href = URL.createObjectURL(blob);
+            //     link.download = 'calendar.ics';
+            //     link.click();
+            // })
+        })
     }
     answers.value.push(userChoice)
     currentQuestion.value++
@@ -156,6 +176,7 @@ onMounted(async () => {
         </div>
         <div v-else>
             Questionnaire terminer
+            <div id="calendar" ref="calendar"></div>
         </div>
     </div>
 
