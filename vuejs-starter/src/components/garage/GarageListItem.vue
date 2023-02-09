@@ -7,10 +7,7 @@ const props = defineProps({
       id: 1,
       name: 'Garage Flowbite',
       isOpen: true,
-    }),
-    validator(value) {
-      return value.id && value.name && value.isOpen;
-    }
+    })
   }
 });
 </script>

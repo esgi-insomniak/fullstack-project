@@ -85,7 +85,6 @@ const emit = defineEmits(['onMapSuccess', 'onMapError', 'onMapClick']);
 
 const loadMap = (jawg) => {
   const map = new L.map(props.id)
-      .setView([0, 0], props.zoom)
       .setMaxBounds([
         [-90, -180],
         [90, 180],
@@ -97,8 +96,7 @@ const loadMap = (jawg) => {
     const marker = L.marker(point.coordinates, {
       icon: props.iconToDisplay,
       uniqueId: point.uniqueId ?? null,
-    })
-        .addTo(map);
+    }).addTo(map);
 
     if(point.name)
       marker.bindPopup(point.name);
@@ -107,8 +105,11 @@ const loadMap = (jawg) => {
   });
 
   if (props.defaultPoint.coordinates && props.defaultPoint.coordinates.length === 2 && props.defaultPoint.name) {
+    console.log(props.defaultPoint.coordinates)
     map.setView(props.defaultPoint.coordinates, props.zoom);
     L.marker(props.defaultPoint.coordinates).addTo(map).bindPopup(props.defaultPoint.name);
+  }else{
+    map.setView([0, 0], props.zoom);
   }
 
   map.addLayer(new L.TileLayer(
@@ -147,7 +148,9 @@ const loadMap = (jawg) => {
 }
 
 onMounted(async () => {
-  loadMap(await Map.getInstance());
+  console.log('Map mounted', props);
+  const map = await Map.getInstance();
+  loadMap(map);
 });
 
 </script>

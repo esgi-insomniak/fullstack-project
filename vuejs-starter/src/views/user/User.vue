@@ -17,7 +17,7 @@ const formData = reactive({
 });
 const editMode = ref(true);
 const cars = ref([]);
-const me = ref(defaultData);
+const me = ref(null);
 
 const handleSendUpdate = async (form) => {
     const response = await UserService.patch('me', form);
@@ -37,7 +37,8 @@ const handleMapError = (e) => {
 
 
 onMounted(async () => {
-    me.value = await UserService.get('me');
+  me.value = await UserService.get("me");
+  me.value.coordinates = me.value.coordinates.reverse();
     formData.data = {
       firstName: me.value.firstName,
       lastName: me.value.lastName,
@@ -49,7 +50,7 @@ onMounted(async () => {
 </script>
 <template>
     <div class="mx-auto flex justify-center items-center h-full">
-        <div class="h-fit w-[70vw] bg-white/20 rounded-lg mt-20">
+        <div class="h-fit w-[70vw] bg-white/20 rounded-lg mt-20" v-if="me">
             <div
                 class="bg-[url('/public/bg_header2.jpg')] w-full h-[30vh] bg-center bg-cover relative rounded-t-lg shadow-xl shadow-slate-500">
                 <div class="absolute w-full flex justify-center -bottom-14">
@@ -96,7 +97,7 @@ onMounted(async () => {
                       <Map
                           :default-point="{
                               name: me.address,
-                              coordinates: me.coordinates.reverse(),
+                              coordinates: me.coordinates,
                           }"
                           :zoom="11"
                           :width="'350px'"
