@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -39,6 +41,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
     paginationClientItemsPerPage: 10,
     paginationMaximumItemsPerPage: 50,
 )]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'name' => 'partial',
+        'slug' => 'partial',
+    ],
+)]
 class Status
 {
     #[Groups(['collection:get:status', 'item:get:status', 'id'])]
@@ -48,7 +57,7 @@ class Status
     private ?int $id = null;
 
     #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 50)]
     private ?string $name = null;
 
     #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status', 'id'])]

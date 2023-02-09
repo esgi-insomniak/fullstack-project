@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Delete(),
         new GetCollection(
-            uriTemplate: '/garages/{id}/garageSchudleEvents',
+            uriTemplate: '/garages/{id}/garage_schudle_events',
             uriVariables: [
                 'id' => new Link(
                     fromProperty: 'garageSchudleEvents',
@@ -98,6 +98,34 @@ class GarageSchudleEvent
     #[ORM\ManyToOne(inversedBy: 'garageSchudleEvents')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $associateUser = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $reason = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\ManyToOne(inversedBy: 'garageSchudleEvents')]
+    private ?CarIdentity $carIdentity = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $kilometers = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fuel = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $gearbox = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'id'])]
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent'])]
+    #[ORM\ManyToOne(inversedBy: 'garageSchudleEvents')]
+    private ?Order $associateOrder = null;
 
     public function getId(): ?int
     {
@@ -184,6 +212,90 @@ class GarageSchudleEvent
     public function setAssociateUser(?User $associateUser): self
     {
         $this->associateUser = $associateUser;
+
+        return $this;
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?string $reason): self
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getCarIdentity(): ?CarIdentity
+    {
+        return $this->carIdentity;
+    }
+
+    public function setCarIdentity(?CarIdentity $carIdentity): self
+    {
+        $this->carIdentity = $carIdentity;
+
+        return $this;
+    }
+
+    public function getKilometers(): ?string
+    {
+        return $this->kilometers;
+    }
+
+    public function setKilometers(?string $kilometers): self
+    {
+        $this->kilometers = $kilometers;
+
+        return $this;
+    }
+
+    public function getFuel(): ?string
+    {
+        return $this->fuel;
+    }
+
+    public function setFuel(?string $fuel): self
+    {
+        $this->fuel = $fuel;
+
+        return $this;
+    }
+
+    public function getGearbox(): ?string
+    {
+        return $this->gearbox;
+    }
+
+    public function setGearbox(?string $gearbox): self
+    {
+        $this->gearbox = $gearbox;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getAssociateOrder(): ?Order
+    {
+        return $this->associateOrder;
+    }
+
+    public function setAssociateOrder(?Order $associateOrder): self
+    {
+        $this->associateOrder = $associateOrder;
 
         return $this;
     }

@@ -60,6 +60,7 @@ class OrderPaymentValidationController extends AbstractController
 
         $order->setStripe([$checkout]);
         $order->setStatus($this->em->getRepository(Status::class)->findOneBy(['slug' => 'paid']));
+        $order->setSold(true);
         $this->em->flush();
 
         return new JsonResponse($stripeData);
