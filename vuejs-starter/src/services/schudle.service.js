@@ -25,25 +25,25 @@ class GarageSchudleEventService {
       });
   }
 
-  async post(garage) {
+  async post(garageSchudleEvent) {
     return getAxiosInstance()
-      .post("garage_schudle_events", garage)
+      .post("garage_schudle_events", garageSchudleEvent)
       .then((response) => {
         return response.data;
       });
   }
 
-  async put(id, garage) {
+  async put(id, garageSchudleEvent) {
     return getAxiosInstance()
-      .put(`garage_schudle_events/${id}`, garage)
+      .put(`garage_schudle_events/${id}`, garageSchudleEvent)
       .then((response) => {
         return response.data;
       });
   }
 
-  async patch(id, garage) {
+  async patch(id, garageSchudleEvent) {
     return getAxiosInstance()
-      .patch(`garage_schudle_events/${id}`, garage)
+      .patch(`garage_schudle_events/${id}`, garageSchudleEvent)
       .then((response) => {
         return response.data;
       });

@@ -99,6 +99,26 @@ class GarageSchudleEvent
     #[ORM\JoinColumn(nullable: false)]
     private ?User $associateUser = null;
 
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $reason = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\ManyToOne(inversedBy: 'garageSchudleEvents')]
+    private ?CarIdentity $carIdentity = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $kilometers = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fuel = null;
+
+    #[Groups(['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:post:garageSchudleEvent', 'item:put:garageSchudleEvent', 'item:patch:garageSchudleEvent'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $gearbox = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -184,6 +204,66 @@ class GarageSchudleEvent
     public function setAssociateUser(?User $associateUser): self
     {
         $this->associateUser = $associateUser;
+
+        return $this;
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?string $reason): self
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getCarIdentity(): ?CarIdentity
+    {
+        return $this->carIdentity;
+    }
+
+    public function setCarIdentity(?CarIdentity $carIdentity): self
+    {
+        $this->carIdentity = $carIdentity;
+
+        return $this;
+    }
+
+    public function getKilometers(): ?string
+    {
+        return $this->kilometers;
+    }
+
+    public function setKilometers(?string $kilometers): self
+    {
+        $this->kilometers = $kilometers;
+
+        return $this;
+    }
+
+    public function getFuel(): ?string
+    {
+        return $this->fuel;
+    }
+
+    public function setFuel(?string $fuel): self
+    {
+        $this->fuel = $fuel;
+
+        return $this;
+    }
+
+    public function getGearbox(): ?string
+    {
+        return $this->gearbox;
+    }
+
+    public function setGearbox(?string $gearbox): self
+    {
+        $this->gearbox = $gearbox;
 
         return $this;
     }

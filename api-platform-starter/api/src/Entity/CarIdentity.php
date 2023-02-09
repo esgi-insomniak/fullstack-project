@@ -77,9 +77,13 @@ class CarIdentity
     #[ORM\JoinColumn(nullable: false)]
     private ?Image $mainPicture = null;
 
+    #[ORM\OneToMany(mappedBy: 'carIdentity', targetEntity: GarageSchudleEvent::class)]
+    private Collection $garageSchudleEvents;
+
     public function __construct()
     {
         $this->cars = new ArrayCollection();
+        $this->garageSchudleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +153,36 @@ class CarIdentity
     public function setMainPicture(?Image $mainPicture): self
     {
         $this->mainPicture = $mainPicture;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setCarIdentity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getCarIdentity() === $this) {
+                $garageSchudleEvent->setCarIdentity(null);
+            }
+        }
 
         return $this;
     }
