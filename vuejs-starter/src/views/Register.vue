@@ -61,7 +61,7 @@ const handleMapClick = (feature) => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-[90vh]">
+  <div class="flex justify-center items-center h-[88vh]">
     <div class="w-3/4 h-5/6 rounded-3xl shadow-md bg-white/30 flex divide-x">
       <div class="w-1/3 bg-[url('/public/bg_register.jpg')] bg-cover rounded-l-3xl" />
       <div class="w-2/3 p-5 flex jusitfy-center items-center h-full flex-col">

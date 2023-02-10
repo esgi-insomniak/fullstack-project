@@ -88,11 +88,6 @@ const routes = [
         component: () => import('../views/admin/LayoutAdmin.vue'),
         children: [
             {
-                path: 'dashboard',
-                name: 'dashboard',
-                component: () => import('../views/admin/Dashboard.vue'),
-            },
-            {
                 path: 'users',
                 name: 'users',
                 component: () => import('../views/admin/UsersAdmin.vue'),

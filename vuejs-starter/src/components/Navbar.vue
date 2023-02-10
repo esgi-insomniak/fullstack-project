@@ -17,7 +17,7 @@ const userLink = [
     { name: 'Mes favoris', href: '/me/favorites', isAuth: true, icon: StarIcon, isAdmin: false },
     { name: 'Mes achats/ventes', href: '/me/list/orders/in-progress', isAuth: true, icon: ShoppingCartIcon, isAdmin: false },
     //{ name: 'Mes messages', href: '/me/messages', isAuth: true, icon: InboxIcon, isAdmin: false },
-    { name: 'Administration', href: '/admin/dashboard', isAuth: true, icon: KeyIcon, isAdmin: true },
+    { name: 'Administration', href: '/admin/users', isAuth: true, icon: KeyIcon, isAdmin: true },
     { name: 'Ma concession', href: '/concession', isAuth: true, icon: HomeModernIcon, isAdmin: true },
     { name: 'Se déconnecter', href: '/logout', isAuth: true, icon: ArrowLeftOnRectangleIcon, isAdmin: false },
     { name: 'Se connecter', href: '/login', isAuth: false, icon: ArrowRightOnRectangleIcon, isAdmin: false },
