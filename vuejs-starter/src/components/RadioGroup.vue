@@ -13,8 +13,12 @@ const props = defineProps({
         type: String,
         default: 'justify-center',
     },
+    selected: {
+        type: Number,
+        default: 0,
+    },
 })
-const selected = ref(0)
+const selected = ref(props.selected)
 const handleChange = (option) => {
     if (selected.value === option.id) {
         selected.value = 0
@@ -25,7 +29,7 @@ const handleChange = (option) => {
         emit('onSelected', option.id)
     }
 }
-const emit = defineEmits(['onSelected'])
+const emit = defineEmits(['onSelected']);
 </script>  
 
 <template>

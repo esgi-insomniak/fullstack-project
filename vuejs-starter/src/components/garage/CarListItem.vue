@@ -1,6 +1,9 @@
 <script setup>
 import {ref} from "vue";
-import {CurrencyEuroIcon, FunnelIcon, CalendarIcon, BoltIcon, ScaleIcon, Battery50Icon, RocketLaunchIcon} from "@heroicons/vue/24/outline";
+import {CurrencyEuroIcon, FunnelIcon, CalendarIcon, BoltIcon, ScaleIcon, Battery50Icon, RocketLaunchIcon, ArrowRightIcon, ArrowLeftIcon, ShoppingCartIcon} from "@heroicons/vue/24/outline";
+import orderService from "../../services/order.service";
+import userService from "../../services/user.service";
+import {useRouter} from "vue-router";
 
 const props = defineProps({
   car: {
@@ -9,12 +12,26 @@ const props = defineProps({
   },
 });
 
+const router = useRouter();
+
 const isDetailedShow = ref(false);
+
+const handleOrder = async () => {
+  const me = await userService.get('me');
+  const order = {
+    orderer: `users/${me.id}`,
+    car: `cars/${props.car.id}`,
+    garage: `garages/${props.car.garage.id}`,
+    totalPrice: props.car.price,
+  }
+  await orderService.post(order);
+  router.push({ name: 'UserOrders', params: { slug: 'in-progress' } });
+};
 
 </script>
 
 <template>
-  <div class="max-w-sm max-h-[500px] bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+  <div class="max-w-sm max-h-[600px] bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
 
     <div v-if="!isDetailedShow">
       <img class="rounded-t-lg" :src="car.identity.mainPicture.src" alt="" />
@@ -24,22 +41,31 @@ const isDetailedShow = ref(false);
           <p class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-400 text-capitalize">{{ car.identity.category.name }}</p>
         </a>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p>
-        <button
-            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            @click="isDetailedShow = !isDetailedShow"
-        >
-          Voir le détail
-          <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        </button>
+
+        <div class="flex justify-around items-center justify-center">
+          <button
+              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              @click="isDetailedShow = !isDetailedShow"
+          >
+            Voir le détail
+            <ArrowRightIcon class="w-5 h-5 ml-2 -mr-1" />
+          </button>
+
+          <button
+              class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-700 dark:hover:bg-green-500 dark:focus:ring-green-300"
+              @click="handleOrder"
+          >
+            Commander
+            <ShoppingCartIcon class="w-5 h-5 ml-2 -mr-1" />
+          </button>
+        </div>
       </div>
     </div>
     <Transition>
     <div v-if="isDetailedShow">
       <!-- <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span> -->
       <!-- svg cross -->
-      <img v-for="image in car.images" class="rounded-t-lg" :src="image.src" alt="" />
+      <img class="rounded-t-lg" :src="car.identity.mainPicture.src" alt="" />
       <div class="p-5">
 
         <div class="grid grid-cols-2 gap-4 text-xs">
@@ -90,13 +116,11 @@ const isDetailedShow = ref(false);
         </div>
 
         <button
-            class="inline-flex items-center px-3 text-sm font-medium text-center text-white bg-white/10 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-white/10 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            class="inline-flex items-center text-sm font-medium text-center text-white bg-white/10 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-white/10 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             @click="isDetailedShow = !isDetailedShow"
         >
           Retour
-          <svg aria-hidden="true" class="w-4 h-4 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
+          <ArrowLeftIcon class="w-5 h-5 ml-2 -mr-1" />
         </button>
       </div>
     </div>

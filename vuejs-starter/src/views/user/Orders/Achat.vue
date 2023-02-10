@@ -221,7 +221,7 @@ const modalProps = reactive({
         <div class="w-full h-52 rounded-lg bg-white/20 flex shadow-inner shadow-slate-200">
             <div class="relative w-1/5 h-full">
                 <div class="absolute -left-32 -top-5 h-52 w-96 hover:scale-110 duration-300 ease-in-out bg-cover">
-                    <img :src="order.car.images[0].src" class="h-full w-full object-cover bg-cover" />
+                    <img :src="order.car.identity.mainPicture.src" class="h-full w-full object-cover bg-cover" />
                 </div>
             </div>
             <div class="relative w-full py-5 px-5 flex flex-col space-y-5 ml-10 item-start">

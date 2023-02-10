@@ -48,7 +48,7 @@ class StripeCheckoutController extends AbstractController
                     'unit_amount_decimal' => $order->getCar()->getPrice() * 100,
                     'product_data' => [
                         'name' => "BMW " . $order->getCar()->getIdentity()->getCategory()->getName() . " " . $order->getCar()->getIdentity()->getName(),
-                        'images' => [$order->getCar()->getImages()[0]->getSrc()],
+                        'images' => [$order->getCar()->getIdentity()->getMainPicture()->getSrc()],
                     ],
                 ],
                 'quantity' => 1,

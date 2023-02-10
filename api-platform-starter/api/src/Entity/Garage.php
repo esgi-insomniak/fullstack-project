@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -39,7 +42,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: 10,
-    paginationMaximumItemsPerPage: 50,
+    paginationMaximumItemsPerPage: 100,
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'name' => 'partial',
+        'coordinates' => 'exact',
+        'isOpen' => 'exact',
+        'cars.isOrdered' => 'exact',
+        'cars.identity.id' => 'exact',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: [
+        'isOpen',
+        'cars.identity.id' => [
+            'property' => 'cars.identity.id',
+            'strategy' => 'COUNT',
+        ],
+    ],
 )]
 class Garage
 {
