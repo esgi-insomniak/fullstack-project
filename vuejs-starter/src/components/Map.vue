@@ -105,7 +105,6 @@ const loadMap = (jawg) => {
   });
 
   if (props.defaultPoint.coordinates && props.defaultPoint.coordinates.length === 2 && props.defaultPoint.name) {
-    console.log(props.defaultPoint.coordinates)
     map.setView(props.defaultPoint.coordinates, props.zoom);
     L.marker(props.defaultPoint.coordinates).addTo(map).bindPopup(props.defaultPoint.name);
   }else{
@@ -148,7 +147,6 @@ const loadMap = (jawg) => {
 }
 
 onMounted(async () => {
-  console.log('Map mounted', props);
   const map = await Map.getInstance();
   loadMap(map);
 });

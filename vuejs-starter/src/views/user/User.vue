@@ -32,7 +32,7 @@ const handleMapClick = (feature) => {
 };
 
 const handleMapError = (e) => {
-  console.log(e);
+  console.error(e);
 };
 
 
