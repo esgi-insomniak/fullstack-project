@@ -14,12 +14,10 @@ const route = useRoute();
 const {identityId} = route.params;
 const garageParams = (identityId) ? {
   "cars.identity.id": identityId,
-  "cars.isOrdered": false,
   "itemsPerPage": 100,
   "order[isOpen]": "desc",
   "order[cars.identity.id]": "desc",
 } : {
-  "cars.isOrdered": false,
   "order[isOpen]": "desc",
   "itemsPerPage": 100,
 };
