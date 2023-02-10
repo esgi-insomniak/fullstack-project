@@ -73,6 +73,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'id' => 'exact',
         'slug' => 'exact',
         'year' => 'exact',
+        'isOrdered' => 'exact',
         'identity.id' => 'exact'
     ]
 )]
@@ -146,6 +147,10 @@ class Car
     #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\ManyToOne(inversedBy: 'cars')]
     private ?Garage $garage = null;
+
+    #[Groups(['collection:get:car', 'item:get:car'])]
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $isOrdered = null;
 
     public function __construct()
     {
@@ -391,6 +396,18 @@ class Car
     public function setGarage(?Garage $garage): self
     {
         $this->garage = $garage;
+
+        return $this;
+    }
+
+    public function isIsOrdered(): ?bool
+    {
+        return $this->isOrdered;
+    }
+
+    public function setIsOrdered(bool $isOrdered): self
+    {
+        $this->isOrdered = $isOrdered;
 
         return $this;
     }

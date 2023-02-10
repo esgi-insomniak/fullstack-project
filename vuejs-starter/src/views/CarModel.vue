@@ -64,7 +64,7 @@ const router = useRouter()
                             <div class="flex space-x-2">
                                 <span>Je commande ma BMW</span>
                             </div>
-                            <button @click="router.push(`/order-car/${car.id}`)">Commander</button>
+                            <button @click="router.push({ name: 'GarageByCarIdentity', params: { identityId: car.id }})">Commander</button>
                         </div>
                         <div class="flex flex-col space-y-2 justify-end bg-white/30 rounded-md h-full p-2" />
                     </div>

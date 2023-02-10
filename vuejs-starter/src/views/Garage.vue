@@ -14,10 +14,12 @@ const route = useRoute();
 const {identityId} = route.params;
 const garageParams = (identityId) ? {
   "cars.identity.id": identityId,
+  "cars.isOrdered": false,
   "itemsPerPage": 100,
   "order[isOpen]": "desc",
   "order[cars.identity.id]": "desc",
 } : {
+  "cars.isOrdered": false,
   "order[isOpen]": "desc",
   "itemsPerPage": 100,
 };
@@ -56,7 +58,7 @@ const handleCarIdentityChange = (identity) => {
 
 const getGarageCars = async (garageId) => {
   selectGarageById(garageId);
-  cars.value = await CarService.getGarageCars(garageId);
+  cars.value = await CarService.getGarageCars(garageId, { "isOrdered": false });
   filteredCars.value = cars.value;
   if (identityId) {
     const findCar = cars.value.find(car => car.identity.id == identityId);

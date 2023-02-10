@@ -134,11 +134,6 @@ const routes = [
         name: 'Model',
         component: () => import('../views/CarModel.vue'),
     },
-    {
-        path: '/order-car/:id',
-        name: 'OrderCar',
-        component: () => import('../views/OrderCars.vue'),
-    }
 ]
 
 const router = VueRouter.createRouter({

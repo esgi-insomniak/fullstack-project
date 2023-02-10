@@ -118,7 +118,6 @@ class OrderFixture extends Fixture implements DependentFixtureInterface
             $order->setCreatedAt(DateTimeImmutable::createFromMutable($created_at));
             $order->setUpdatedAt(DateTimeImmutable::createFromMutable($updated_at));
             $order->setAppointmentDate(DateTimeImmutable::createFromMutable($appointment));
-            $order->setUuid($this->faker->uuid);
             $order->setStripe($stripe);
             $order->setTotalPrice($stripe['amount'] ?? null);
 

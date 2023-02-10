@@ -50,6 +50,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'name' => 'partial',
         'coordinates' => 'exact',
         'isOpen' => 'exact',
+        'cars.isOrdered' => 'exact',
         'cars.identity.id' => 'exact',
     ],
 )]
