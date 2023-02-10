@@ -73,7 +73,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'id' => 'exact',
         'slug' => 'exact',
         'year' => 'exact',
-        'identity.id' => 'exact',
+        'identity.id' => 'exact'
     ]
 )]
 class Car

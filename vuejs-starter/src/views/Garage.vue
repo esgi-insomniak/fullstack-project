@@ -14,7 +14,7 @@ const route = useRoute();
 const {identityId} = route.params;
 const garageParams = (identityId) ? {
   "cars.identity.id": identityId,
-  "itemsPerPage": 50,
+  "itemsPerPage": 100,
   "order[isOpen]": "desc",
   "order[cars.identity.id]": "desc",
 } : {
@@ -27,7 +27,6 @@ const cars = ref([]);
 const filteredCars = ref([]);
 const me = ref(null);
 const selectedCategory = ref(undefined);
-const categoriesRadioGroup = ref(null);
 
 
 const handleGarageIconClick = async (e) => {
@@ -49,7 +48,7 @@ const handleCarCategoryChange = (category) => {
 
 const handleCarIdentityChange = (identity) => {
   if (identity === undefined) {
-    filteredCars.value = cars.value;
+    handleCarCategoryChange(selectedCategory.value);
   } else {
     filteredCars.value = cars.value.filter(car => car.identity.id === identity);
   }
@@ -60,8 +59,11 @@ const getGarageCars = async (garageId) => {
   cars.value = await CarService.getGarageCars(garageId);
   filteredCars.value = cars.value;
   if (identityId) {
-    selectedCategory.value = cars.value.find(car => car.identity.id == identityId).identity.category.id;
-    //trigger child event
+    const findCar = cars.value.find(car => car.identity.id == identityId);
+    if (findCar) {
+      handleCarCategoryChange(findCar.identity.category.id);
+      handleCarIdentityChange(findCar.identity.id);
+    }
   }
 };
 
@@ -133,12 +135,12 @@ onMounted(async () => {
         <div class="md:w-1/4 sm:w-full">
           <div class="mt-2">
             <h2 class="text-2xl font-bold">Catégories</h2>
-            <RadioGroup class="uppercase" :options="getAllCarCategories()" @on-selected="handleCarCategoryChange" />
+            <RadioGroup class="uppercase" :selected="Number(selectedCategory)" :options="getAllCarCategories()" @on-selected="handleCarCategoryChange" />
           </div>
 
           <div class="mt-2" v-if="selectedCategory">
             <h2 class="text-2xl font-bold">Modèles</h2>
-            <RadioGroup class="uppercase" :options="getAllCarIdentities(selectedCategory)" @on-selected="handleCarIdentityChange" />
+            <RadioGroup class="uppercase" :selected="Number(identityId)" :options="getAllCarIdentities(selectedCategory)" @on-selected="handleCarIdentityChange" />
           </div>
         </div>
         <div>
