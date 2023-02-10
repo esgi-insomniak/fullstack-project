@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -64,6 +66,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
     paginationClientEnabled: true,
     paginationClientItemsPerPage: 10,
     paginationMaximumItemsPerPage: 50,
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'slug' => 'exact',
+        'year' => 'exact',
+        'identity.id' => 'exact',
+    ]
 )]
 class Car
 {
