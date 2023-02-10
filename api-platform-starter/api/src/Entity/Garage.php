@@ -19,13 +19,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:garage', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garage', 'item:get:user', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garage']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:garage', 'id']],
+            normalizationContext: ['groups' => ['item:get:garage', 'item:get:user', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garage']],
@@ -72,6 +72,11 @@ class Garage
 
     #[ORM\OneToMany(mappedBy: 'associateGarage', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
     private Collection $garageSchudleEvents;
+
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
+    #[ORM\ManyToOne(inversedBy: 'garages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -236,6 +241,18 @@ class Garage
                 $garageSchudleEvent->setAssociateGarage(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }

@@ -19,7 +19,6 @@ const handleChange = (option) => {
     if (selected.value === option.id) {
         selected.value = 0
         emit('onSelected', undefined)
-        return
     }
     else {
         selected.value = option.id
@@ -46,7 +45,6 @@ const emit = defineEmits(['onSelected'])
                     <div :class="[
                         'relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none',
                         {
-                            'ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-sky-300': active === index,
                             'bg-sky-600 shadow-inner shadow-black bg-opacity-75 text-white': selected === option.id,
                             'bg-white': selected !== option
                         }
@@ -65,7 +63,7 @@ const emit = defineEmits(['onSelected'])
                             <template v-if="selected === option.id">
                                 <div class="shrink-0 text-green-500">
                                     <svg viewBox="0 0 24 24" fill="none" class="h-6 w-6">
-                                        <circle cx={12} cy={12} r={12} fill="#fff" opacity="0.2" />
+                                        <circle cx="12" cy="12" r="12" fill="currentColor" />
                                         <path d="M7 13l3 3 7-7" stroke="#fff" stroke-width="1.5" stroke-linecap="round"
                                             stroke-linejoin="round" />
                                     </svg>

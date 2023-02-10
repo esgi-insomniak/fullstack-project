@@ -14,7 +14,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="grid grid-cols-4 gap-4 py-4">
+  <div class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1 gap-4 py-4">
     <CarListItem v-for="car in cars" :car="car" />
   </div>
 </template>
