@@ -37,21 +37,6 @@ const routes = [
         component: () => import('../views/Logout.vue'),
     },
     {
-        path: '/order',
-        name: 'order',
-        component: () => import('../views/order/Order.vue'),
-    },
-    {
-        path: '/success',
-        name: 'success',
-        component: () => import('../views/order/Success.vue'),
-    },
-    {
-        path: '/cancel',
-        name: 'cancel',
-        component: () => import('../views/order/Cancel.vue'),
-    },
-    {
         // user 
         path: '/me',
         name: 'User',
@@ -68,7 +53,7 @@ const routes = [
                 component: () => import('../views/user/Orders/LayoutOrders.vue'),
                 children: [
                     {
-                        path: 'orders',
+                        path: 'orders/:slug',
                         name: 'UserOrders',
                         component: () => import('../views/user/Orders/Achat.vue'),
                     },
@@ -85,9 +70,37 @@ const routes = [
                 ]
             },
             {
+                path: 'orders/:orderId/success/:sessionId',
+                name: 'UserOrdersSuccess',
+                component: () => import('../views/user/Orders/AchatSuccess.vue'),
+            },
+            {
                 path: 'profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/User.vue'),
+            }
+        ]
+    },
+    {
+        // admin
+        path: '/admin',
+        name: 'Admin',
+        component: () => import('../views/admin/LayoutAdmin.vue'),
+        children: [
+            {
+                path: 'users',
+                name: 'users',
+                component: () => import('../views/admin/UsersAdmin.vue'),
+            },
+            {
+                path: 'cars',
+                name: 'cars',
+                component: () => import('../views/admin/CarAdmin.vue'),
+            },
+            {
+                path: 'orders',
+                name: 'orders',
+                component: () => import('../views/admin/OrderAdmin.vue'),
             }
         ]
     },
@@ -100,6 +113,21 @@ const routes = [
         path: '/garage',
         name: 'Garage',
         component: () => import('../views/Garage.vue'),
+    },
+    {
+        path: '/forgot_password',
+        name: 'ForgotPassword',
+        component: () => import('../views/ForgotPassword.vue'),
+    },
+    {
+        path: '/account_recovery/:token',
+        name: 'AccountRecovery',
+        component: () => import('../views/AccountRecovery.vue'),
+    },
+    {
+        path: '/model',
+        name: 'Model',
+        component: () => import('../views/CarModel.vue'),
     }
 ]
 

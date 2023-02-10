@@ -18,6 +18,8 @@ RUN apt-get -yq update
 RUN apt-get -yq install python3 python3-pip
 RUN python3 -m pip install ansible
 
+RUN apt-get -yq install vim
+
 # Install ansible extension
 RUN apt-get -yq install python-dnspython
 

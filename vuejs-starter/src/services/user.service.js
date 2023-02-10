@@ -1,33 +1,45 @@
-import {getAxiosInstance} from "../helpers/axios/config.js";
+import { getAxiosInstance } from "../helpers/axios/config.js";
 
 class UserService {
-    constructor () {
-        this.user = null
-    }
+  async getCollection(params = null) {
+    return getAxiosInstance()
+      .get("users", { params: params })
+      .then((response) => {
+        return response.data;
+      });
+  }
 
-    getUser () {
-        return this.user
-    }
+  async get(id) {
+    return getAxiosInstance()
+      .get(`users/${id}`)
+      .then((response) => {
+        return response.data;
+      });
+  }
 
-    setUser (user) {
-        this.user = user
-    }
+  async put(id, user) {
+    return getAxiosInstance()
+      .put(`users/${id}`, user)
+      .then((response) => {
+        return response.data;
+      });
+  }
 
-    me() {
-        return getAxiosInstance()
-            .get("users/me")
-            .then((response) => {
-                return response.data;
-            });
-    }
+  async patch(id, user) {
+    return getAxiosInstance()
+      .patch(`users/${id}`, user)
+      .then((response) => {
+        return response.data;
+      });
+  }
 
-    update(user) {
-        return getAxiosInstance()
-            .patch("users/me", user)
-            .then((response) => {
-                return response.data;
-            });
-    }
+  async delete(id) {
+    return getAxiosInstance()
+      .delete(`users/${id}`)
+      .then((response) => {
+        return response.data;
+      });
+  }
 }
 
 export default new UserService();

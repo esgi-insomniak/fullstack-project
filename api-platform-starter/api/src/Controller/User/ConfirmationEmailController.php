@@ -2,6 +2,7 @@
 
 namespace App\Controller\User;
 
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,25 +23,25 @@ class ConfirmationEmailController extends AbstractController
 
     public function __invoke($id)
     {
-        // /**
-        //  * @var User
-        //  */
+        /**
+         * @var User
+         */
         $user = $this->getUser();
 
         if($user->getId() !== (int)$id)
             throw new \Exception('You are not allowed to send a confirmation email.');
-        // if($user->isActivated())
-        //     throw new \Exception('Your account is already activated.');
+        if($user->isActivated())
+            throw new \Exception('Your account is already activated.');
 
-        // $user->setConfirmationCode(substr(str_shuffle(str_repeat('0123456789', 6)), 0, 6));
-        // $this->em->flush();
+        $user->setConfirmationCode(substr(str_shuffle(str_repeat('0123456789', 6)), 0, 6));
+        $this->em->flush();
 
         $email = (new TemplatedEmail())
             ->subject('Email de confirmation de compte')
-            ->html("<p>votre code de confirmation est <strong>test</strong></p>")
+            ->html("<p>votre code de confirmation est <strong>" . $user->getConfirmationCode() . "</strong></p>")
             ->from($this->getParameter('sender_address'))
             ->to($user->getEmail());
-        
+
         $this->mailer->send($email);
 
         return $this->json([

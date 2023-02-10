@@ -7,6 +7,11 @@ axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 axios.defaults.headers.patch['Content-Type'] = 'application/merge-patch+json';
 
+//return default data
+axios.defaults.validateStatus = function (status) {
+    return status >= 200 && status < 300; // default
+}
+
 //axios.defaults.headers.common['Access-Control-Allow-Origin'] = import.meta.env.VITE_ALLOW_ORIGIN;
 
 export const getAxiosInstance = () => {

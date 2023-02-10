@@ -3,6 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\CarCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,19 +16,44 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CarCategoryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:carCategory', 'id']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:carCategory']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:carCategory', 'id']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:carCategory']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:carCategory']],
+        ),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['collection:get:carCategory', 'item:get:carCategory']],
+    denormalizationContext: ['groups' => ['item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
+)]
 class CarCategory
 {
+    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory', 'id'])]
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
-    #[Groups(['car:read:item', 'car:read:collection'])]
+    #[Groups(['collection:get:carCategory', 'item:get:carCategory', 'item:post:carCategory', 'item:put:carCategory', 'item:patch:carCategory', 'id'])]
     #[ORM\Column(length: 80, unique: true)]
     private ?string $slug = null;
 

@@ -7,13 +7,6 @@
                 <span class="font-bold text-white text-left underline pl-1">Trouver votre plaisir</span>
                 <router-link to="/model"
                     class="rounded-lg p-1 text-slate-200 hover:bg-inherit text-left cursor-pointer min-w-full">Models</router-link>
-                <router-link to="/achat"
-                    class="rounded-lg p-1 text-slate-200 hover:bg-inherit text-left cursor-pointer min-w-full">Achat</router-link>
-                <router-link to="/e-brid"
-                    class="rounded-lg p-1 text-slate-200 hover:bg-inherit text-left cursor-pointer min-w-full">Electrique
-                    &
-                    Hybride Rechargeable
-                </router-link>
                 <router-link to="/services"
                     class="rounded-lg p-1 text-slate-200 hover:bg-inherit text-left cursor-pointer min-w-full">
                     Services

@@ -10,6 +10,9 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Controller\User\ConfirmationEmailController;
+use App\Controller\User\RecoveryAccountChangePasswordController;
+use App\Controller\User\RecoveryAccountController;
+use App\Controller\User\ValidateAccountController;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
 use DateTimeImmutable;
@@ -24,12 +27,22 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
 
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(processor: UserPasswordHasher::class),
-        new Get(),
-        new Put(processor: UserPasswordHasher::class),
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:user', 'id']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:user']],
+            processor: UserPasswordHasher::class
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:user', 'id']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:user']],
+            processor: UserPasswordHasher::class
+        ),
         new Patch(
-            denormalizationContext: ['groups' => ['user:update']],
+            denormalizationContext: ['groups' => ['item:patch:user']],
             processor: UserPasswordHasher::class
         ),
         new Delete(),
@@ -39,25 +52,86 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
             controller: ConfirmationEmailController::class,
             openapiContext: [
                 'requestBody' => [
-                    'content' => [
-                        'application/ld+json' => [
-                            'schema' => [],
+                    'content' => [],
+                ],
+            ],
+            output: false,
+        ),
+        new Post(
+            uriTemplate: '/users/{id}/validate_account',
+            defaults: ['_api_receive' => false],
+            controller: ValidateAccountController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "confirmationCode" => ["type" => "string"],
+                                ],
+                            ],
                         ],
                     ],
                 ],
             ],
             output: false,
         ),
+        new Post(
+            uriTemplate: '/users/recovery_account',
+            defaults: ['_api_receive' => false],
+            controller: RecoveryAccountController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "email" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            output: false,
+        ),
+        new Post(
+            uriTemplate: '/users/recovery_account_change_password',
+            defaults: ['_api_receive' => false],
+            controller: RecoveryAccountChangePasswordController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "recoveryToken" => ["type" => "string"],
+                                    "password" => ["type" => "string"],
+                                    "confirmPassword" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            output: false,
+        )
     ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    normalizationContext: ['groups' => ['collection:get:user', 'item:get:user']],
+    denormalizationContext: ['groups' => ['item:post:user', 'item:put:user', 'item:patch:user']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity('email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Groups(['user:read'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -65,18 +139,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Assert\NotBlank]
     #[Assert\Email]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
-    #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['item:post:user', 'item:put:user', 'item:patch:user'])]
     private ?string $plainPassword = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $confirmationCode;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $recoveryToken;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups(['item:get:user'])]
+    private $haveRecoverToken = false;
 
     /**
      * @var string The hashed password
@@ -84,30 +167,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private string $password = '';
 
-    #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(length: 50)]
     private ?string $firstName = null;
 
 
-    #[Assert\NotBlank(groups: ['user:create', 'user:update'])]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(length: 50)]
     private ?string $lastName = null;
 
-    #[Groups(['user:read', 'user:update'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $verifiedAt = null;
 
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Assert\NotBlank(groups: ['item:post:user'])]
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(type: 'json')]
     private array $coordinates;
 
-    #[Groups(['user:read'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
-    #[Groups(['user:read'])]
+    #[Groups(['collection:get:user', 'item:get:user'])]
     #[ORM\Column(type: 'datetime_immutable', nullable: true, options: ['default' => null])]
     private ?DateTimeImmutable $updatedAt = null;
 
@@ -117,10 +201,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'recover', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]
+    #[ORM\Column(length: 60, nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $phone = null;
+
+    #[ORM\OneToMany(mappedBy: 'associateUser', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
+    private Collection $garageSchudleEvents;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
+        $this->haveRecoverToken = false;
+        $this->roles = ['ROLE_USER'];
+        $this->garageSchudleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,6 +289,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $painPassword): self
     {
         $this->plainPassword = $painPassword;
+
+        return $this;
+    }
+
+    public function isActivated(): ?bool
+    {
+        return $this->verifiedAt !== null;
+    }
+
+    public function isHaveRecoverToken(): ?bool
+    {
+        return $this->haveRecoverToken;
+    }
+
+    public function activate(): self
+    {
+        $this->verifiedAt = new DateTimeImmutable();
+        $this->confirmationCode = null;
+
+        return $this;
+    }
+
+    public function getConfirmationCode(): ?string
+    {
+        return $this->confirmationCode;
+    }
+
+    public function setConfirmationCode(?string $confirmationCode): self
+    {
+        $this->confirmationCode = $confirmationCode;
+
+        return $this;
+    }
+
+    public function getRecoveryToken(): ?string
+    {
+        return $this->recoveryToken;
+    }
+
+    public function setRecoveryToken(?string $recoveryToken): self
+    {
+        $this->recoveryToken = $recoveryToken;
+        $this->haveRecoverToken = $recoveryToken !== null;
 
         return $this;
     }
@@ -334,4 +474,57 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateUser() === $this) {
+                $garageSchudleEvent->setAssociateUser(null);
+            }
+        }
+
+        return $this;
+    }
 }

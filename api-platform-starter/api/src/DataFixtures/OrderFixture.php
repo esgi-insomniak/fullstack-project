@@ -108,6 +108,11 @@ class OrderFixture extends Fixture implements DependentFixtureInterface
             }
 
             $final_status = $order_status[array_rand($order_status)];
+            $progression = [
+                'in-progress',
+                'completed',
+                'canceled',
+            ];
 
             $order = new Order();
             $order->setCreatedAt(DateTimeImmutable::createFromMutable($created_at));
@@ -121,6 +126,7 @@ class OrderFixture extends Fixture implements DependentFixtureInterface
             $order->setCar($car);
             $order->setOrderer($users[array_rand($users)]);
             $order->setStatus($final_status);
+            $order->setProgression($progression[array_rand($progression)]);
             $order->setSold($sold);
             $order->setFinalisedAt($finalised_at ? DateTimeImmutable::createFromMutable($finalised_at) : null);
             $manager->persist($order);

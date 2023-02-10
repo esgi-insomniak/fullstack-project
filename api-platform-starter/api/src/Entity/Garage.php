@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -14,42 +12,52 @@ use ApiPlatform\Metadata\Put;
 use App\Repository\GarageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GarageRepository::class)]
 #[ApiResource(
-    shortName: 'garages',
     operations: [
         new GetCollection(
-            paginationItemsPerPage: 10,
-            normalizationContext: ['groups' => ['garage:read:collection']],
+            normalizationContext: ['groups' => ['collection:get:garage', 'id']],
         ),
-        new Get(),
-        new Post(),
-        new Put(),
-        new Patch(),
+        new Post(
+            denormalizationContext: ['groups' => ['item:post:garage']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:garage', 'id']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:garage']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:garage']],
+        ),
         new Delete(),
     ],
-    denormalizationContext: ['groups' => ['garage:create', 'garage:update']],
+    normalizationContext: ['groups' => ['collection:get:garage', 'item:get:garage']],
+    denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Garage
 {
+    #[Groups(['collection:get:garage', 'item:get:garage', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(['car:read:item'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[Groups(['car:read:item'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
     #[ORM\Column(type: 'json')]
     private array $coordinates = [];
 
-    #[Groups(['car:read:item'])]
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
     #[ORM\Column]
     private ?bool $isOpen = null;
 
@@ -59,15 +67,18 @@ class Garage
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
-    #[Groups(['garage:read:collection'])]
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
     private Collection $cars;
+
+    #[ORM\OneToMany(mappedBy: 'associateGarage', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
+    private Collection $garageSchudleEvents;
 
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->recoveries = new ArrayCollection();
         $this->cars = new ArrayCollection();
+        $this->garageSchudleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,6 +205,36 @@ class Garage
         // set the owning side to null (unless already changed)
         if ($this->cars->removeElement($car) && $car->getGarage() === $this) {
             $car->setGarage(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateGarage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateGarage() === $this) {
+                $garageSchudleEvent->setAssociateGarage(null);
+            }
         }
 
         return $this;

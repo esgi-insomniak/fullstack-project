@@ -1,22 +1,47 @@
 <script setup>
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, defineEmits } from 'vue'
 const props = defineProps({
     options: {
         type: Array,
         required: true,
     },
+    flexDirection: {
+        type: String,
+        default: 'flex-col',
+    },
+    positionFlex: {
+        type: String,
+        default: 'justify-center',
+    },
 })
 const selected = ref(0)
 const handleChange = (option) => {
-    selected.value = option.id
+    if (selected.value === option.id) {
+        selected.value = 0
+        emit('onSelected', undefined)
+        return
+    }
+    else {
+        selected.value = option.id
+        emit('onSelected', option.id)
+    }
 }
-
+const emit = defineEmits(['onSelected'])
 </script>  
 
 <template>
-    <div class="w-full px-4 py-16">
-        <div class="mx-auto w-full max-w-md">
-            <div class="space-y-2">
+    <div :class="[
+        'w-full',
+        { 'px-4 py-2': flexDirection === 'flex-col' }
+    ]">
+        <div class="mx-auto">
+            <div :class="[
+                'flex flex-wrap {{ positionFlex }}',
+                {
+                    'flex-row space-x-2': flexDirection === 'flex-row',
+                    'flex-col space-y-2': flexDirection === 'flex-col',
+                }
+            ]">
                 <template v-for="(option, index) in options" :key="index">
                     <div :class="[
                         'relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none',
@@ -32,7 +57,7 @@ const handleChange = (option) => {
                                     <p class="font-medium"
                                         :class="[selected === option.id ? 'text-white' : 'text-gray-900']">
                                         {{
-                                            option.label
+                                            option.label || option.name
                                         }}
                                     </p>
                                 </div>

@@ -25,6 +25,21 @@ class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         coordinates: user.coordinates,
+        address: user.address,
+    });
+  }
+
+  forgotPassword(values) {
+    return getAxiosInstance().post("users/recovery_account", {
+        email: values.email,
+    });
+  }
+
+  accountRecovery(values) {
+    return getAxiosInstance().post("users/recovery_account_change_password", {
+        recoveryToken: values.recoveryToken,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
     });
   }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Controller\PaymentController;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -11,43 +10,39 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\Order\OrderPaymentValidationController;
+use App\Controller\Order\StripeCheckoutController;
 use App\Repository\OrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(),
-        new Get(),
-        new Put(),
-        new Patch(),
-        new Delete(),
-    ],
-    normalizationContext: ['groups' => ['order:read:item', 'order:read:collection']],
-    denormalizationContext: ['groups' => ['order:create', 'order:update']],
-)]
-#[ApiResource(
-    uriTemplate: '/users/{id}/orders',
-    operations: [
-        new GetCollection()
-    ],
-    uriVariables: [
-        'orderer' => new Link(
-            fromProperty: 'id',
-            fromClass: User::class
-        )
-    ]
-)]
-#[ApiResource(
-    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+        ),
         new Post(
-            uriTemplate: '/payment/{id}',
+            denormalizationContext: ['groups' => ['item:post:order']],
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'id']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:put:order']],
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['item:patch:order']],
+        ),
+        new Delete(),
+        new Post(
+            uriTemplate: '/orders/{id}/checkout',
             defaults: ['_api_receive' => false],
-            controller: PaymentController::class,
+            controller: StripeCheckoutController::class,
             openapiContext: [
                 'requestBody' => [
                     'content' => [
@@ -59,55 +54,131 @@ use Doctrine\ORM\Mapping as ORM;
             ],
             output: false,
         ),
+        new Post(
+            uriTemplate: '/orders/{id}/payment_validation',
+            defaults: ['_api_receive' => false],
+            controller: OrderPaymentValidationController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "sessionId" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/orders',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'orders',
+                    fromClass: User::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+        ),
+        new GetCollection(
+            uriTemplate: '/garages/{id}/orders',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'orders',
+                    fromClass: Garage::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+        ),
+        new GetCollection(
+            uriTemplate: '/cars/{id}/orders',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'orders',
+                    fromClass: Car::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+        ),
     ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+    normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],
+    denormalizationContext: ['groups' => ['item:post:order', 'item:put:order', 'item:patch:order']],
+    paginationClientEnabled: true,
+    paginationClientItemsPerPage: 10,
+    paginationMaximumItemsPerPage: 50,
 )]
 class Order
 {
+    #[Groups(['collection:get:order', 'item:get:order', 'id'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $orderer = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Car $car = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne(inversedBy: 'orders')]
     private ?Garage $garage = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
     private ?float $totalPrice = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $appointmentDate = null;
 
+    #[Groups(['collection:get:order', 'item:get:order'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[Groups(['collection:get:order', 'item:get:order'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finalisedAt = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
+    #[ORM\Column(nullable: false, options: ['default' => 'in-progress'])]
+    private ?string $progression = null;
+
     #[ORM\Column(nullable: true)]
     private array $stripe = [];
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::GUID, unique: true)]
     private ?string $uuid = null;
 
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column]
     private ?bool $sold = null;
+
+    #[ORM\OneToMany(mappedBy: 'associateOrder', targetEntity: GarageSchudleEvent::class)]
+    private Collection $garageSchudleEvents;
+
+    public function __construct()
+    {
+        $this->garageSchudleEvents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -222,6 +293,18 @@ class Order
         return $this;
     }
 
+    public function getProgression(): string
+    {
+        return $this->progression;
+    }
+
+    public function setProgression(string $progression): self
+    {
+        $this->progression = $progression;
+
+        return $this;
+    }
+
     public function getStripe(): array
     {
         return $this->stripe;
@@ -254,6 +337,36 @@ class Order
     public function setSold(bool $sold): self
     {
         $this->sold = $sold;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateOrder() === $this) {
+                $garageSchudleEvent->setAssociateOrder(null);
+            }
+        }
 
         return $this;
     }
