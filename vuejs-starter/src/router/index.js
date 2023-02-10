@@ -115,6 +115,11 @@ const routes = [
         component: () => import('../views/Garage.vue'),
     },
     {
+        path: '/garage/:identityId',
+        name: 'GarageByCarIdentity',
+        component: () => import('../views/Garage.vue'),
+    },
+    {
         path: '/forgot_password',
         name: 'ForgotPassword',
         component: () => import('../views/ForgotPassword.vue'),

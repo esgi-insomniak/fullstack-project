@@ -8,11 +8,23 @@ import CarService from "../services/car.service.js";
 import GarageList from "../components/garage/GarageList.vue";
 import CarList from "../components/garage/CarList.vue";
 import RadioGroup from "../components/RadioGroup.vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
+const {identityId} = route.params;
+const garageParams = (identityId) ? {
+  "cars.identity.id": identityId,
+  "itemsPerPage": 50,
+  "order[isOpen]": "desc",
+  "order[cars.identity.id]": "desc",
+} : {};
 
 const garages = ref([]);
 const cars = ref([]);
 const filteredCars = ref([]);
 const me = ref(null);
+
+
 
 const handleGarageIconClick = async (e) => {
   await getGarageCars(e.target.options.uniqueId);
@@ -56,13 +68,13 @@ const selectGarageById = (id) => {
 onMounted(async () => {
   me.value = await UserService.get("me");
   me.value.coordinates = me.value.coordinates.reverse();
-  garages.value = await GarageService.getCollection()
+  console.log(garageParams);
+  garages.value = await GarageService.getCollection(garageParams)
 });
 
 </script>
 <template>
-  <div class="container my-5">
-
+  <div class="flex justify-center flex-col my-5">
     <div class="flex flex-row justify-center" v-if="garages.length > 0">
       <Map
           :zoom="8"
