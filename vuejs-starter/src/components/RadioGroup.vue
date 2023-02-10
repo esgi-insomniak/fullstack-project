@@ -25,7 +25,10 @@ const handleChange = (option) => {
         emit('onSelected', option.id)
     }
 }
-const emit = defineEmits(['onSelected'])
+const emit = defineEmits(['onSelected']);
+defineExpose({
+    handleChange,
+})
 </script>  
 
 <template>

@@ -42,7 +42,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: 10,
-    paginationMaximumItemsPerPage: 50,
+    paginationMaximumItemsPerPage: 100,
 )]
 #[ApiFilter(
     SearchFilter::class,

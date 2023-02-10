@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, ref, watchEffect} from "vue";
 import L from "leaflet";
 import Map from "../components/Map.vue";
 import GarageService from "../services/garage.service.js";
@@ -17,13 +17,17 @@ const garageParams = (identityId) ? {
   "itemsPerPage": 50,
   "order[isOpen]": "desc",
   "order[cars.identity.id]": "desc",
-} : {};
+} : {
+  "order[isOpen]": "desc",
+  "itemsPerPage": 100,
+};
 
 const garages = ref([]);
 const cars = ref([]);
 const filteredCars = ref([]);
 const me = ref(null);
-
+const selectedCategory = ref(undefined);
+const categoriesRadioGroup = ref(null);
 
 
 const handleGarageIconClick = async (e) => {
@@ -34,10 +38,31 @@ const handleGarageClick = async (garage) => {
   await getGarageCars(garage.id)
 };
 
+const handleCarCategoryChange = (category) => {
+  if (category === undefined) {
+    filteredCars.value = cars.value;
+  } else {
+    filteredCars.value = cars.value.filter(car => car.identity.category.id === category);
+  }
+  selectedCategory.value = category;
+};
+
+const handleCarIdentityChange = (identity) => {
+  if (identity === undefined) {
+    filteredCars.value = cars.value;
+  } else {
+    filteredCars.value = cars.value.filter(car => car.identity.id === identity);
+  }
+};
+
 const getGarageCars = async (garageId) => {
   selectGarageById(garageId);
   cars.value = await CarService.getGarageCars(garageId);
   filteredCars.value = cars.value;
+  if (identityId) {
+    selectedCategory.value = cars.value.find(car => car.identity.id == identityId).identity.category.id;
+    //trigger child event
+  }
 };
 
 const getCarCategory = (car) => {
@@ -47,16 +72,19 @@ const getCarCategory = (car) => {
   }
 };
 
-const getAllCarCategories = () => {
-  return cars.value.map(getCarCategory).filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i)
+const getCarIdentity = (car) => {
+  return {
+    label: car.identity.name,
+    id: car.identity.id,
+  }
 };
 
-const handleCarCategoryChange = (category) => {
-  if (category === undefined) {
-    filteredCars.value = cars.value;
-  } else {
-    filteredCars.value = cars.value.filter(car => car.identity.category.id === category);
-  }
+const getAllCarIdentities = (category) => {
+  return cars.value.filter(car => car.identity.category.id === category).map(getCarIdentity).filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+};
+
+const getAllCarCategories = () => {
+  return cars.value.map(getCarCategory).filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i)
 };
 
 const selectGarageById = (id) => {
@@ -68,7 +96,6 @@ const selectGarageById = (id) => {
 onMounted(async () => {
   me.value = await UserService.get("me");
   me.value.coordinates = me.value.coordinates.reverse();
-  console.log(garageParams);
   garages.value = await GarageService.getCollection(garageParams)
 });
 
@@ -103,9 +130,16 @@ onMounted(async () => {
     <div class="p-6">
       <span class="h-1 w-full lg:w-1/3"></span>
       <div class="flex md:flex-row sm:flex-col" v-if="cars.length > 0">
-        <div class="md:w-1/4 mt-2 sm:w-full">
-          <h2 class="text-2xl font-bold">Catégories</h2>
-          <RadioGroup class="uppercase" :options="getAllCarCategories()" @on-selected="handleCarCategoryChange" />
+        <div class="md:w-1/4 sm:w-full">
+          <div class="mt-2">
+            <h2 class="text-2xl font-bold">Catégories</h2>
+            <RadioGroup class="uppercase" :options="getAllCarCategories()" @on-selected="handleCarCategoryChange" />
+          </div>
+
+          <div class="mt-2" v-if="selectedCategory">
+            <h2 class="text-2xl font-bold">Modèles</h2>
+            <RadioGroup class="uppercase" :options="getAllCarIdentities(selectedCategory)" @on-selected="handleCarIdentityChange" />
+          </div>
         </div>
         <div>
           <CarList :cars="filteredCars" search/>
