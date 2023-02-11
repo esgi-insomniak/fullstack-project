@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -19,13 +22,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:garage', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garage', 'item:get:user', 'item:get:car:isordered', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garage']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:garage', 'id']],
+            normalizationContext: ['groups' => ['item:get:garage', 'item:get:user', 'item:get:car:isordered', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garage']],
@@ -39,7 +42,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: 10,
-    paginationMaximumItemsPerPage: 50,
+    paginationMaximumItemsPerPage: 100,
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'name' => 'partial',
+        'coordinates' => 'exact',
+        'isOpen' => 'exact',
+        'cars.identity.id' => 'exact',
+    ],
+)]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: [
+        'isOpen',
+        'cars.identity.id' => [
+            'property' => 'cars.identity.id',
+            'strategy' => 'COUNT',
+        ],
+    ],
 )]
 class Garage
 {
@@ -67,11 +89,17 @@ class Garage
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[Groups(['item:get:car:isordered'])]
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
     private Collection $cars;
 
     #[ORM\OneToMany(mappedBy: 'associateGarage', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
     private Collection $garageSchudleEvents;
+
+    #[Groups(['collection:get:garage', 'item:get:garage', 'item:post:garage', 'item:put:garage', 'item:patch:garage'])]
+    #[ORM\ManyToOne(inversedBy: 'garages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -236,6 +264,18 @@ class Garage
                 $garageSchudleEvent->setAssociateGarage(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }

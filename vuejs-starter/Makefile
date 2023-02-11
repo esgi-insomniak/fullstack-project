@@ -1,7 +1,8 @@
 build:
 	docker compose build --no-cache --force-rm --pull
 start:
-	docker compose up -d
+	docker compose run --rm node yarn
+	docker compose --env-file=".env.local" up -d
 stop:
 	docker compose stop
 restart:

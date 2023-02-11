@@ -19,21 +19,29 @@ class UserFixture extends Fixture
         $fakeUser = $this->createFakeUser();
         $manager->persist($fakeUser);
 
+        $fakeAdmin = $this->createFakeAdmin();
+        $manager->persist($fakeAdmin);
+
         //create 100 fake users
         for ($i = 0; $i < 100; $i++) {
             $fakeUser = $this->createRandomUser();
             $manager->persist($fakeUser);
+
+            if ($i % 10 === 0) {
+                $fakeDealer = $this->createRandomUser(['ROLE_DEALER']);
+                $manager->persist($fakeDealer);
+            }
         }
 
         $manager->flush();
     }
 
-    private function createRandomUser(): User
+    private function createRandomUser($roles = ['ROLE_USER']): User
     {
         $user = new User();
         $user->setEmail($this->faker->email);
         $user->setPassword($this->pwd);
-        $user->setRoles(['ROLE_USER']);
+        $user->setRoles($roles);
         $user->setFirstName($this->faker->firstName);
         $user->setLastName($this->faker->lastName);
         $user->setCoordinates([$this->faker->latitude, $this->faker->longitude]);
@@ -51,7 +59,8 @@ class UserFixture extends Fixture
         $fakeUser->setFirstName("User");
         $fakeUser->setLastName("User");
         $fakeUser->setVerifiedAt(new DateTimeImmutable());
-        $fakeUser->setCoordinates([48.856614,2.3522219]);
+        $fakeUser->setCoordinates([2.342865,48.858705]);
+        $fakeUser->setAddress("Paris, France");
         $fakeUser->setCreatedAt(new DateTimeImmutable());
         $fakeUser->setUpdatedAt(null);
         return $fakeUser;
@@ -66,7 +75,8 @@ class UserFixture extends Fixture
         $fakeAdmin->setFirstName("Admin");
         $fakeAdmin->setLastName("Admin");
         $fakeAdmin->setVerifiedAt(new DateTimeImmutable());
-        $fakeAdmin->setCoordinates([48.856614, 2.3522219]);
+        $fakeAdmin->setCoordinates([2.342865,48.858705]);
+        $fakeAdmin->setAddress("Paris, France");
         $fakeAdmin->setCreatedAt(new DateTimeImmutable());
         $fakeAdmin->setUpdatedAt(null);
         return $fakeAdmin;

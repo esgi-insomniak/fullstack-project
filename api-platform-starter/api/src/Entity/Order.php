@@ -24,13 +24,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:order']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:order']],
@@ -81,7 +81,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: User::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/orders',
@@ -91,7 +91,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/orders',
@@ -101,7 +101,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Car::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],
@@ -136,7 +136,7 @@ class Order
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
     private ?float $totalPrice = null;
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $appointmentDate = null;
 
@@ -152,7 +152,7 @@ class Order
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finalisedAt = null;
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
@@ -164,12 +164,8 @@ class Order
     #[ORM\Column(nullable: true)]
     private array $stripe = [];
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
-    #[ORM\Column(type: Types::GUID, unique: true)]
-    private ?string $uuid = null;
-
     #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private ?bool $sold = null;
 
     #[ORM\OneToMany(mappedBy: 'associateOrder', targetEntity: GarageSchudleEvent::class)]
@@ -178,6 +174,8 @@ class Order
     public function __construct()
     {
         $this->garageSchudleEvents = new ArrayCollection();
+        $this->sold = false;
+        $this->progression = 'in-progress';
     }
 
     public function getId(): ?int
@@ -313,18 +311,6 @@ class Order
     public function setStripe(?array $stripe): self
     {
         $this->stripe = $stripe;
-
-        return $this;
-    }
-
-    public function getUuid(): ?string
-    {
-        return $this->uuid;
-    }
-
-    public function setUuid(string $uuid): self
-    {
-        $this->uuid = $uuid;
 
         return $this;
     }

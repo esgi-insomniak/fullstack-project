@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:user', 'id']],
+            normalizationContext: ['groups' => ['collection:get:user','id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:user']],
@@ -145,7 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['collection:get:user', 'item:get:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(type: 'json')]
-    private array $roles = [];
+    private array $roles;
 
     #[Assert\NotBlank(groups: ['item:post:user'])]
     #[Groups(['item:post:user', 'item:put:user', 'item:patch:user'])]
@@ -211,6 +211,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'associateUser', targetEntity: GarageSchudleEvent::class, orphanRemoval: true)]
     private Collection $garageSchudleEvents;
 
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Garage::class)]
+    private Collection $garages;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
@@ -218,6 +221,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->haveRecoverToken = false;
         $this->roles = ['ROLE_USER'];
         $this->garageSchudleEvents = new ArrayCollection();
+        $this->garages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -522,6 +526,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($garageSchudleEvent->getAssociateUser() === $this) {
                 $garageSchudleEvent->setAssociateUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Garage>
+     */
+    public function getGarages(): Collection
+    {
+        return $this->garages;
+    }
+
+    public function addGarage(Garage $garage): self
+    {
+        if (!$this->garages->contains($garage)) {
+            $this->garages->add($garage);
+            $garage->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarage(Garage $garage): self
+    {
+        if ($this->garages->removeElement($garage)) {
+            // set the owning side to null (unless already changed)
+            if ($garage->getOwner() === $this) {
+                $garage->setOwner(null);
             }
         }
 

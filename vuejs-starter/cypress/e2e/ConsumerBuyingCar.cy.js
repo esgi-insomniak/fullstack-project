@@ -1,0 +1,15 @@
+describe('template spec', () => {
+  it('passes', () => {
+    cy.visit(`${Cypress.env('HOST_URL')}login`)
+    cy.login(Cypress.env('USER_ID'), Cypress.env('USER_PSWD'))
+    cy.url().should('include', '/home')
+    cy.contains('div', 'Les modèles').click()
+    cy.url().should('include', '/model')
+    cy.get('*[class^="grid grid-flow-dense grid-cols-3 gap-2"]').children().first().should('not.have.attr', 'role', 'status').click()
+    cy.get('button').contains('Commander').click()
+    cy.get('*[class^="p-3 sm:p-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"]').children().first().click()
+    cy.get('button').contains('Commander').click()
+    cy.get('div').contains('Payer en ligne').click()
+    cy.get('button').contains('Payer').click()
+  })
+})

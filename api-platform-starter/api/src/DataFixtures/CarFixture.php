@@ -40,6 +40,7 @@ class CarFixture extends Fixture implements DependentFixtureInterface
             $car->setGearboxType($faker->vehicleGearBoxType);
             $car->addImage($images[array_rand($images)]);
             $car->setIdentity($carIdentities[array_rand($carIdentities)]);
+            $car->setIsOrdered(false);
             $manager->persist($car);
         }
 

@@ -7,10 +7,7 @@ const props = defineProps({
       id: 1,
       name: 'Garage Flowbite',
       isOpen: true,
-    }),
-    validator(value) {
-      return value.id && value.name && value.isOpen;
-    }
+    })
   }
 });
 </script>
@@ -21,7 +18,7 @@ const props = defineProps({
     </div>
     <div class="flex-1 min-w-0">
       <p class="text-sm font-medium text-gray-900 truncate dark:text-white">{{ garage.name }}</p>
-      <p class="text-sm text-gray-500 truncate dark:text-gray-400">email@flowbite.com</p>
+      <p class="text-sm text-gray-500 truncate dark:text-gray-400">{{ garage.owner.email }}</p>
     </div>
     <div
         class="inline-flex items-center text-base font-semibold"

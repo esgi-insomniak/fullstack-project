@@ -5,12 +5,10 @@ services:
     image: node:18.2.0
     container_name: insomniak-vue-starter
     working_dir: /var/www/
-    # * Decomment the line below if you need an env file (origin makefile)
-    env_file: ".env.local"
     environment:
       TZ: Europe/Paris
       DEBIAN_FRONTEND: noninteractive
-    command: /bin/bash -c "yarn && yarn dev"
+    command: /bin/bash -c "yarn dev"
     ports:
       - 8080:8080
     volumes:
