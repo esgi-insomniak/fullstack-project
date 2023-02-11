@@ -2,33 +2,53 @@ version: 2.1
 
 jobs:    
   build:
-    docker:
-      - image: circleci/php:8.0-fpm-node-browsers
+    machine:
+      image: ubuntu-2004:2022.10.1
     steps:
       - checkout
       - run:
-          name: Set up SSH
+          name: Setup SSH Keys
           command: |
             echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ssh_key
             chmod 600 ssh_key
             ssh-keyscan frozox.fr >> ~/.ssh/known_hosts
-      # - run:
-      #     name: "Build api platform"
-      #     command: |
-      #         cd ./api-platform-starter
-      #         docker-compose build --no-cache --force-rm --pull
-      #         docker-compose run --rm php composer install --no-interaction --no-progress --no-suggest
-      #         docker-compose run --rm php sh -c "chmod +x bin/** && mkdir 'config/jwt' || true"
-      #         docker-compose run --rm php sh -c 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair --overwrite && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
-      # - run:
-      #     name: "Build vuejs"
-      #     command: |
-      #         cd ./vuejs-starter
-      #         docker-compose build --no-cache --force-rm --pull
-      #         docker-compose run --rm node yarn install
-      #         docker-compose run --rm node yarn build
+      - run:
+          name: Prepare Ansible Environment
+          command: |
+            sudo apt update
+            sudo apt install -y software-properties-common
+            sudo apt-add-repository --yes --update ppa:ansible/ansible
+            sudo apt install -y ansible
+            cd .infrastructure
+            echo "$ANSIBLE_VAULT_PASSWORD" > vault.txt
+            ansible-vault decrypt vars/.env.circle-ci vars/.env.circle-ci.vite
+            cp vars/.env.circle-ci ../api-platform-starter/api/.env
+            cp vars/.env.circle-ci.vite ../vuejs-starter/.env
+      - run:
+          name: Build Api Platform
+          command: |
+            cd ./api-platform-starter
+            docker compose up -d
+            docker compose run --rm php composer install --no-interaction --no-progress --no-suggest
+            docker compose run --rm php sh -c "chmod +x bin/** && mkdir 'config/jwt' || true"
+            docker compose run --rm php sh -c 'set -e && apk add openssl && php bin/console lexik:jwt:generate-keypair --overwrite && setfacl -R -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt && setfacl -dR -m u:www-data:rX -m u:"$(whoami)":rwX config/jwt'
+            docker compose run --rm php bin/console --no-interaction doctrine:migrations:migrate
+            docker compose run --rm php bin/console doctrine:fixtures:load --purge-with-truncate --no-interaction
+      - run:
+          name: Build Vuejs
+          command: |
+            cd ./vuejs-starter
+            docker compose run --rm node yarn
+            docker compose --env-file=".env" up -d
+      - run:
+          name: Run Cypress Tests
+          command: |
+            cd ./vuejs-starter
+            npx cypress install
+            yarn cy:run:chrome
+            yarn cy:run:firefox
       - deploy:
-          name: Deploy to environment
+          name: Deploy To Environment
           command: |
             set -x
             if [ "${CIRCLE_BRANCH}" == "develop" ]; then
