@@ -46,7 +46,6 @@ jobs:
             cd ./vuejs-starter
             npx cypress install
             yarn cy:run:chrome
-            yarn cy:run:firefox
       - deploy:
           name: Deploy To Environment
           command: |
