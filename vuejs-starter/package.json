@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "cy:open": "cypress open",
-    "cy:run": "cypress run --spec 'cypress/e2e/*.cy.js'"
+    "cy:run:chrome": "cypress run --browser chrome --spec 'cypress/e2e/*.cy.js'",
+    "cy:run:firefox": "cypress run --browser firefox --spec 'cypress/e2e/*.cy.js'"
   },
   "dependencies": {
     "@formkit/addons": "^1.0.0-beta.10",
@@ -19,6 +20,7 @@
     "@jawg/js-loader": "^1.0.0",
     "@types/qrcode": "^1.5.0",
     "axios": "^1.1.2",
+    "dotenv": "^16.0.3",
     "leaflet": "^1.9.3",
     "moment": "^2.29.4",
     "qrcode": "^1.5.1",

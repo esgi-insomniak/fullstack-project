@@ -58,7 +58,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: CarIdentity::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
+            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'item:get:car:isordered', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:car', 'item:get:car']],
@@ -148,7 +148,7 @@ class Car
     #[ORM\ManyToOne(inversedBy: 'cars')]
     private ?Garage $garage = null;
 
-    #[Groups(['collection:get:car', 'item:get:car'])]
+    #[Groups(['collection:get:car', 'item:get:car', 'item:get:car:isordered'])]
     #[ORM\Column(options: ['default' => false])]
     private ?bool $isOrdered = null;
 
