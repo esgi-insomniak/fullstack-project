@@ -22,13 +22,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:garage', 'item:get:user', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garage', 'item:get:user', 'item:get:car:isordered', 'id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garage']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:garage', 'item:get:user', 'id']],
+            normalizationContext: ['groups' => ['item:get:garage', 'item:get:user', 'item:get:car:isordered', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garage']],
@@ -89,6 +89,7 @@ class Garage
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
+    #[Groups(['item:get:car:isordered'])]
     #[ORM\OneToMany(mappedBy: 'garage', targetEntity: Car::class)]
     private Collection $cars;
 

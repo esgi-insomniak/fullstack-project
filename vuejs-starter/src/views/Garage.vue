@@ -98,7 +98,8 @@ const selectGarageById = (id) => {
 onMounted(async () => {
   me.value = await UserService.get("me");
   me.value.coordinates = me.value.coordinates.reverse();
-  garages.value = await GarageService.getCollection(garageParams)
+  const filteredGarages = await GarageService.getCollection(garageParams);
+  garages.value = Object.values(filteredGarages).filter(g => g.cars.filter(c => !c.isOrdered).length > 0);
 });
 
 </script>
