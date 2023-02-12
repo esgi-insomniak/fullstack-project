@@ -3,8 +3,6 @@ import {onMounted, ref} from "vue";
 import GarageService from "../../services/garage.service.js";
 import UserService from "../../services/user.service.js";
 import CarService from "../../services/car.service.js";
-import L from "leaflet";
-import GarageList from "../../components/garage/GarageList.vue";
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import RadioGroup from "../../components/RadioGroup.vue";
 import CarList from "../../components/garage/CarList.vue";
@@ -81,6 +79,7 @@ onMounted(async () => {
             body-row-class-name="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
             :items="orders"
             :headers="orderHeaders"
+            rows-per-page="10"
             buttons-pagination
         >
           <template #loading>
@@ -117,7 +116,7 @@ onMounted(async () => {
         <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">
           Voitures Disponibles
         </h2>
-        <CarList :cars="cars" />
+        <CarList :cars="cars" only-show />
       </div>
     </div>
   </div>

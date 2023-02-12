@@ -98,15 +98,13 @@ onMounted(async () => {
 
 </script>
 <template>
-  <div class="flex justify-center flex-col my-5">
-
+  <div class="flex justify-center flex-col my-5" v-if="garages.length > 0">
     <GarageListWithMap
         :garages="garages"
         :handle-garage-click="handleGarageClick"
         :handle-garage-icon-click="handleGarageIconClick"
         search
     />
-
     <div class="p-6">
       <span class="h-1 w-full lg:w-1/3"></span>
       <div class="flex md:flex-row sm:flex-col" v-if="cars.length > 0">
