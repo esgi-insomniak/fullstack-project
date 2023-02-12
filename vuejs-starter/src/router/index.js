@@ -1,5 +1,17 @@
 import * as VueRouter from 'vue-router'
 
+const publicPages = ['/login', '/register', '/'];
+
+const needsAuth = (to, from, next) => {
+    const loggedIn = sessionStorage.getItem('user');
+    const authRequired = !publicPages.includes(to.path);
+    if (authRequired && !loggedIn) {
+        return next('/login');
+    }
+
+    return next();
+}
+
 const routes = [
     {
         path: '/',
@@ -11,20 +23,6 @@ const routes = [
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),
-        beforeEnter: (to, from, next) => {
-            const publicPages = ['/login', '/register'];
-            const authRequired = !publicPages.includes(to.path);
-            const loggedIn = sessionStorage.getItem('user');
-
-            if (authRequired && !loggedIn) {
-                return next('/login');
-            }
-
-            next();
-        }
-        // meta: {
-        //     hideNavBar: true
-        // }
     },
     {
         path: '/register',
@@ -35,12 +33,14 @@ const routes = [
         path: '/logout',
         name: 'logout',
         component: () => import('../views/Logout.vue'),
+        beforeEnter: (to, from, next) => needsAuth(to, from, next)
     },
     {
         // user 
         path: '/me',
         name: 'User',
         component: () => import('../views/user/LayoutUser.vue'),
+        beforeEnter: (to, from, next) => needsAuth(to, from, next),
         children: [
             {
                 path: 'favorites',
@@ -78,7 +78,12 @@ const routes = [
                 path: 'profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/User.vue'),
-            }
+            },
+            {
+                path: 'concession',
+                name: 'Concession',
+                component: () => import('../views/user/Concession.vue'),
+            },
         ]
     },
     {
@@ -86,6 +91,7 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: () => import('../views/admin/LayoutAdmin.vue'),
+        beforeEnter: (to, from, next) => needsAuth(to, from, next),
         children: [
             {
                 path: 'users',
@@ -107,6 +113,7 @@ const routes = [
     {
         path: '/services',
         name: 'Services',
+        beforeEnter: (to, from, next) => needsAuth(to, from, next),
         component: () => import('../views/Services.vue'),
     },
     {

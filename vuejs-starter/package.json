@@ -28,6 +28,7 @@
     "tailwind-scrollbar-hide": "^1.1.7",
     "vue": "^3.2.37",
     "vue-router": "4",
+    "vue3-easy-data-table": "^1.5.32",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

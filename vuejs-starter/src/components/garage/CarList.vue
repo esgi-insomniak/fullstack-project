@@ -5,11 +5,7 @@ const props = defineProps({
   cars: {
     type: Array,
     required: true,
-  },
-  search: {
-    type: Boolean,
-    required: true,
-  },
+  }
 });
 </script>
 

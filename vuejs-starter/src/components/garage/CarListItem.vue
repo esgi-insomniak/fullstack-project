@@ -4,6 +4,7 @@ import {CurrencyEuroIcon, FunnelIcon, CalendarIcon, BoltIcon, ScaleIcon, Battery
 import orderService from "../../services/order.service";
 import userService from "../../services/user.service";
 import {useRouter} from "vue-router";
+import CarListItemDetails from "./CarListItemDetails.vue";
 
 const props = defineProps({
   car: {
@@ -25,16 +26,15 @@ const handleOrder = async () => {
     totalPrice: props.car.price,
   }
   await orderService.post(order);
-  router.push({ name: 'UserOrders', params: { slug: 'in-progress' } });
+  await router.push({name: 'UserOrders', params: {slug: 'in-progress'}});
 };
 
 </script>
 
 <template>
   <div class="max-w-sm max-h-[600px] bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-
-    <div v-if="!isDetailedShow">
-      <img class="rounded-t-lg" :src="car.identity.mainPicture.src" alt="" />
+    <div v-show="!isDetailedShow">
+      <img class="rounded-t-lg w-50 h-40" :src="car.identity.mainPicture.src" alt="" />
       <div class="p-5">
         <a href="#">
           <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">BMW {{ car.identity.name }}</h5>
@@ -51,7 +51,7 @@ const handleOrder = async () => {
             <ArrowRightIcon class="w-5 h-5 ml-2 -mr-1" />
           </button>
 
-          <button
+          <button v-if="!car.isOrdered"
               class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-700 dark:hover:bg-green-500 dark:focus:ring-green-300"
               @click="handleOrder"
           >
@@ -61,60 +61,21 @@ const handleOrder = async () => {
         </div>
       </div>
     </div>
-    <Transition>
-    <div v-if="isDetailedShow">
+
+    <div v-show="isDetailedShow">
       <!-- <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">Default</span> -->
       <!-- svg cross -->
-      <img class="rounded-t-lg" :src="car.identity.mainPicture.src" alt="" />
+      <img class="rounded-t-lg w-50 h-40" :src="car.identity.mainPicture.src" alt="" />
       <div class="p-5">
-
-        <div class="grid grid-cols-2 gap-4 text-xs">
-          <ul class="mb-8 space-y-4 text-left text-gray-500 dark:text-gray-400" v-if="car.options.length > 0">
-            <li class="flex items-center space-x-3" v-for="option in car.options">
-              <!-- Icon -->
-              <svg class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-              <span>{{ option }}</span>
-            </li>
-          </ul>
-
-          <ul class="mb-8 space-y-4 text-gray-500 dark:text-gray-400" v-if="car.options.length > 0">
-            <li class="flex items-center space-x-3">
-              <CalendarIcon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.year }}</span>
-            </li>
-
-            <li class="flex items-center space-x-3">
-              <CurrencyEuroIcon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.price }} €</span>
-            </li>
-
-            <li class="flex items-center space-x-3">
-              <FunnelIcon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.fuel }}</span>
-            </li>
-
-            <li class="flex items-center space-x-3">
-              <BoltIcon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.power }} ch</span>
-            </li>
-
-            <li class="flex items-center space-x-3">
-              <ScaleIcon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.weight }} kg</span>
-            </li>
-
-            <li class="flex items-center space-x-3">
-              <Battery50Icon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.consumption }} l/100km</span>
-            </li>
-
-            <li class="flex items-center space-x-3">
-              <RocketLaunchIcon class="flex-shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-              <span>{{ car.speeding }}s 0-100 km/h</span>
-            </li>
-          </ul>
-        </div>
-
+        <CarListItemDetails :options="car.options" :details="[
+            {icon: CalendarIcon, value: car.year},
+            {icon: CurrencyEuroIcon, value: car.price, unit: '€'},
+            {icon: FunnelIcon, value: car.fuel},
+            {icon: BoltIcon, value: car.power, unit: 'ch'},
+            {icon: ScaleIcon, value: car.weight, unit: 'kg'},
+            {icon: Battery50Icon, value: car.consumption, unit: 'l/100km'},
+            {icon: RocketLaunchIcon, value: car.speeding, unit: 's 0-100 km/h'}
+          ]" />
         <button
             class="inline-flex items-center text-sm font-medium text-center text-white bg-white/10 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-white/10 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             @click="isDetailedShow = !isDetailedShow"
@@ -124,7 +85,7 @@ const handleOrder = async () => {
         </button>
       </div>
     </div>
-    </Transition>
+
   </div>
 </template>
 
