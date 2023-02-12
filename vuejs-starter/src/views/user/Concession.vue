@@ -12,6 +12,7 @@ import GarageListWithMap from "../../components/garage/GarageListWithMap.vue";
 const garages = ref([]);
 const orders = ref([]);
 const cars = ref([]);
+const formData = ref([]);
 
 const radioOptions = [
   {label: 'Commandes', id: 'orders'},
@@ -27,7 +28,14 @@ const orderHeaders = [
   {text: 'Vendu ?', value: 'sold'},
   {text: 'Statut', value: 'status.name'},
   {text: 'Statut du paiement', value: 'progression'},
+  {text: 'Actions', value: 'actions', sortable: false},
 ];
+
+const handleSubmit = async () => {
+  console.log(formData);
+};
+
+/*
 const carHeaders = [
   {text: 'Nom', value: 'identity.name'},
   {text: 'Puissance (ch)', value: 'power'},
@@ -38,7 +46,9 @@ const carHeaders = [
   {text: 'Vendu ?', value: 'sold'},
   {text: 'Statut', value: 'status.name'},
   {text: 'Statut du payement', value: 'progression'},
+  {text: 'Actions', value: 'actions', sortable: false},
 ]
+*/
 
 const handleGarageClick = async (garage) => {
   console.log(garage);
@@ -60,36 +70,41 @@ onMounted(async () => {
 
 <template>
   <div class="container mx-auto my-5">
-    <div class="flex flex-col justify-between items-center gap-4">
-      <div class="flex justify-between" v-if="garages.length > 0">
-
+    <div class="flex flex-col justify-between items-center gap-4" v-if="garages.length > 0">
+      <div class="flex justify-between" >
         <GarageListWithMap :garages="garages" :handle-garage-click="handleGarageClick" search/>
-
         <div class="flex justify-between">
           <RadioGroup class="self-end" :options="radioOptions" />
         </div>
       </div>
 
+      <div class="w-full">
+        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Informations générales</h2>
+        <FormKit type="form" form-class="grid grid-flow-row grid-cols-2 gap-3" submit-label="Mettre à jour">
+          <FormKit type="text" name="name" label="Nom du garage" placeholder="Nom" />
+          <FormKit
+            type="checkbox"
+            label="Ouvert ?"
+            help="Le garage est-il ouvert et accepte des offres ?"
+            name="is_open"
+            :value="true"
+          />
+        </FormKit>
+      </div>
+
 
       <div class="w-full">
-        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">Commandes</h2>
+        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Commandes</h2>
         <Vue3EasyDataTable
-            table-class-name="w-full text-sm text-left text-gray-500 dark:text-gray-400"
-            header-class-name="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-            body-row-class-name="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+            table-class-name="customize-table"
             :items="orders"
             :headers="orderHeaders"
-            rows-per-page="10"
+            :rows-per-page="10"
             buttons-pagination
         >
-          <template #loading>
-            <div class="flex justify-center items-center">
-              <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
-            </div>
-          </template>
           <template #item-car="item">
             <div class="flex items-center">
-              <img :src="item.car.identity.mainPicture.src" class="w-10 h-10 rounded-full"  :alt="item.car.identity.name"/>
+              <img :src="item.car.identity.mainPicture.src" class="object-cover rounded-full"  :alt="item.car.identity.name"/>
               <div class="ml-4">
                 <div class="text-sm font-medium text-gray-900">
                   {{ item.car.identity.name }}
@@ -108,6 +123,12 @@ onMounted(async () => {
           </template>
           <template #item-sold="{sold}">
             {{ sold ? 'Oui' : 'Non' }}
+          </template>
+          <template #item-actions="item">
+            <div class="flex items-center space-x-4">
+              <button class="text-indigo-600 hover:text-indigo-900">Modifier</button>
+              <button class="text-indigo-600 hover:text-indigo-900">Annuler</button>
+            </div>
           </template>
         </Vue3EasyDataTable>
       </div>

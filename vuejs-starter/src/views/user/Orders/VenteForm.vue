@@ -68,7 +68,6 @@ const handleSubmit = (form) => {
         <FormKit type="text" name="doors" label="Doors" placeholder="Doors" />
         <FormKit type="file" name="image" label="Image" placeholder="Image" accept=".jpg,.png,.svg" multiple />
     </FormKit>
-
 </template>
 
 

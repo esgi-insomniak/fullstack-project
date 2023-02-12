@@ -33,14 +33,14 @@ const routes = [
         path: '/logout',
         name: 'logout',
         component: () => import('../views/Logout.vue'),
-        beforeEnter: (to, from, next) => needsAuth(to, from, next)
+        beforeEnter: needsAuth
     },
     {
         // user 
         path: '/me',
         name: 'User',
         component: () => import('../views/user/LayoutUser.vue'),
-        beforeEnter: (to, from, next) => needsAuth(to, from, next),
+        beforeEnter: needsAuth,
         children: [
             {
                 path: 'favorites',
@@ -91,7 +91,7 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: () => import('../views/admin/LayoutAdmin.vue'),
-        beforeEnter: (to, from, next) => needsAuth(to, from, next),
+        beforeEnter: needsAuth,
         children: [
             {
                 path: 'users',
