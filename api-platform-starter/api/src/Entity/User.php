@@ -206,7 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'orderer', targetEntity: Order::class)]
     private Collection $orders;
 
-    #[ORM\OneToMany(mappedBy: 'recover', targetEntity: Recovery::class)]
+    #[ORM\OneToMany(mappedBy: 'recoverer', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
     #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]

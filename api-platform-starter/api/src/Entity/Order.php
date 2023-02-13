@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -59,7 +60,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 ],
             ],
             output: false,
-            security: "object.getOrderer() == user"
         ),
         new Post(
             uriTemplate: '/orders/{id}/payment_validation',
@@ -79,7 +79,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     ],
                 ],
             ],
-            security: "object.getOrderer() == user"
         ),
         new GetCollection(
             uriTemplate: '/users/{id}/orders',
@@ -163,6 +162,7 @@ class Order
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finalisedAt = null;
 
+    #[ApiProperty(securityPostDenormalize: "is_granted('ROLE_ADMIN')")]
     #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]

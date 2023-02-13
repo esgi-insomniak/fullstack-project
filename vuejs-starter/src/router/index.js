@@ -63,7 +63,7 @@ const routes = [
                         component: () => import('../views/user/Orders/VenteForm.vue'),
                     },
                     {
-                        path: 'sales/:id',
+                        path: 'sales/:slug',
                         name: 'UserSalesEdit',
                         component: () => import('../views/user/Orders/Sales.vue'),
                     }

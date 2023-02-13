@@ -70,10 +70,17 @@ const route = useRoute();
                             </router-link>
                         </li>
                         <li>
-                            <router-link to="/me/list/sales/finished"
+                            <router-link to="/me/list/sales/completed"
                                 :class="route.path === '/me/list/sales/finished' ? 'font-bold scale-110' : 'hover:scale-110 hover:font-bold'"
                                 class="cursor-pointer text-left min-w-[10rem]">
                                 Terminées
+                            </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/me/list/sales/canceled"
+                                :class="route.path === '/me/list/orders/finished' ? 'font-bold scale-110' : 'hover:scale-110 hover:font-bold'"
+                                class="cursor-pointer text-left min-w-[10rem]">
+                                Annulées
                             </router-link>
                         </li>
                     </ul>
