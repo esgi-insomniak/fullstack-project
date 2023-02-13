@@ -21,13 +21,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:get:user','item:get:carIdentity','id']],
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garageSchudleEvent']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'id']],
+            normalizationContext: ['groups' => ['item:get:garageSchudleEvent', 'item:get:garageSchudleEvent','item:get:user', 'item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garageSchudleEvent']],
@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:get:user', 'item:get:carIdentity', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent']],
