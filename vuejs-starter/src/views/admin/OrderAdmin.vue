@@ -1,7 +1,8 @@
 <script setup>
 import {
     ref,
-    onMounted
+    onMounted,
+    reactive
 } from 'vue';
 import orderService from "../../services/order.service";
 import {
@@ -12,8 +13,10 @@ import {
     PencilSquareIcon,
     PlusCircleIcon
 } from '@heroicons/vue/24/outline';
+import Modal from "../../components/Modal.vue";
 
 const orders = ref([]);
+const myOrder = ref({});
 const loading = ref(true);
 const currentPage = ref(1);
 const thead = [{
@@ -53,15 +56,6 @@ onMounted(async () => {
     loading.value = false;
 });
 
-const deleteOrders = async (id) => {
-    await orderService.delete(id).then(response => {
-        console.log(response);
-    }).catch(error => {
-        alert('La commande ne peut être supprimer, elle est lié à une voiture et/ou un utilisateur')
-        console.log(error)
-    });
-};
-
 const previousPage = async () => {
     if (currentPage.value > 1) {
         currentPage.value--;
@@ -91,13 +85,118 @@ const nextPage = async () => {
         console.log(error)
     });
 };
+
+const editOrder = async (order) => {
+    await orderService.patch(order.id, order).then(user => {
+      orders.value = orders.value.map((o) => {
+        if (o.id === order.id) {
+          o = order;
+        }
+        return o;
+    });
+        toggleModal();
+    }).catch(error => {
+        console.log(error)
+    });
+};
+
+const deleteOrder = async (user) => {
+    await orderService.delete(user.id).then(response => {
+        orders.value = orders.value.filter((o) => o.id !== order.id);
+        toggleModal();
+    }).catch(error => {
+        console.log(error)
+    });
+};
+
+const loadModificationModal = async (order) => {
+    myOrder.value = await orderService.get(order.id);
+    modalProps.id = 'modification';
+    modalProps.title = `Modification de la commande ${myOrder.value.id}`;
+    modalProps.content = 'Modification de la commande';
+    modalProps.icon = {
+        type: PencilSquareIcon,
+        bgColor: 'bg-blue-100',
+        textColor: 'text-blue-600'
+    };
+    modalProps.buttons = [
+        {
+            text: 'Annuler',
+            class: 'mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm',
+            action: toggleModal
+        },
+        {
+            text: 'Modifier',
+            class: 'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm bg-green-600 hover:bg-green-700 focus:ring-green-500',
+            action: async () => editOrder(myOrder.value)
+        }
+    ]
+    toggleModal();
+}
+
+const loadDeleteModal = async (order) => {
+    myOrder.value = await orderService.get(order.id);
+    modalProps.id = 'delete';
+    modalProps.title = `Suppression de la commande ${myOrder.value.id}`;
+    modalProps.content = 'Suppression de la commande';
+    modalProps.icon = {
+        type: TrashIcon,
+        bgColor: 'bg-blue-100',
+        textColor: 'text-blue-600'
+    };
+    modalProps.buttons = [
+        {
+            text: 'Annuler',
+            class: 'mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm',
+            action: toggleModal
+        },
+        {
+            text: 'Supprimer',
+            class: 'inline-flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm bg-green-600 hover:bg-green-700 focus:ring-green-500',
+            action: async () => deleteOrder(myOrder.value)
+        }
+    ]
+    toggleModal();
+}
+
+const toggleModal = () => {
+    modalProps.open = !modalProps.open
+};
+
+const modalProps = reactive({
+    open: false,
+    toggle: toggleModal,
+});
+
 </script>
 
 <template>
+    <Modal v-bind="{ ...modalProps }">
+        <div v-if="modalProps.id === 'modification'">
+            <div class="flex flex-col">
+                <label class="block text-sm font-medium text-gray-700">ID</label>
+                <input type="text" v-model="myOrder.id" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+                <label class="block text-sm font-medium text-gray-700">User ID</label>
+                <input type="text" v-model="myOrder.orderer.id" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+                <label class="block text-sm font-medium text-gray-700">Car ID</label>
+                <input type="text" v-model="myOrder.car.id" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+                <label class="block text-sm font-medium text-gray-700">Date</label>
+                <input type="text" v-model="myOrder.finalisedAt" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+                <label class="block text-sm font-medium text-gray-700">Price</label>
+                <input type="text" v-model="myOrder.totalPrice" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+                <label class="block text-sm font-medium text-gray-700">Status</label>
+                <input type="text" v-model="myOrder.progression" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+        </div>
+    </Modal>
 <div class="h-[75vh] overflow-scroll scrollbar-hide">
     <div class="flex justify-between w-full">
         <h2 class="text-2xl uppercase tracking-widest">Commandes</h2>
-        <button class="flex items-center justify-center min-w-[15rem]">Ajouter une commande <PlusCircleIcon class="w-5 h-5 ml-3" /></button>
     </div>
     <table class="table-auto w-full mx-auto text-left my-5">
         <tr>
@@ -111,8 +210,8 @@ const nextPage = async () => {
             <td class="py-3">{{ order.totalPrice }}</td>
             <td class="py-3">{{ order.status.slug }}</td>
             <td class="py-3 flex" :class="{'text-white': index % 2 === 0}">
-                <button @click="editUser(user.id)" class="mr-3 flex items-center justify-center min-w-[8rem]">Modifier <PencilSquareIcon class="h-5 w-5 ml-3" /></button>
-                <button @click="deleteUser(user.id)" class="ml-3 flex items-center justify-center min-w-[8rem]">Supprimer <TrashIcon class="h-5 w-5 ml-3" /></button>
+                <button @click="loadModificationModal(order)" class="mr-3 flex items-center justify-center min-w-[8rem]">Modifier <PencilSquareIcon class="h-5 w-5 ml-3" /></button>
+                <button @click="loadDeleteModal(order)" class="ml-3 flex items-center justify-center min-w-[8rem]">Supprimer <TrashIcon class="h-5 w-5 ml-3" /></button>
             </td>
         </tr>
     </table>
