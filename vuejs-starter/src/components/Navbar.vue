@@ -1,55 +1,37 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { UserIcon, MagnifyingGlassIcon, StarIcon, InboxIcon, ShoppingCartIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, RocketLaunchIcon, HomeModernIcon, KeyIcon } from '@heroicons/vue/24/outline';
-import { ref, reactive, computed, onMounted, onUpdated } from 'vue';
+import { UserIcon, MagnifyingGlassIcon, ShoppingCartIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, RocketLaunchIcon, HomeModernIcon, KeyIcon } from '@heroicons/vue/24/outline';
+import { ref, reactive, computed, onUpdated } from 'vue';
 import { useStore } from 'vuex';
-import UserService from '../services/user.service';
 
 const route = useRoute();
 const store = useStore();
+
 const isLoggedIn = computed(() => store.getters['auth/isLoggedIn'])
+const userRoles = computed(() => store.getters['auth/user'])
+
+const userLink = ref([])
+const showUserMenu = ref(false)
 const isAdmin = ref(false)
 const isOwner = ref(false)
+
 const navLink = reactive([
     { name: 'Les modèles', href: '/model', current: false },
     { name: 'Services', href: '/services', current: false },
     { name: 'Nos concessionaires', href: '/garage', current: false },
 ]);
-const userLink = ref([
-    { name: 'Mon profil', href: '/me/profile', isShow: isLoggedIn.value, icon: UserIcon },
-    { name: 'Mes achats/ventes', href: '/me/list/orders/in-progress', isShow: isLoggedIn.value, icon: ShoppingCartIcon },
-    { name: 'Administration', href: '/admin/users', isShow: isAdmin.value, icon: KeyIcon },
-    { name: 'Ma concession', href: '/me/concession', isShow: isOwner.value, icon: HomeModernIcon },
-    { name: 'Se déconnecter', href: '/logout', isShow: isLoggedIn.value, icon: ArrowLeftOnRectangleIcon },
-    { name: 'Se connecter', href: '/login', isShow: !isLoggedIn.value, icon: ArrowRightOnRectangleIcon },
-    { name: 'S\'inscrire', href: '/register', isShow: !isLoggedIn.value, icon: RocketLaunchIcon },
-])
-const showUserMenu = ref(false)
 const searchBar = reactive({
     show: false,
     value: ''
 })
+
 const handleSearch = () => {
     searchBar.show = !searchBar.show
 }
-onMounted(async () => {
-    const me = await UserService.get('me')
-    if (me) {
-        isAdmin.value = isLoggedIn.value && me.roles.includes('ROLE_ADMIN')
-        isOwner.value = isLoggedIn.value && me.roles.includes('ROLE_DEALER')
-    }
-    console.log(isAdmin.value, isOwner.value)
-})
 
-onUpdated(async () => {
-    const me = await UserService.get('me')
-    if (me) {
-        isAdmin.value = isLoggedIn.value && me.roles.includes('ROLE_ADMIN')
-        isOwner.value = isLoggedIn.value && me.roles.includes('ROLE_DEALER')
-    } else {
-        isAdmin.value = false
-        isOwner.value = false
-    }
+onUpdated(() => {
+    isAdmin.value = userRoles.value ? userRoles.value.roles.includes('ROLE_ADMIN') : false
+    isOwner.value = userRoles.value ? userRoles.value.roles.includes('ROLE_DEALER') : false
     userLink.value = [
         { name: 'Mon profil', href: '/me/profile', isShow: isLoggedIn.value, icon: UserIcon },
         { name: 'Mes achats/ventes', href: '/me/list/orders/in-progress', isShow: isLoggedIn.value, icon: ShoppingCartIcon },
@@ -60,7 +42,6 @@ onUpdated(async () => {
         { name: 'S\'inscrire', href: '/register', isShow: !isLoggedIn.value, icon: RocketLaunchIcon },
     ]
 })
-
 
 </script>
 
