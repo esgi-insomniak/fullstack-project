@@ -1,13 +1,17 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import GarageService from "../../services/garage.service.js";
 import UserService from "../../services/user.service.js";
 import CarService from "../../services/car.service.js";
+import SchudleService from "../../services/schudle.service.js";
+import OrderService from "../../services/order.service.js";
+import StatusService from "../../services/status.service.js";
 import Vue3EasyDataTable from 'vue3-easy-data-table';
 import RadioGroup from "../../components/RadioGroup.vue";
 import CarList from "../../components/garage/CarList.vue";
 import GarageListWithMap from "../../components/garage/GarageListWithMap.vue";
-import SchudleService from "../../services/schudle.service.js";
+import Modal from "../../components/Modal.vue";
+import {CurrencyEuroIcon, ExclamationTriangleIcon} from "@heroicons/vue/24/outline/index.js";
 
 
 const garages = ref([]);
@@ -54,6 +58,14 @@ const meetingHeaders = [
   {text: 'Boite de vitesse', value: 'gearbox'},
   {text: 'Actions', value: 'actions', sortable: false},
 ]
+const toggleModal = () => {
+  modalProps.open = !modalProps.open
+};
+
+const modalProps = reactive({
+  open: false,
+  toggle: toggleModal,
+});
 
 const handleSubmit = (form) => {
   if (selectedGarage.value) {
@@ -77,10 +89,81 @@ const handleRadioSelected = (selected) => {
 
 const handleGarageClick = async (garage) => {
   selectedGarage.value = garage;
+  formData.value.name = garage.name;
+  formData.value.is_open = garage.is_open === true ? 'true' : 'false';
   orders.value = await GarageService.getGarageOrders(garage.id);
   cars.value = await CarService.getGarageCars(garage.id);
   meetings.value = await SchudleService.getGarageEvents(garage.id);
 };
+
+const cancelOrder = async (order) => {
+  const updatedOrder = await OrderService.patch(order.id, { progression: 'canceled' });
+  console.log(order)
+  orders.value = orders.value.map((o) => {
+    if (o.id === order.id) {
+      o.progression = updatedOrder.progression;
+      o.status.canCancel = updatedOrder.status.canCancel;
+    }
+    return o;
+  });
+  toggleModal();
+};
+
+const editOrder = async (order) => {
+  const updatedOrder = await OrderService.patch(order.id, { progression: 'in_progress' });
+
+  orders.value = orders.value.map((o) => {
+    if (o.id === order.id) {
+      o.progression = updatedOrder.progression;
+      o.status.canCancel = updatedOrder.status.canCancel;
+    }
+    return o;
+  });
+};
+const loadCancelOrderModal = (order) => {
+  modalProps.id = 'cancel-order-modal';
+  modalProps.title = 'Annuler la commande ?';
+  modalProps.content = 'Si vous annulez la commande, vous ne pourrez plus revenir en arrière. Voulez-vous vraiment annuler la commande ?'
+  modalProps.icon = {
+    type: ExclamationTriangleIcon,
+    bgColor: 'bg-red-100',
+    textColor: 'text-red-600'
+  };
+  modalProps.buttons = [
+    {
+      text: 'Annuler la commande',
+      class: 'inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm',
+      action: async () => await cancelOrder(order)
+    },
+    {
+      text: 'Fermer',
+      class: 'mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm',
+      action: toggleModal
+    }
+  ]
+  toggleModal();
+};
+
+const loadEditOrderModal = (order) => {
+  modalProps.id = 'order-edit-modal';
+  modalProps.title = 'Modifier la commande';
+  modalProps.content = null;
+  modalProps.icon = null;
+  modalProps.buttons = [
+    {
+      text: 'Modifier',
+      class: 'inline-flex w-full justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm',
+      action: async () => await (order)
+    },
+    {
+      text: 'Fermer',
+      class: 'mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm',
+      action: toggleModal
+    }
+  ]
+  toggleModal();
+}
+
 
 onMounted(async () => {
   const me = await UserService.get("me");
@@ -95,6 +178,12 @@ onMounted(async () => {
 </script>
 
 <template>
+
+  <Modal v-bind="{ ...modalProps }">
+
+  </Modal>
+
+
   <div class="container mx-auto my-5">
     <div class="flex flex-col justify-between items-center gap-4" v-if="garages.length > 0">
       <div class="flex justify-between" >
@@ -114,7 +203,6 @@ onMounted(async () => {
             label="Ouvert ?"
             help="Le garage est-il ouvert et accepte des offres ?"
             name="is_open"
-            :value="true"
           />
         </FormKit>
       </div>
@@ -165,8 +253,8 @@ onMounted(async () => {
           </template>
           <template #item-actions="item">
             <div class="flex items-center space-x-4">
-              <button class="text-indigo-600 hover:text-indigo-900">Modifier</button>
-              <button class="text-indigo-600 hover:text-indigo-900">Annuler</button>
+              <button class="text-indigo-600 hover:text-indigo-900" @click="loadEditOrderModal(item)">Modifier</button>
+              <button class="text-indigo-600 hover:text-indigo-900" @click="loadCancelOrderModal(item)">Annuler</button>
             </div>
           </template>
         </Vue3EasyDataTable>
@@ -194,7 +282,7 @@ onMounted(async () => {
             </div>
           </template>
           <template #item-carIdentity="item">
-            <div class="flex items-center">
+            <div class="flex items-center" v-if="item.carIdentity">
               <img :src="item.carIdentity.mainPicture.src" class="object-cover rounded-full"  :alt="item.carIdentity.name"/>
               <div class="ml-4">
                 <div class="text-sm font-medium text-gray-900">

@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:get:user', 'item:get:carIdentity', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:get:user', 'item:get:carIdentity', 'item:get:order', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent']],
