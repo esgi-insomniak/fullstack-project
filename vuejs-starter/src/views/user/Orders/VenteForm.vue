@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router';
 import SkeletonModelCars from '../../../components/Skeleton/SkeletonModelCars.vue';
 import CarService from '../../../services/car.service';
 import GarageService from '../../../services/garage.service';
@@ -23,6 +24,7 @@ const model = ref([])
 const garage = ref([])
 const previewModel = ref('')
 const me = ref(null)
+const router = useRouter();
 
 const handleSubmit = (form) => {
     const toBeSubmitted = {
@@ -38,15 +40,21 @@ const handleSubmit = (form) => {
         recoverer: `/users/${me.value.id}`,
         progression: 'in-progress'
     }
-    RecoveryService.post(toBeSubmitted)
+    RecoveryService.post(toBeSubmitted).then(() => {
+        router.push({ name: 'UserSalesEdit', params: { slug: 'in-progress' } })
+    });
 }
 const handlePictureChange = () => {
     const img = model.value.find(item => item.id === modelSelected.value).mainPicture.src
     previewModel.value = img
 }
 onMounted(async () => {
-    model.value = await CarService.getCarIdentityCollection()
-    garage.value = await GarageService.getCollection()
+    model.value = await CarService.getCarIdentityCollection({
+        itemsPerPage: 100
+    })
+    garage.value = await GarageService.getCollection({
+        itemsPerPage: 100
+    })
     me.value = await UserService.get('me')
 });
 </script>
@@ -100,9 +108,6 @@ onMounted(async () => {
     </FormKit>
     <div v-if="previewModel !== ''" class="w-96 h-96">
         <img :src="previewModel" alt="" class="object-cover">
-    </div>
-    <div v-else>
-        <SkeletonModelCars />
     </div>
 </template>
 

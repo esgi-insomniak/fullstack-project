@@ -59,6 +59,7 @@ const takeAppointment = async (order) => {
         associateGarage: `garages/${order.garage.id}`,
         associateUser: `users/${order.orderer.id}`,
         associateOrder: `orders/${order.id}`,
+        carIdentity: `car_identities/${order.car.identity.id}`,
         type: 'commande'
     };
     await GarageSchudleEventService.post(garageSchudleEvent);
