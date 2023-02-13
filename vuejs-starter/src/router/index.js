@@ -2,11 +2,13 @@ import * as VueRouter from 'vue-router'
 import VueJwtDecode from 'vue-jwt-decode'
 
 const publicPages = ['/login', '/register', '/'];
-const user = JSON.parse(localStorage.getItem('user')) ?? null;
-const isAdmin = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_ADMIN') : null;
-const isOwner = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_DEALER') : null;
+
+const decodeUser = () => {
+    return JSON.parse(localStorage.getItem('user')) ?? null;
+}
 
 const needsAuth = (to, from, next) => {
+    const user = decodeUser();
     const authRequired = !publicPages.includes(to.path);
     if (authRequired && !user) {
         return next('/login');
@@ -15,11 +17,15 @@ const needsAuth = (to, from, next) => {
 }
 
 const needsAdmin = (to, from, next) => {
+    const user = decodeUser();
+    const isAdmin = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_ADMIN') : null;
     if (isAdmin) return next();
     return next('/home');
 }
 
 const needsOwner = (to, from, next) => {
+    const user = decodeUser();
+    const isOwner = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_DEALER') : null;
     if (isOwner) return next();
     return next('/home');
 }

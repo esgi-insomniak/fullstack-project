@@ -40,6 +40,6 @@ describe('template spec', () => {
       cy.get('select[name="appointement"]').select($childrens.eq(random).val())
     })
     cy.get('button').contains('Demande de RDV').click()
-    cy.get('div').children().contains('Questionnaire terminer').should('be.visible')
+    cy.get('div').children().contains('Votre demande à bien été prise en compte, retrouver votre rendez-vous sur votre profil.').should('be.visible')
   })
 })
