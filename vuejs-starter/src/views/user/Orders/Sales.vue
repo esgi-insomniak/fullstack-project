@@ -69,7 +69,7 @@ const loadCancelModal = (recover) => {
 const loadDetailsModal = (recover) => {
     modalProps.id = 'recovery-details-modal';
     modalProps.title = 'Détails de la commande';
-    modalProps.content = `Vente number: ${recover.id}<br>Année: ${recover.year}<br>Status: ${recover.status.name}<br>Montant: ${recover.proposedPrice} €`;
+    modalProps.content = `Vente number: ${recover.id}<br>Modèle: ${recover.carIdentity.name}<br>Année: ${recover.year}<br>Status: ${recover.status.name}<br>Prix de vente: ${recover.proposedPrice} €<br>Carburant: ${recover.fuel}<br>Kilomètres: ${recover.kilometers}<br>Boite de vitesses: ${recover.gearbox}`;
     modalProps.icon = null;
     modalProps.buttons = [
         {
