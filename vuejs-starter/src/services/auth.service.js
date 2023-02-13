@@ -12,7 +12,7 @@ class AuthService {
           localStorage.setItem("user", JSON.stringify({ token: token }));
           return decodedToken;
         }
-        return response_authentication_token.data;
+        return null
       });
   }
 

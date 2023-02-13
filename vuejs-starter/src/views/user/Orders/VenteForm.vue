@@ -7,15 +7,16 @@ import RecoveryService from '../../../services/recovery.service';
 import UserService from '../../../services/user.service';
 
 const formData = ref({
-    car: '',
+    carIdentity: '',
     year: '',
     proposedPrice: '',
     km: '',
+    garage: '',
     power: '',
     gearbox: '',
     fuel: '',
     carDescription: '',
-    recover: ''
+    recoverer: ''
 });
 const modelSelected = ref(null);
 const model = ref([])
@@ -25,18 +26,19 @@ const me = ref(null)
 
 const handleSubmit = (form) => {
     const toBeSubmitted = {
-        car: form.car,
+        carIdentity: `/car_identities/${form.carIdentity}`,
         year: form.year,
-        proposedPrice: form.proposedPrice,
-        km: form.km,
+        proposedPrice: parseFloat(form.proposedPrice),
+        kilometers: form.kilometers,
+        garage: `/garages/${form.garage}`,
         power: form.power,
         gearbox: form.gearbox,
         fuel: form.fuel,
         carDescription: form.carDescription,
-        recover: me.value.id,
+        recoverer: `/users/${me.value.id}`,
+        progression: 'in-progress'
     }
-    // RecoveryService.post(toBeSubmitted)
-    console.log(toBeSubmitted)
+    RecoveryService.post(toBeSubmitted)
 }
 const handlePictureChange = () => {
     const img = model.value.find(item => item.id === modelSelected.value).mainPicture.src
@@ -50,7 +52,7 @@ onMounted(async () => {
 </script>
 <template>
     <FormKit type="form" form-class="grid grid-flow-row grid-cols-2 gap-3" v-model="formData" @submit="handleSubmit">
-        <FormKit type="select" name="car" label="Model" placeholder="Model" :options="model.map((item) => {
+        <FormKit type="select" name="carIdentity" label="Model" placeholder="Model" :options="model.map((item) => {
             return {
                 value: item.id,
                 label: item.name
@@ -64,7 +66,7 @@ onMounted(async () => {
         })" required />
         <FormKit type="date" name="year" label="Date mise en circulation" placeholder="Year" required />
         <FormKit type="text" name="proposedPrice" label="Prix estimé" placeholder="Prix estimé" required />
-        <FormKit type="number" name="km" label="Km" placeholder="Km" required />
+        <FormKit type="number" name="kilometers" label="Km" placeholder="Km" required />
         <FormKit type="text" name="power" label="CV" placeholder="Puissance" required />
         <FormKit type="select" name="gearbox" label="Boite à vitesse" placeholder="Boite à vitesse" :options="[
             {
