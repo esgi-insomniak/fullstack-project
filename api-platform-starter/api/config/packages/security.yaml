@@ -35,6 +35,7 @@ security:
         - { path: ^/users/recovery_account$, roles: PUBLIC_ACCESS, methods: [POST] } # Recovery account
         - { path: ^/users/recovery_account_change_password$, roles: PUBLIC_ACCESS, methods: [POST] } # Recovery account
         - { path: /orders$, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+        - { path: /garage_schudle_events$, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
         - { path: ^/car_categories, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/car_identities, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/cars, roles: PUBLIC_ACCESS, methods: [GET] }

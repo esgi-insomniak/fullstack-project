@@ -25,20 +25,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:order']],
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:order']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:order']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
+        ),
         new Post(
             uriTemplate: '/orders/{id}/checkout',
             defaults: ['_api_receive' => false],
@@ -53,6 +59,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 ],
             ],
             output: false,
+            security: "object.getOrderer() == user"
         ),
         new Post(
             uriTemplate: '/orders/{id}/payment_validation',
@@ -72,6 +79,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     ],
                 ],
             ],
+            security: "object.getOrderer() == user"
         ),
         new GetCollection(
             uriTemplate: '/users/{id}/orders',
@@ -82,6 +90,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or id == user.getId()"
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/orders',
@@ -92,6 +101,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/orders',
@@ -102,6 +112,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],

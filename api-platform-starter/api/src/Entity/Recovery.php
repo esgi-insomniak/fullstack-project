@@ -19,20 +19,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:recovery']],
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:recovery', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getRecover() == user"
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:recovery']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getRecover() == user"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:recovery']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getRecover() == user"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new GetCollection(
             uriTemplate: '/users/{id}/recoveries',
             uriVariables: [
@@ -42,6 +48,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or id == user.getId()"
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/recoveries',
@@ -52,6 +59,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/recoveries',
@@ -62,6 +70,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:recovery']],
@@ -106,7 +115,7 @@ class Recovery
     #[ORM\Column]
     private ?float $proposedPrice = null;
 
-    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
     #[ORM\Column]
     private ?float $totalPrice = null;
 
