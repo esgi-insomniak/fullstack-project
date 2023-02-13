@@ -227,7 +227,7 @@ const modalProps = reactive({
             <div class="relative w-full py-5 px-5 flex flex-col space-y-5 ml-10 item-start">
                 <div class="flex justify-between w-full h-full">
                     <div class="flex flex-col w-4/6">
-                        <span>Modèle : {{ order.car.model }} - {{ order.car.year }}</span>
+                        <span>Modèle : {{ order.car.identity.name }}</span>
                         <span>Numéro du chassis : {{ order.car.slug }}</span>
                         <span>Prix : {{ order.car.price }} €</span>
                         <span>Status de la commande : {{ order.status.name }}</span>
