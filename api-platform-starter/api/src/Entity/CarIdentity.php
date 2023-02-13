@@ -24,17 +24,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new GetCollection(
             uriTemplate: '/car_categories/{id}/car_identities',
             uriVariables: [
