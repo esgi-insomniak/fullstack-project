@@ -11,8 +11,10 @@ class StatusFixture extends Fixture
     public function load(ObjectManager $manager): void
     {
         $statusNames = [
+            'Voiture ajouté',
             'Commandée',
             'En attente de paiement',
+            'Vendu',
             'Payée',
             'Erreur Paiement',
             'Contrôle technique',
@@ -24,8 +26,10 @@ class StatusFixture extends Fixture
             'Livrée et terminée',
         ];
         $statusSlug = [
+            'car-added',
             'ordered',
             'waiting-for-payment',
+            'sold',
             'paid',
             'payment-error',
             'technical-control',
@@ -37,8 +41,10 @@ class StatusFixture extends Fixture
             'delivered-and-finished',
         ];
         $statusWidths = [
+            '33.2%',
             '16.6%',
             '33.2%',
+            '66.4%',
             '33.2%',
             '33.2%',
             '49.8%',
@@ -50,6 +56,8 @@ class StatusFixture extends Fixture
             '100%',
         ];
         $statusBgColors = [
+            'bg-blue-500/60',
+            'bg-blue-500/60',
             'bg-blue-500/60',
             'bg-blue-500/60',
             'bg-blue-500/60',
@@ -65,6 +73,8 @@ class StatusFixture extends Fixture
         $statusCanCancel = [
             true,
             true,
+            true,
+            false,
             false,
             true,
             false,

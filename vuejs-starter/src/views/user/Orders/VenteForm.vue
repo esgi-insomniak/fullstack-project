@@ -1,74 +1,109 @@
 <script setup>
-import { reactive } from 'vue'
-const formData = reactive({
-    name: '',
-    model: '',
+import { ref, onMounted } from 'vue'
+import SkeletonModelCars from '../../../components/Skeleton/SkeletonModelCars.vue';
+import CarService from '../../../services/car.service';
+import GarageService from '../../../services/garage.service';
+import RecoveryService from '../../../services/recovery.service';
+import UserService from '../../../services/user.service';
+
+const formData = ref({
+    carIdentity: '',
     year: '',
-    chasis: '',
-    price: '',
+    proposedPrice: '',
     km: '',
+    garage: '',
     power: '',
     gearbox: '',
     fuel: '',
-    location: '',
-    consumption: '',
-    doors: '',
-    image: '',
-})
-const model = [
-    { value: 'BMW', label: 'BMW' },
-    { value: 'Mercedes', label: 'Mercedes' },
-    { value: 'Audi', label: 'Audi' },
-    { value: 'Porsche', label: 'Porsche' },
-    { value: 'Ferrari', label: 'Ferrari' },
-    { value: 'Lamborghini', label: 'Lamborghini' },
-    { value: 'Bugatti', label: 'Bugatti' },
-    { value: 'McLaren', label: 'McLaren' },
-    { value: 'Koenigsegg', label: 'Koenigsegg' },
-    { value: 'Pagani', label: 'Pagani' },
-    { value: 'Rolls-Royce', label: 'Rolls-Royce' },
-    { value: 'Bentley', label: 'Bentley' },
-    { value: 'Maserati', label: 'Maserati' },
-    { value: 'Alfa Romeo', label: 'Alfa Romeo' },
-    { value: 'Aston Martin', label: 'Aston Martin' },
-    { value: 'Jaguar', label: 'Jaguar' },
-    { value: 'Land Rover', label: 'Land Rover' },
-    { value: 'Lotus', label: 'Lotus' },
-    { value: 'Morgan', label: 'Morgan' },
-    { value: 'Nissan', label: 'Nissan' },
-    { value: 'Infiniti', label: 'Infiniti' },
-    { value: 'Toyota', label: 'Toyota' },
-    { value: 'Lexus', label: 'Lexus' },
-    { value: 'Honda', label: 'Honda' },
-    { value: 'Acura', label: 'Acura' },
-    { value: 'Mazda', label: 'Mazda' },
-    { value: 'Subaru', label: 'Subaru' },
-    { value: 'Mitsubishi', label: 'Mitsubishi' },
-    { value: 'Suzuki', label: 'Suzuki' },
-    { value: 'Hyundai', label: 'Hyundai' },
-    { value: 'Kia', label: 'Kia' },
-]
+    carDescription: '',
+    recoverer: ''
+});
+const modelSelected = ref(null);
+const model = ref([])
+const garage = ref([])
+const previewModel = ref('')
+const me = ref(null)
+
 const handleSubmit = (form) => {
-    console.log(form)
+    const toBeSubmitted = {
+        carIdentity: `/car_identities/${form.carIdentity}`,
+        year: form.year,
+        proposedPrice: parseFloat(form.proposedPrice),
+        kilometers: form.kilometers,
+        garage: `/garages/${form.garage}`,
+        power: form.power,
+        gearbox: form.gearbox,
+        fuel: form.fuel,
+        carDescription: form.carDescription,
+        recoverer: `/users/${me.value.id}`,
+        progression: 'in-progress'
+    }
+    RecoveryService.post(toBeSubmitted)
 }
+const handlePictureChange = () => {
+    const img = model.value.find(item => item.id === modelSelected.value).mainPicture.src
+    previewModel.value = img
+}
+onMounted(async () => {
+    model.value = await CarService.getCarIdentityCollection()
+    garage.value = await GarageService.getCollection()
+    me.value = await UserService.get('me')
+});
 </script>
 <template>
     <FormKit type="form" form-class="grid grid-flow-row grid-cols-2 gap-3" v-model="formData" @submit="handleSubmit">
-        <FormKit type="text" name="name" label="Name" placeholder="Name" />
-        <FormKit type="select" name="model" label="Model" placeholder="Model" :options="model" />
-        <FormKit type="date" name="year" label="Year" placeholder="Year" />
-        <FormKit type="text" name="chasis" label="Chasis" placeholder="Chasis" />
-        <FormKit type="text" name="price" label="Price" placeholder="Price" />
-        <FormKit type="number" name="km" label="Km" placeholder="Km" />
-        <FormKit type="text" name="power" label="Power" placeholder="Power" />
-        <FormKit type="text" name="gearbox" label="Gearbox" placeholder="Gearbox" />
-        <FormKit type="text" name="fuel" label="Fuel" placeholder="Fuel" />
-        <FormKit type="text" name="location" label="Location" placeholder="Location" />
-        <FormKit type="text" name="consumption" label="Consumption" placeholder="Consumption" />
-        <FormKit type="text" name="doors" label="Doors" placeholder="Doors" />
-        <FormKit type="file" name="image" label="Image" placeholder="Image" accept=".jpg,.png,.svg" multiple />
+        <FormKit type="select" name="carIdentity" label="Model" placeholder="Model" :options="model.map((item) => {
+            return {
+                value: item.id,
+                label: item.name
+            }
+        })" v-model="modelSelected" @change="handlePictureChange" required />
+        <FormKit type="select" name="garage" label="Garage" placeholder="Garage" :options="garage.map((item) => {
+            return {
+                value: item.id,
+                label: item.name
+            }
+        })" required />
+        <FormKit type="date" name="year" label="Date mise en circulation" placeholder="Year" required />
+        <FormKit type="text" name="proposedPrice" label="Prix estimé" placeholder="Prix estimé" required />
+        <FormKit type="number" name="kilometers" label="Km" placeholder="Km" required />
+        <FormKit type="text" name="power" label="CV" placeholder="Puissance" required />
+        <FormKit type="select" name="gearbox" label="Boite à vitesse" placeholder="Boite à vitesse" :options="[
+            {
+                value: 'manual',
+                label: 'Manual'
+            },
+            {
+                value: 'automatic',
+                label: 'Automatic'
+            }
+        ]" required />
+        <FormKit type="select" name="fuel" label="Carburant" placeholder="Carburant" :options="[
+            {
+                value: 'diesel',
+                label: 'Diesel'
+            },
+            {
+                value: 'essence',
+                label: 'Essence'
+            },
+            {
+                value: 'hybrid',
+                label: 'Hybrid'
+            },
+            {
+                value: 'electric',
+                label: 'Electric'
+            }
+        ]" required />
+        <FormKit type="textarea" name="carDescription" label="Description" placeholder="Description" />
     </FormKit>
-
+    <div v-if="previewModel !== ''" class="w-96 h-96">
+        <img :src="previewModel" alt="" class="object-cover">
+    </div>
+    <div v-else>
+        <SkeletonModelCars />
+    </div>
 </template>
 
 

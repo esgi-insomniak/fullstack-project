@@ -21,27 +21,43 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'id']],
+            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:get:user','item:get:carIdentity','id']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garageSchudleEvent']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'id']],
+            normalizationContext: ['groups' => ['item:get:garageSchudleEvent', 'item:get:garageSchudleEvent','item:get:user', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getAssociateUser() == user"
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garageSchudleEvent']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:garageSchudleEvent']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
+        ),
         new GetCollection(
             uriTemplate: '/garages/{id}/garage_schudle_events',
             uriVariables: [
                 'id' => new Link(
                     fromProperty: 'garageSchudleEvents',
                     fromClass: Garage::class
+                )
+            ],
+            normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'item:get:user', 'item:get:carIdentity', 'item:get:order', 'id']],
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{id}/garage_schudle_events',
+            uriVariables: [
+                'id' => new Link(
+                    fromProperty: 'garageSchudleEvents',
+                    fromClass: User::class
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:garageSchudleEvent', 'item:get:garageSchudleEvent', 'id']],

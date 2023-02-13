@@ -83,7 +83,7 @@ const getGaragesEvents = async (concessionId) => {
     const fromDate = moment().add(1, 'days').startOf('day');
     const toDate = moment().add(7, 'days').startOf('day');
     const disponibilities = await GarageSchudleEventService.getCalendarDisponibilities(concessionId, fromDate, toDate);
-    
+
     questions.value[6].options = disponibilities.reduce((acc, day) => {
         return [...acc, ...day.disponibilities]
     }, []).filter(dispo => dispo.isDisponible).map(dispo => {
@@ -136,12 +136,15 @@ onMounted(async () => {
                 :submit-label="currentQuestion === questions.length ? 'Demande de RDV' : 'Question suivante'">
                 <template v-for="question in questions">
                     <FormKit :type="question.type" :name="question.name" :label="question.label"
-                        :options="question.options" v-if="question.step === currentQuestion" />
+                        :options="question.options" v-if="question.step === currentQuestion" validation="required"
+                        :validation-messages="{
+                            required: 'Ce champs est requis ! ❌'
+                        }" />
                 </template>
             </FormKit>
         </div>
-        <div v-else>
-            Questionnaire terminer
+        <div v-else class="text-green-500">
+            Votre demande à bien été prise en compte, retrouver votre rendez-vous sur votre profil.
             <div id="calendar" ref="calendar"></div>
         </div>
     </div>

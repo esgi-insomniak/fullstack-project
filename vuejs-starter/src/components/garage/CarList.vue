@@ -6,16 +6,20 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  search: {
+  onlyShow: {
     type: Boolean,
-    required: true,
+    default: false,
   },
+  user: {
+    type: Object,
+    required: false,
+  }
 });
 </script>
 
 <template>
   <div class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1 gap-4 py-4">
-    <CarListItem v-for="car in cars" :car="car" />
+    <CarListItem v-for="car in cars" :car="car" :onlyShow="onlyShow" :user="user"/>
   </div>
 </template>
 

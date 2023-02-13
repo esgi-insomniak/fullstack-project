@@ -24,17 +24,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new GetCollection(
             uriTemplate: '/car_categories/{id}/car_identities',
             uriVariables: [
@@ -80,10 +85,14 @@ class CarIdentity
     #[ORM\OneToMany(mappedBy: 'carIdentity', targetEntity: GarageSchudleEvent::class)]
     private Collection $garageSchudleEvents;
 
+    #[ORM\OneToMany(mappedBy: 'carIdentity', targetEntity: Recovery::class, orphanRemoval: true)]
+    private Collection $recoveries;
+
     public function __construct()
     {
         $this->cars = new ArrayCollection();
         $this->garageSchudleEvents = new ArrayCollection();
+        $this->recoveries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -181,6 +190,36 @@ class CarIdentity
             // set the owning side to null (unless already changed)
             if ($garageSchudleEvent->getCarIdentity() === $this) {
                 $garageSchudleEvent->setCarIdentity(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recovery>
+     */
+    public function getRecoveries(): Collection
+    {
+        return $this->recoveries;
+    }
+
+    public function addRecovery(Recovery $recovery): self
+    {
+        if (!$this->recoveries->contains($recovery)) {
+            $this->recoveries->add($recovery);
+            $recovery->setCarIdentity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecovery(Recovery $recovery): self
+    {
+        if ($this->recoveries->removeElement($recovery)) {
+            // set the owning side to null (unless already changed)
+            if ($recovery->getCarIdentity() === $this) {
+                $recovery->setCarIdentity(null);
             }
         }
 

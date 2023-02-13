@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -25,20 +26,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
     operations: [
         new GetCollection(
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:order']],
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:order']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:order']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
+        ),
         new Post(
             uriTemplate: '/orders/{id}/checkout',
             defaults: ['_api_receive' => false],
@@ -82,6 +89,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or id == user.getId()"
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/orders',
@@ -91,7 +99,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'item:get:user', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/orders',
@@ -102,6 +111,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 )
             ],
             normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],
@@ -152,6 +162,7 @@ class Order
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finalisedAt = null;
 
+    #[ApiProperty(securityPostDenormalize: "is_granted('ROLE_ADMIN')")]
     #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]

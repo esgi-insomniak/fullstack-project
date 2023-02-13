@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -39,13 +40,17 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:user']],
-            processor: UserPasswordHasher::class
+            processor: UserPasswordHasher::class,
+            security: "is_granted('ROLE_ADMIN') or object == user"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:user']],
-            processor: UserPasswordHasher::class
+            processor: UserPasswordHasher::class,
+            security: "is_granted('ROLE_ADMIN') or object == user"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new Post(
             uriTemplate: '/users/{id}/send_confirmation_email',
             defaults: ['_api_receive' => false],
@@ -56,6 +61,7 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
                 ],
             ],
             output: false,
+            security: "object == user"
         ),
         new Post(
             uriTemplate: '/users/{id}/validate_account',
@@ -76,6 +82,7 @@ use Symfony\Component\Validator\Constraints as Assert; // Symfony's built-in con
                 ],
             ],
             output: false,
+            security: "object == user"
         ),
         new Post(
             uriTemplate: '/users/recovery_account',
@@ -143,6 +150,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
+    #[ApiProperty(securityPostDenormalize: "is_granted('ROLE_ADMIN')")]
     #[Groups(['collection:get:user', 'item:get:user', 'item:put:user', 'item:patch:user'])]
     #[ORM\Column(type: 'json')]
     private array $roles;
@@ -198,7 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'orderer', targetEntity: Order::class)]
     private Collection $orders;
 
-    #[ORM\OneToMany(mappedBy: 'recover', targetEntity: Recovery::class)]
+    #[ORM\OneToMany(mappedBy: 'recoverer', targetEntity: Recovery::class)]
     private Collection $recoveries;
 
     #[Groups(['collection:get:user', 'item:get:user', 'item:post:user', 'item:put:user', 'item:patch:user'])]

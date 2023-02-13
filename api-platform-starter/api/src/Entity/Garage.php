@@ -26,17 +26,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:garage']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:garage', 'item:get:user', 'item:get:car:isordered', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:garage']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:garage']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
     ],
     normalizationContext: ['groups' => ['collection:get:garage', 'item:get:garage']],
     denormalizationContext: ['groups' => ['item:post:garage', 'item:put:garage', 'item:patch:garage']],
@@ -51,6 +56,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'coordinates' => 'exact',
         'isOpen' => 'exact',
         'cars.identity.id' => 'exact',
+        'owner.id' => 'exact',
     ],
 )]
 #[ApiFilter(

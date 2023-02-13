@@ -9,6 +9,7 @@ import GarageList from "../components/garage/GarageList.vue";
 import CarList from "../components/garage/CarList.vue";
 import RadioGroup from "../components/RadioGroup.vue";
 import {useRoute} from "vue-router";
+import GarageListWithMap from "../components/garage/GarageListWithMap.vue";
 
 const route = useRoute();
 const {identityId} = route.params;
@@ -25,7 +26,7 @@ const garageParams = (identityId) ? {
 const garages = ref([]);
 const cars = ref([]);
 const filteredCars = ref([]);
-const me = ref(null);
+const me = ref({ address: "Votre position", coordinates: [46.635738928197114, 2.6308714120530854]});
 const selectedCategory = ref(undefined);
 
 
@@ -55,12 +56,11 @@ const handleCarIdentityChange = (identity) => {
 };
 
 const getGarageCars = async (garageId) => {
-  selectGarageById(garageId);
   cars.value = await CarService.getGarageCars(garageId, { "isOrdered": false });
   filteredCars.value = cars.value;
   if (identityId) {
     const findCar = cars.value.find(car => car.identity.id == identityId);
-    if (findCar) {
+    if (findCar && findCar.identity) {
       handleCarCategoryChange(findCar.identity.category.id);
       handleCarIdentityChange(findCar.identity.id);
     }
@@ -89,47 +89,28 @@ const getAllCarCategories = () => {
   return cars.value.map(getCarCategory).filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i)
 };
 
-const selectGarageById = (id) => {
-  garages.value.forEach(g => {
-    g.selected = g.id === id;
-  });
-};
-
 onMounted(async () => {
-  me.value = await UserService.get("me");
-  me.value.coordinates = me.value.coordinates.reverse();
+  UserService.get("me").then((user) => {
+    me.value = user;
+    me.value.coordinates = me.value.coordinates.reverse();
+  })
   const filteredGarages = await GarageService.getCollection(garageParams);
   garages.value = Object.values(filteredGarages).filter(g => g.cars.filter(c => !c.isOrdered).length > 0);
 });
 
 </script>
 <template>
-  <div class="flex justify-center flex-col my-5">
-    <div class="flex flex-row justify-center" v-if="garages.length > 0">
-      <Map
-          :zoom="8"
-          :icon-to-display="new L.icon({
-            iconUrl: '/src/assets/bmw_logo.png',
-            iconSize: [35, 35],
-            iconAnchor: [13, 41],
-            popupAnchor: [0, -41],
-          })"
-          :points-to-display="garages.map(garage => {
-            return {
-              name: garage.name,
-              coordinates: garage.coordinates,
-              uniqueId: garage.id,
-              onClick: handleGarageIconClick
-            }
-          })"
-          :default-point="{
-            name: me.address,
-            coordinates: me.coordinates
-          }"
-      />
-      <GarageList :garages="garages" @garage-click="handleGarageClick" search/>
-    </div>
-
+  <div class="flex justify-center flex-col my-5" v-if="garages.length > 0">
+    <GarageListWithMap
+        :garages="garages"
+        :handle-garage-click="handleGarageClick"
+        :handle-garage-icon-click="handleGarageIconClick"
+        :default-point="{
+          name: me.address,
+          coordinates: me.coordinates,
+        }"
+        search
+    />
     <div class="p-6">
       <span class="h-1 w-full lg:w-1/3"></span>
       <div class="flex md:flex-row sm:flex-col" v-if="cars.length > 0">
@@ -145,7 +126,7 @@ onMounted(async () => {
           </div>
         </div>
         <div>
-          <CarList :cars="filteredCars" search/>
+          <CarList :cars="filteredCars" :user="me"/>
         </div>
       </div>
     </div>

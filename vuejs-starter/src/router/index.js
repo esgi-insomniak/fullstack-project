@@ -1,4 +1,28 @@
 import * as VueRouter from 'vue-router'
+import VueJwtDecode from 'vue-jwt-decode'
+
+const publicPages = ['/login', '/register', '/'];
+const user = JSON.parse(localStorage.getItem('user')) ?? null;
+const isAdmin = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_ADMIN') : null;
+const isOwner = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_DEALER') : null;
+
+const needsAuth = (to, from, next) => {
+    const authRequired = !publicPages.includes(to.path);
+    if (authRequired && !user) {
+        return next('/login');
+    }
+    return next();
+}
+
+const needsAdmin = (to, from, next) => {
+    if (isAdmin) return next();
+    return next('/home');
+}
+
+const needsOwner = (to, from, next) => {
+    if (isOwner) return next();
+    return next('/home');
+}
 
 const routes = [
     {
@@ -11,20 +35,6 @@ const routes = [
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),
-        beforeEnter: (to, from, next) => {
-            const publicPages = ['/login', '/register'];
-            const authRequired = !publicPages.includes(to.path);
-            const loggedIn = sessionStorage.getItem('user');
-
-            if (authRequired && !loggedIn) {
-                return next('/login');
-            }
-
-            next();
-        }
-        // meta: {
-        //     hideNavBar: true
-        // }
     },
     {
         path: '/register',
@@ -35,12 +45,14 @@ const routes = [
         path: '/logout',
         name: 'logout',
         component: () => import('../views/Logout.vue'),
+        beforeEnter: needsAuth
     },
     {
         // user 
         path: '/me',
         name: 'User',
         component: () => import('../views/user/LayoutUser.vue'),
+        beforeEnter: needsAuth,
         children: [
             {
                 path: 'favorites',
@@ -63,7 +75,7 @@ const routes = [
                         component: () => import('../views/user/Orders/VenteForm.vue'),
                     },
                     {
-                        path: 'sales/:id',
+                        path: 'sales/:slug',
                         name: 'UserSalesEdit',
                         component: () => import('../views/user/Orders/Sales.vue'),
                     }
@@ -78,7 +90,13 @@ const routes = [
                 path: 'profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/User.vue'),
-            }
+            },
+            {
+                path: 'concession',
+                name: 'Concession',
+                component: () => import('../views/user/Concession.vue'),
+                beforeEnter: needsOwner
+            },
         ]
     },
     {
@@ -86,6 +104,7 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: () => import('../views/admin/LayoutAdmin.vue'),
+        beforeEnter: needsAdmin,
         children: [
             {
                 path: 'users',
@@ -107,6 +126,7 @@ const routes = [
     {
         path: '/services',
         name: 'Services',
+        beforeEnter: (to, from, next) => needsAuth(to, from, next),
         component: () => import('../views/Services.vue'),
     },
     {

@@ -1,36 +1,47 @@
 <script setup>
 import { useRoute } from 'vue-router';
-import { UserIcon, MagnifyingGlassIcon, StarIcon, InboxIcon, ShoppingCartIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, RocketLaunchIcon, HomeModernIcon, KeyIcon } from '@heroicons/vue/24/outline';
-import { ref, reactive, computed } from 'vue';
+import { UserIcon, MagnifyingGlassIcon, ShoppingCartIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, RocketLaunchIcon, HomeModernIcon, KeyIcon } from '@heroicons/vue/24/outline';
+import { ref, reactive, computed, onUpdated } from 'vue';
 import { useStore } from 'vuex';
 
 const route = useRoute();
 const store = useStore();
+
 const isLoggedIn = computed(() => store.getters['auth/isLoggedIn'])
+const userRoles = computed(() => store.getters['auth/user'])
+
+const userLink = ref([])
+const showUserMenu = ref(false)
+const isAdmin = ref(false)
+const isOwner = ref(false)
+
 const navLink = reactive([
     { name: 'Les modèles', href: '/model', current: false },
     { name: 'Services', href: '/services', current: false },
     { name: 'Nos concessionaires', href: '/garage', current: false },
 ]);
-const userLink = [
-    { name: 'Mon profil', href: '/me/profile', isAuth: true, icon: UserIcon, isAdmin: false },
-    { name: 'Mes favoris', href: '/me/favorites', isAuth: true, icon: StarIcon, isAdmin: false },
-    { name: 'Mes achats/ventes', href: '/me/list/orders/in-progress', isAuth: true, icon: ShoppingCartIcon, isAdmin: false },
-    //{ name: 'Mes messages', href: '/me/messages', isAuth: true, icon: InboxIcon, isAdmin: false },
-    { name: 'Administration', href: '/admin/users', isAuth: true, icon: KeyIcon, isAdmin: true },
-    { name: 'Ma concession', href: '/concession', isAuth: true, icon: HomeModernIcon, isAdmin: true },
-    { name: 'Se déconnecter', href: '/logout', isAuth: true, icon: ArrowLeftOnRectangleIcon, isAdmin: false },
-    { name: 'Se connecter', href: '/login', isAuth: false, icon: ArrowRightOnRectangleIcon, isAdmin: false },
-    { name: 'S\'inscrire', href: '/register', isAuth: false, icon: RocketLaunchIcon, isAdmin: false },
-]
-const showUserMenu = ref(false)
 const searchBar = reactive({
     show: false,
     value: ''
 })
+
 const handleSearch = () => {
     searchBar.show = !searchBar.show
 }
+
+onUpdated(() => {
+    isAdmin.value = userRoles.value ? userRoles.value.roles.includes('ROLE_ADMIN') : false
+    isOwner.value = userRoles.value ? userRoles.value.roles.includes('ROLE_DEALER') : false
+    userLink.value = [
+        { name: 'Mon profil', href: '/me/profile', isShow: isLoggedIn.value, icon: UserIcon },
+        { name: 'Mes achats/ventes', href: '/me/list/orders/in-progress', isShow: isLoggedIn.value, icon: ShoppingCartIcon },
+        { name: 'Administration', href: '/admin/users', isShow: isAdmin.value, icon: KeyIcon },
+        { name: 'Ma concession', href: '/me/concession', isShow: isOwner.value, icon: HomeModernIcon },
+        { name: 'Se déconnecter', href: '/logout', isShow: isLoggedIn.value, icon: ArrowLeftOnRectangleIcon },
+        { name: 'Se connecter', href: '/login', isShow: !isLoggedIn.value, icon: ArrowRightOnRectangleIcon },
+        { name: 'S\'inscrire', href: '/register', isShow: !isLoggedIn.value, icon: RocketLaunchIcon },
+    ]
+})
 
 </script>
 
@@ -59,7 +70,7 @@ const handleSearch = () => {
                 <div class="absolute bg-white w-52 max-h-[24rem] h-fit top-12 rounded-lg p-2 space-y-2 flex justify-start flex-col"
                     v-show="showUserMenu">
                     <template v-for="link in userLink">
-                        <div class="flex group" v-if="link.isAuth === isLoggedIn">
+                        <div class="flex group" v-if="link.isShow">
                             <router-link :to="link.href" @click="showUserMenu = false"
                                 class="p-3 rounded-sm text-gray-700 min-w-full cursor-pointer group-hover:bg-slate-300 bg-slate-200 group-hover:text-white group-hover:shadow-inner group-hover:shadow-black">
                                 <div class="flex space-x-2 items-center w-full text-left">
