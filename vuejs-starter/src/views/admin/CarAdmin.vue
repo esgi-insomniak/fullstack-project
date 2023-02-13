@@ -20,41 +20,37 @@ const loading = ref(true);
 const myCar = ref({})
 const currentPage = ref(1);
 const thead = [{
-        id: 'id',
-        label: 'ID'
-    },
-    {
-        id: 'brand',
-        label: 'Marque'
-    },
-    {
-        id: 'model',
-        label: 'Modèle'
-    },
-    {
-        id: 'price',
-        label: 'Prix'
-    },
-    {
-        id: 'year',
-        label: 'Année'
-    },
-    {
-        id: 'fuel',
-        label: 'Carburant'
-    },
-    {
-        id: 'kilometers',
-        label: 'Kilométrage'
-    },
-    {
-        id: 'image',
-        label: 'Image'
-    },
-    {
-        id: 'actions',
-        label: 'Actions'
-    },
+    id: 'id',
+    label: 'ID'
+},
+{
+    id: 'brand',
+    label: 'Marque'
+},
+{
+    id: 'model',
+    label: 'Modèle'
+},
+{
+    id: 'price',
+    label: 'Prix'
+},
+{
+    id: 'year',
+    label: 'Année'
+},
+{
+    id: 'fuel',
+    label: 'Carburant'
+},
+{
+    id: 'image',
+    label: 'Image'
+},
+{
+    id: 'actions',
+    label: 'Actions'
+},
 ];
 
 onMounted(async () => {
@@ -92,12 +88,12 @@ const nextPage = async () => {
 
 const editCar = async (car) => {
     await carService.patchCar(car.id, car).then(car => {
-      cars.value = cars.value.map((c) => {
-        if (c.id === car.id) {
-          c = car;
-        }
-        return c;
-    });
+        cars.value = cars.value.map((c) => {
+            if (c.id === car.id) {
+                c = car;
+            }
+            return c;
+        });
         toggleModal();
     }).catch(error => {
         console.log(error)
@@ -217,66 +213,84 @@ const modalProps = reactive({
         <div v-if="modalProps.id === 'modification'">
             <div class="flex flex-col">
                 <label class="block text-sm font-medium text-gray-700">Prix</label>
-                <input type="number" v-model="myCar.price" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-            
+                <input type="number" v-model="myCar.price"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
                 <label class="block text-sm font-medium text-gray-700">Année</label>
-                <input type="text" v-model="myCar.year" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myCar.year"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Fuel</label>
-                <input type="text" v-model="myCar.fuel" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myCar.fuel"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Kilométrage</label>
-                <input type="number" v-model="myCar.mileage" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="number" v-model="myCar.mileage"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
             </div>
         </div>
         <div v-else>
             <div class="flex flex-col">
                 <label class="block text-sm font-medium text-gray-700">Prix</label>
-                <input type="number" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-            
+                <input type="number"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
                 <label class="block text-sm font-medium text-gray-700">Année</label>
-                <input type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Fuel</label>
-                <input type="text" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Kilométrage</label>
-                <input type="number" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="number"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
             </div>
         </div>
     </Modal>
-<div class="h-[75vh] overflow-scroll scrollbar-hide">
-    <div class="flex justify-between w-full">
-        <h2 class="text-2xl uppercase tracking-widest">Voitures</h2>
-        <button class="flex items-center justify-center min-w-[15rem]" @click="loadAddModal()">Ajouter une voiture
-            <PlusCircleIcon class="w-5 h-5 ml-3" /></button>
+    <div class="h-[75vh] overflow-scroll scrollbar-hide">
+        <div class="flex justify-between w-full">
+            <h2 class="text-2xl uppercase tracking-widest">Voitures</h2>
+            <button class="flex items-center justify-center min-w-[15rem]" @click="loadAddModal()">Ajouter une voiture
+                <PlusCircleIcon class="w-5 h-5 ml-3" />
+            </button>
+        </div>
+        <table class="table-auto w-full mx-auto text-left my-5">
+            <tr>
+                <th class="p-3" v-for="column in thead" :key="column.id">{{ column.label }}</th>
+            </tr>
+            <tr v-for="(car, index) in cars" :key="car.id"
+                :class="{'bg-gray-400': index % 2 === 0, 'text-black': index % 2 === 0}">
+                <td class="p-3">{{ car.id }}</td>
+                <td class="py-3">BMW {{ car.identity.name }}</td>
+                <td class="py-3">{{ car.identity.category.name }}</td>
+                <td class="py-3">{{ car.price }}</td>
+                <td class="py-3">{{ car.year }}</td>
+                <td class="py-3">{{ car.fuel }}</td>
+                <td class="py-3">{{ car.mileage }}</td>
+                <td class="py-3">
+                    <img :src="car.images[0].src" width="150">
+                </td>
+                <td class="py-10 flex" :class="{'text-white': index % 2 === 0}">
+                    <button class="mr-3 flex items-center justify-center min-w-[8rem]"
+                        @click="loadModificationModal(car)">Modifier
+                        <PencilSquareIcon class="h-5 w-5 ml-3" />
+                    </button>
+                    <button @click="loadDeleteModal(car)"
+                        class="ml-3 flex items-center justify-center min-w-[8rem]">Supprimer
+                        <TrashIcon class="h-5 w-5 ml-3" />
+                    </button>
+                </td>
+            </tr>
+        </table>
     </div>
-    <table class="table-auto w-full mx-auto text-left my-5">
-        <tr>
-            <th class="p-3" v-for="column in thead" :key="column.id">{{ column.label }}</th>
-        </tr>
-        <tr v-for="(car, index) in cars" :key="car.id" :class="{'bg-gray-400': index % 2 === 0, 'text-black': index % 2 === 0}">
-            <td class="p-3">{{ car.id }}</td>
-            <td class="py-3">BMW {{ car.identity.name }}</td>
-            <td class="py-3">{{ car.identity.category.name }}</td>
-            <td class="py-3">{{ car.price }}</td>
-            <td class="py-3">{{ car.year }}</td>
-            <td class="py-3">{{ car.fuel }}</td>
-            <td class="py-3">{{ car.mileage }}</td>
-            <td class="py-3">
-                <img :src="car.images[0].src" width="150">
-            </td>
-            <td class="py-10 flex" :class="{'text-white': index % 2 === 0}">
-                <button class="mr-3 flex items-center justify-center min-w-[8rem]" @click="loadModificationModal(car)">Modifier
-                    <PencilSquareIcon class="h-5 w-5 ml-3" /></button>
-                <button @click="loadDeleteModal(car)" class="ml-3 flex items-center justify-center min-w-[8rem]">Supprimer
-                    <TrashIcon class="h-5 w-5 ml-3" /></button>
-            </td>
-        </tr>
-    </table>
-</div>
-<div class="flex justify-end my-5 space-x-3">
-    <button @click="previousPage" class="bg-blue-900 min-w-[10rem]"><ChevronLeftIcon class="h-7 w-7 mx-auto" /></button>
-    <button @click="nextPage" class="bg-blue-900 min-w-[10rem]"><ChevronRightIcon class="h-7 w-7 mx-auto" /></button>
-</div>
+    <div class="flex justify-end my-5 space-x-3">
+        <button @click="previousPage" class="bg-blue-900 min-w-[10rem]">
+            <ChevronLeftIcon class="h-7 w-7 mx-auto" />
+        </button>
+        <button @click="nextPage" class="bg-blue-900 min-w-[10rem]">
+            <ChevronRightIcon class="h-7 w-7 mx-auto" />
+        </button>
+    </div>
 </template>

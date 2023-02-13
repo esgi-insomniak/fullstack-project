@@ -20,34 +20,33 @@ const myOrder = ref({});
 const loading = ref(true);
 const currentPage = ref(1);
 const thead = [{
-        id: 'id',
-        label: 'ID'
-    },
-    {
-        id: 'userId',
-        label: 'User Id'
-    },
-    {
-        id: 'carId',
-        label: 'Car Id'
-    },
-    {
-        id: 'date',
-        label: 'Date'
-    },
-    {
-        id: 'price',
-        label: 'Price'
-    },
-    {
-        id: 'status',
-        label: 'Status'
-    },
-    {
-        id: 'actions',
-        label: 'Actions'
-    },
-];
+    id: 'id',
+    label: 'ID'
+},
+{
+    id: 'userId',
+    label: 'Id Utilisateur'
+},
+{
+    id: 'carId',
+    label: 'Id Voiture'
+},
+{
+    id: 'date',
+    label: 'Date'
+},
+{
+    id: 'price',
+    label: 'Prix'
+},
+{
+    id: 'status',
+    label: 'Status'
+},
+{
+    id: 'actions',
+    label: 'Actions'
+}];
 
 onMounted(async () => {
     orders.value = await orderService.getCollection({
@@ -88,12 +87,12 @@ const nextPage = async () => {
 
 const editOrder = async (order) => {
     await orderService.patch(order.id, order).then(user => {
-      orders.value = orders.value.map((o) => {
-        if (o.id === order.id) {
-          o = order;
-        }
-        return o;
-    });
+        orders.value = orders.value.map((o) => {
+            if (o.id === order.id) {
+                o = order;
+            }
+            return o;
+        });
         toggleModal();
     }).catch(error => {
         console.log(error)
@@ -175,49 +174,66 @@ const modalProps = reactive({
         <div v-if="modalProps.id === 'modification'">
             <div class="flex flex-col">
                 <label class="block text-sm font-medium text-gray-700">ID</label>
-                <input type="text" v-model="myOrder.id" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myOrder.id"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">User ID</label>
-                <input type="text" v-model="myOrder.orderer.id" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myOrder.orderer.id"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Car ID</label>
-                <input type="text" v-model="myOrder.car.id" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myOrder.car.id"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="text" v-model="myOrder.finalisedAt" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myOrder.finalisedAt"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Price</label>
-                <input type="text" v-model="myOrder.totalPrice" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myOrder.totalPrice"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
 
                 <label class="block text-sm font-medium text-gray-700">Status</label>
-                <input type="text" v-model="myOrder.progression" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <input type="text" v-model="myOrder.progression"
+                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
             </div>
         </div>
     </Modal>
-<div class="h-[75vh] overflow-scroll scrollbar-hide">
-    <div class="flex justify-between w-full">
-        <h2 class="text-2xl uppercase tracking-widest">Commandes</h2>
+    <div class="h-[75vh] overflow-scroll scrollbar-hide">
+        <div class="flex justify-between w-full">
+            <h2 class="text-2xl uppercase tracking-widest">Commandes</h2>
+        </div>
+        <table class="table-auto w-full mx-auto text-left my-5">
+            <tr>
+                <th class="p-3" v-for="head in thead" :key="head.id">{{ head.label }}</th>
+            </tr>
+            <tr v-for="(order, index) in orders" :key="order.id"
+                :class="{ 'bg-gray-400': index % 2 === 0, 'text-black': index % 2 === 0 }">
+                <th class="p-3">{{ order.id }}</th>
+                <td class="py-3">{{ order.orderer.id }}</td>
+                <td class="py-3">{{ order.car.id }}</td>
+                <td class="py-3">{{ order.finalisedAt }}</td>
+                <td class="py-3">{{ order.totalPrice }}</td>
+                <td class="py-3">{{ order.status.slug }}</td>
+                <td class="py-3 flex" :class="{ 'text-white': index % 2 === 0 }">
+                    <button @click="loadModificationModal(order)"
+                        class="mr-3 flex items-center justify-center min-w-[8rem]">Modifier
+                        <PencilSquareIcon class="h-5 w-5 ml-3" />
+                    </button>
+                    <button @click="loadDeleteModal(order)"
+                        class="ml-3 flex items-center justify-center min-w-[8rem]">Supprimer
+                        <TrashIcon class="h-5 w-5 ml-3" />
+                    </button>
+                </td>
+            </tr>
+        </table>
     </div>
-    <table class="table-auto w-full mx-auto text-left my-5">
-        <tr>
-            <th class="p-3" v-for="head in thead" :key="head.id">{{ head.label }}</th>
-        </tr>
-        <tr v-for="(order, index) in orders" :key="order.id" :class="{'bg-gray-400': index % 2 === 0, 'text-black': index % 2 === 0}">
-            <th class="p-3">{{ order.id }}</th>
-            <td class="py-3">{{ order.orderer.id }}</td>
-            <td class="py-3">{{ order.car.id }}</td>
-            <td class="py-3">{{ order.finalisedAt }}</td>
-            <td class="py-3">{{ order.totalPrice }}</td>
-            <td class="py-3">{{ order.status.slug }}</td>
-            <td class="py-3 flex" :class="{'text-white': index % 2 === 0}">
-                <button @click="loadModificationModal(order)" class="mr-3 flex items-center justify-center min-w-[8rem]">Modifier <PencilSquareIcon class="h-5 w-5 ml-3" /></button>
-                <button @click="loadDeleteModal(order)" class="ml-3 flex items-center justify-center min-w-[8rem]">Supprimer <TrashIcon class="h-5 w-5 ml-3" /></button>
-            </td>
-        </tr>
-    </table>
-</div>
-<div class="flex justify-end my-5 space-x-3">
-    <button @click="previousPage" class="bg-blue-900 min-w-[10rem]"><ChevronLeftIcon  class="h-7 w-7 mx-auto" /></button>
-    <button @click="nextPage" class="bg-blue-900 min-w-[10rem]"><ChevronRightIcon  class="h-7 w-7 mx-auto" /></button>
-</div>
+    <div class="flex justify-end my-5 space-x-3">
+        <button @click="previousPage" class="bg-blue-900 min-w-[10rem]">
+            <ChevronLeftIcon class="h-7 w-7 mx-auto" />
+        </button>
+        <button @click="nextPage" class="bg-blue-900 min-w-[10rem]">
+            <ChevronRightIcon class="h-7 w-7 mx-auto" />
+        </button>
+    </div>
 </template>

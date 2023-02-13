@@ -14,7 +14,7 @@ const navLink = reactive([
 ]);
 const userLink = [
     { name: 'Mon profil', href: '/me/profile', isAuth: true, icon: UserIcon, isAdmin: false },
-    { name: 'Mes favoris', href: '/me/favorites', isAuth: true, icon: StarIcon, isAdmin: false },
+    //{ name: 'Mes favoris', href: '/me/favorites', isAuth: true, icon: StarIcon, isAdmin: false },
     { name: 'Mes achats/ventes', href: '/me/list/orders/in-progress', isAuth: true, icon: ShoppingCartIcon, isAdmin: false },
     //{ name: 'Mes messages', href: '/me/messages', isAuth: true, icon: InboxIcon, isAdmin: false },
     { name: 'Administration', href: '/admin/users', isAuth: true, icon: KeyIcon, isAdmin: true },
