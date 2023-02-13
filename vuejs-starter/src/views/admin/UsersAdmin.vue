@@ -186,12 +186,13 @@ const modalProps = reactive({
                 <th class="p-3" v-for="column in thead" :key="column.id">{{ column.label }}</th>
             </tr>
             <tr v-for="(user, index) in users" :key="user.id"
-                :class="{'bg-gray-400': index % 2 === 0, 'text-black': index % 2 === 0}">
+                :class="{ 'bg-gray-400': index % 2 === 0, 'text-black': index % 2 === 0 }">
                 <td class="p-3">{{ user.id }}</td>
                 <td class="py-3">{{ user.firstName }}</td>
                 <td class="py-3">{{ user.lastName }}</td>
                 <td class="py-3">{{ user.email }}</td>
-                <td class="py-3 flex" :class="{'text-white': index % 2 === 0}">
+                <td class="py-3">{{ user.roles }}</td>
+                <td class="py-3 flex" :class="{ 'text-white': index % 2 === 0 }">
                     <button v-on:click="loadModificationModal(user)"
                         class="mr-3 flex items-center justify-center min-w-[8rem]">Modifier
                         <PencilSquareIcon class="h-5 w-5 ml-3" />
