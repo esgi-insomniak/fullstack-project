@@ -27,7 +27,6 @@ const props = defineProps({
   },
 });
 const garagesList = ref(props.garages);
-console.log(garagesList.value);
 const selectGarageById = (id) => {
   garagesList.value.forEach(g => {
     g.selected = g.id === id;

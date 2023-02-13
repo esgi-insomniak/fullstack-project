@@ -105,6 +105,10 @@ onMounted(async () => {
         :garages="garages"
         :handle-garage-click="handleGarageClick"
         :handle-garage-icon-click="handleGarageIconClick"
+        :default-point="{
+          name: me.address,
+          coordinates: me.coordinates,
+        }"
         search
     />
     <div class="p-6">
