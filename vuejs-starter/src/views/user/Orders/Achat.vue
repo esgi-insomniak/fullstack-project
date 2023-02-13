@@ -100,7 +100,7 @@ const loadCancelModal = (order) => {
 const loadDetailsModal = (order) => {
     modalProps.id = 'order-details-modal';
     modalProps.title = 'Détails de la commande';
-    modalProps.content = `Order number: ${order.id}<br>Année: ${order.car.year}<br>Status: ${order.status.name}<br>Montant: ${order.car.price} €`;
+    modalProps.content = `Order number: ${order.id}<br>Modèle: ${order.car.identity.name}<br>Année: ${order.car.year}<br>Status: ${order.status.name}<br>Montant: ${order.car.price} €`;
     modalProps.icon = null;
     modalProps.buttons = [
         {
