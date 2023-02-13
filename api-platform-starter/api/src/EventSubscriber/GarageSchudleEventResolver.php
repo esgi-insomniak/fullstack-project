@@ -64,6 +64,7 @@ class GarageSchudleEventResolver implements EventSubscriberInterface
 
         $status = $this->em->getRepository(Status::class)->findOneBy(['slug' => 'appointment-taken']);
         $order->setStatus($status);
+        $order->setAppointmentDate($entity->getDateStart());
         $this->em->flush();
     }
 }

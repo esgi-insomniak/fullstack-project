@@ -61,7 +61,8 @@ onMounted(() => {
         <div class="text-white hover:text-blue-500 hover:underline hover:cursor-pointer" @click="handleForgotPassword">
           Mot de passe oublié ?
         </div>
-        <div class="text-white hover:text-blue-500 hover:underline hover:cursor-pointer">
+        <div class="text-white hover:text-blue-500 hover:underline hover:cursor-pointer"
+          @click="router.push({ name: 'register' })">
           Créer un compte
         </div>
       </div>
