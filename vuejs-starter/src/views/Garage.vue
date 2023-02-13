@@ -90,10 +90,10 @@ const getAllCarCategories = () => {
 };
 
 onMounted(async () => {
-  UserService.get("me").then((user) => {
-    me.value = user;
-    me.value.coordinates = me.value.coordinates.reverse();
-  })
+  // UserService.get("me").then((user) => {
+  //   me.value = user;
+  //   me.value.coordinates = me.value.coordinates.reverse();
+  // })
   const filteredGarages = await GarageService.getCollection(garageParams);
   garages.value = Object.values(filteredGarages).filter(g => g.cars.filter(c => !c.isOrdered).length > 0);
 });

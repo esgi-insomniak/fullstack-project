@@ -3,7 +3,7 @@
 namespace App\EventSubscriber;
 
 use ApiPlatform\Symfony\EventListener\EventPriorities;
-use App\Entity\Order;
+use App\Entity\Recovery;
 use App\Entity\Status;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class OrderResolver implements EventSubscriberInterface
+class RecoveryResolver implements EventSubscriberInterface
 {
     private $em;
 
@@ -27,13 +27,13 @@ class OrderResolver implements EventSubscriberInterface
     {
         return [
             KernelEvents::VIEW => [
-                ['updateCarOnEditOrder', EventPriorities::PRE_WRITE],
+                ['onCreateRecovery', EventPriorities::PRE_WRITE],
             ],
         ];
     }
 
 
-    public function updateCarOnEditOrder(ViewEvent $event): void
+    public function onCreateRecovery(ViewEvent $event): void
     {
         $entity = $event->getControllerResult();
         $request = $event->getRequest();
@@ -43,30 +43,15 @@ class OrderResolver implements EventSubscriberInterface
             return;
         }
 
-        if (!$entity instanceof Order) {
+        if (!$entity instanceof Recovery) {
             return;
         }
 
-        if ($method === Request::METHOD_POST) {
-            $status = $this->em->getRepository(Status::class)->findOneBy(['slug' => 'waiting-for-payment']);
+        if($method === Request::METHOD_POST) {
+            $status = $this->em->getRepository(Status::class)->findOneBy(['slug' => 'car-added']);
             $entity->setStatus($status);
-            $entity->getCar()->setIsOrdered(true);
             $this->em->persist($entity);
             $this->em->flush();
-            return;
-        }
-
-        if ($method === Request::METHOD_PATCH && $entity->getStatus()->getSlug() === 'delivered-and-finished') {
-            $entity->setProgression('completed');
-            $entity->setFinalisedAt(new \DateTimeImmutable());
-            $this->em->flush();
-            return;
-        }
-
-        if ($entity->getProgression() === 'canceled') {
-            $entity->getCar()->setIsOrdered(false);
-            $this->em->flush();
-            return;
         }
     }
 }
