@@ -2,7 +2,7 @@
 import GarageList from "./GarageList.vue";
 import Map from "../Map.vue";
 import L from "leaflet";
-import {ref} from "vue";
+import { ref } from "vue";
 
 const props = defineProps({
   garages: {
@@ -27,7 +27,6 @@ const props = defineProps({
   },
 });
 const garagesList = ref(props.garages);
-console.log(garagesList.value);
 const selectGarageById = (id) => {
   garagesList.value.forEach(g => {
     g.selected = g.id === id;
@@ -35,14 +34,14 @@ const selectGarageById = (id) => {
 };
 
 const handleGarageIconClick = (e) => {
-  if (typeof props.handleGarageIconClick === "function"){
+  if (typeof props.handleGarageIconClick === "function") {
     props.handleGarageIconClick(e);
   }
   selectGarageById(e.target.options.uniqueId);
 };
 
 const handleGarageClick = (garage) => {
-  if (typeof props.handleGarageClick === "function"){
+  if (typeof props.handleGarageClick === "function") {
     props.handleGarageClick(garage);
   }
   selectGarageById(garage.id);
@@ -52,25 +51,20 @@ const handleGarageClick = (garage) => {
 
 <template>
   <div class="flex flex-row justify-center">
-    <Map
-        :zoom="8"
-        :icon-to-display="new L.icon({
-              iconUrl: '/src/assets/bmw_logo.png',
-              iconSize: [35, 35],
-              iconAnchor: [13, 41],
-              popupAnchor: [0, -41],
-            })"
-        :points-to-display="garagesList.map(garage => {
-              return {
-                name: garage.name,
-                coordinates: garage.coordinates,
-                uniqueId: garage.id,
-                onClick: handleGarageIconClick
-              }
-            })"
-        :default-point="defaultPoint"
-    />
-    <GarageList :garages="garagesList" @garage-click="handleGarageClick" search/>
+    <Map :zoom="8" :icon-to-display="new L.icon({
+      iconUrl: '/src/assets/bmw_logo.png',
+      iconSize: [35, 35],
+      iconAnchor: [13, 41],
+      popupAnchor: [0, -41],
+    })" :points-to-display="garagesList.map(garage => {
+  return {
+    name: garage.name,
+    coordinates: garage.coordinates,
+    uniqueId: garage.id,
+    onClick: handleGarageIconClick
+  }
+})" :default-point="defaultPoint" />
+    <GarageList :garages="garagesList" @garage-click="handleGarageClick" search />
   </div>
 </template>
 
