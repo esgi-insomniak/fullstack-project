@@ -6,26 +6,35 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cy:open": "cypress open",
+    "cy:run:chrome": "cypress run --browser chrome --spec 'cypress/e2e/*.cy.js'",
+    "cy:run:firefox": "cypress run --browser firefox --spec 'cypress/e2e/*.cy.js'",
+    "cy:run:electron": "cypress run --browser electron --spec 'cypress/e2e/*.cy.js'"
   },
   "dependencies": {
     "@formkit/addons": "^1.0.0-beta.10",
     "@formkit/themes": "^1.0.0-beta.10",
     "@formkit/vue": "^1.0.0-beta.10",
+    "@headlessui/vue": "^1.7.9",
     "@heroicons/vue": "^2.0.13",
     "@jawg/js-loader": "^1.0.0",
-    "@stripe/stripe-js": "^1.46.0",
-    "@vue-stripe/vue-stripe": "^4.4.4",
+    "@types/qrcode": "^1.5.0",
     "axios": "^1.1.2",
+    "dotenv": "^16.0.3",
     "leaflet": "^1.9.3",
+    "moment": "^2.29.4",
+    "qrcode": "^1.5.1",
     "tailwind-scrollbar-hide": "^1.1.7",
     "vue": "^3.2.37",
     "vue-router": "4",
+    "vue3-easy-data-table": "^1.5.32",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.1.0",
     "autoprefixer": "^10.4.11",
+    "cypress": "^12.3.0",
     "postcss": "^8.4.16",
     "tailwindcss": "^3.1.8",
     "vite": "^3.1.0"

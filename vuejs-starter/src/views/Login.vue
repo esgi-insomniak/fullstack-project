@@ -47,9 +47,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex justify-center items-center h-screen">
+  <div class="flex justify-center items-center h-[88vh]">
     <div class="w-2/3 h-4/6 rounded-3xl shadow-md bg-white/30 flex">
-      <div class="w-1/3 flex flex-col justify-center items-center px-2">
+      <div class="w-1/3 bg-[url('/public/bg_login.jpg')] bg-cover rounded-l-3xl" />
+      <div class="w-2/3 flex flex-col justify-center items-center px-2">
         <FormKit type="form" form-class="w-full flex justify-center  flex-col h-4/6" @submit="handleLogin"
           submit-label="Connexion">
           <FormKit type="text" name="email" label="Email" placeholder="exemple@email.here" validation="required|email"
@@ -57,14 +58,10 @@ onMounted(() => {
           <FormKit type="password" name="password" label="Password" placeholder="Mot de passe"
             validation="required|password" v-model="password" />
         </FormKit>
-        <div class="text-blue-500 hover:underline hover:cursor-pointer" @click="handleForgotPassword">
+        <div class="text-white hover:text-blue-500 hover:underline hover:cursor-pointer" @click="handleForgotPassword">
           Mot de passe oublié ?
         </div>
-
-        <div class="h-1/6 w-full mt-10" />
-      </div>
-      <div class="w-1/3 flex flex-col justify-end items-end">
-        <div class="p-3 rounded-lg bg-green-400 mb-10 -mr-7 hover:cursor-pointer hover:bg-green-500">
+        <div class="text-white hover:text-blue-500 hover:underline hover:cursor-pointer">
           Créer un compte
         </div>
       </div>

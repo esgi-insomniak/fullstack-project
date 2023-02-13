@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -27,17 +29,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:car']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:car']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:car']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
+        ),
         new GetCollection(
             uriTemplate: '/garages/{id}/cars',
             uriVariables: [
@@ -56,7 +63,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: CarIdentity::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
+            normalizationContext: ['groups' => ['collection:get:car', 'item:get:garage', 'item:get:carIdentity', 'item:get:car:isordered', 'id']],
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:car', 'item:get:car']],
@@ -64,6 +71,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
     paginationClientEnabled: true,
     paginationClientItemsPerPage: 10,
     paginationMaximumItemsPerPage: 50,
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'id' => 'exact',
+        'slug' => 'exact',
+        'year' => 'exact',
+        'isOrdered' => 'exact',
+        'identity.id' => 'exact'
+    ]
 )]
 class Car
 {
@@ -135,6 +152,10 @@ class Car
     #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\ManyToOne(inversedBy: 'cars')]
     private ?Garage $garage = null;
+
+    #[Groups(['collection:get:car', 'item:get:car', 'item:get:car:isordered'])]
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $isOrdered = null;
 
     public function __construct()
     {
@@ -380,6 +401,18 @@ class Car
     public function setGarage(?Garage $garage): self
     {
         $this->garage = $garage;
+
+        return $this;
+    }
+
+    public function isIsOrdered(): ?bool
+    {
+        return $this->isOrdered;
+    }
+
+    public function setIsOrdered(bool $isOrdered): self
+    {
+        $this->isOrdered = $isOrdered;
 
         return $this;
     }

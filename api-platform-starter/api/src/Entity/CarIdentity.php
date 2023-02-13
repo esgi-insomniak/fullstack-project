@@ -24,17 +24,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:carIdentity']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new GetCollection(
             uriTemplate: '/car_categories/{id}/car_identities',
             uriVariables: [
@@ -78,9 +83,13 @@ class CarIdentity
     #[ORM\JoinColumn(nullable: false)]
     private ?Image $mainPicture = null;
 
+    #[ORM\OneToMany(mappedBy: 'carIdentity', targetEntity: GarageSchudleEvent::class)]
+    private Collection $garageSchudleEvents;
+
     public function __construct()
     {
         $this->cars = new ArrayCollection();
+        $this->garageSchudleEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,6 +159,36 @@ class CarIdentity
     public function setMainPicture(?Image $mainPicture): self
     {
         $this->mainPicture = $mainPicture;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setCarIdentity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getCarIdentity() === $this) {
+                $garageSchudleEvent->setCarIdentity(null);
+            }
+        }
 
         return $this;
     }

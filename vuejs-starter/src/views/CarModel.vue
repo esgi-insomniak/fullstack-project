@@ -5,6 +5,7 @@ import { onMounted, ref } from 'vue'
 import CardCar from '../components/CardCar.vue';
 import CarService from '../services/car.service.js';
 import SkeletonModelCars from '../components/Skeleton/SkeletonModelCars.vue';
+import { useRouter } from 'vue-router';
 
 const carCategories = ref([])
 const allCars = ref([]);
@@ -30,6 +31,7 @@ onMounted(async () => {
     getCarsByCategory()
     if (allCars.value.length > 0) isLoading.value = false
 })
+const router = useRouter()
 </script>
 <template>
     <div class="w-full h-[88vh] px-52">
@@ -62,7 +64,7 @@ onMounted(async () => {
                             <div class="flex space-x-2">
                                 <span>Je commande ma BMW</span>
                             </div>
-                            <button>Voir les stocks</button>
+                            <button @click="router.push({ name: 'GarageByCarIdentity', params: { identityId: car.id }})">Commander</button>
                         </div>
                         <div class="flex flex-col space-y-2 justify-end bg-white/30 rounded-md h-full p-2" />
                     </div>

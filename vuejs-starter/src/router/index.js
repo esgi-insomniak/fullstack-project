@@ -1,5 +1,17 @@
 import * as VueRouter from 'vue-router'
 
+const publicPages = ['/login', '/register', '/'];
+
+const needsAuth = (to, from, next) => {
+    const loggedIn = sessionStorage.getItem('user');
+    const authRequired = !publicPages.includes(to.path);
+    if (authRequired && !loggedIn) {
+        return next('/login');
+    }
+
+    return next();
+}
+
 const routes = [
     {
         path: '/',
@@ -11,20 +23,6 @@ const routes = [
         path: '/login',
         name: 'login',
         component: () => import('../views/Login.vue'),
-        beforeEnter: (to, from, next) => {
-            const publicPages = ['/login', '/register'];
-            const authRequired = !publicPages.includes(to.path);
-            const loggedIn = localStorage.getItem('user');
-
-            if (authRequired && !loggedIn) {
-                return next('/login');
-            }
-
-            next();
-        }
-        // meta: {
-        //     hideNavBar: true
-        // }
     },
     {
         path: '/register',
@@ -35,27 +33,14 @@ const routes = [
         path: '/logout',
         name: 'logout',
         component: () => import('../views/Logout.vue'),
-    },
-    {
-        path: '/order',
-        name: 'order',
-        component: () => import('../views/order/Order.vue'),
-    },
-    {
-        path: '/success',
-        name: 'success',
-        component: () => import('../views/order/Success.vue'),
-    },
-    {
-        path: '/cancel',
-        name: 'cancel',
-        component: () => import('../views/order/Cancel.vue'),
+        beforeEnter: needsAuth
     },
     {
         // user 
         path: '/me',
         name: 'User',
         component: () => import('../views/user/LayoutUser.vue'),
+        beforeEnter: needsAuth,
         children: [
             {
                 path: 'favorites',
@@ -85,10 +70,20 @@ const routes = [
                 ]
             },
             {
+                path: 'orders/:orderId/success/:sessionId',
+                name: 'UserOrdersSuccess',
+                component: () => import('../views/user/Orders/AchatSuccess.vue'),
+            },
+            {
                 path: 'profile',
                 name: 'UserProfile',
                 component: () => import('../views/user/User.vue'),
-            }
+            },
+            {
+                path: 'concession',
+                name: 'Concession',
+                component: () => import('../views/user/Concession.vue'),
+            },
         ]
     },
     {
@@ -96,12 +91,8 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: () => import('../views/admin/LayoutAdmin.vue'),
+        beforeEnter: needsAuth,
         children: [
-            {
-                path: 'dashboard',
-                name: 'dashboard',
-                component: () => import('../views/admin/Dashboard.vue'),
-            },
             {
                 path: 'users',
                 name: 'users',
@@ -122,11 +113,17 @@ const routes = [
     {
         path: '/services',
         name: 'Services',
+        beforeEnter: (to, from, next) => needsAuth(to, from, next),
         component: () => import('../views/Services.vue'),
     },
     {
         path: '/garage',
         name: 'Garage',
+        component: () => import('../views/Garage.vue'),
+    },
+    {
+        path: '/garage/:identityId',
+        name: 'GarageByCarIdentity',
         component: () => import('../views/Garage.vue'),
     },
     {
@@ -143,7 +140,7 @@ const routes = [
         path: '/model',
         name: 'Model',
         component: () => import('../views/CarModel.vue'),
-    }
+    },
 ]
 
 const router = VueRouter.createRouter({

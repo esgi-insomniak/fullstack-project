@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Controller\PaymentController;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -11,7 +10,11 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\Order\OrderPaymentValidationController;
+use App\Controller\Order\StripeCheckoutController;
 use App\Repository\OrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -21,25 +24,31 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:order']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['item:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:order']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:order']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getOrderer() == user"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
+        ),
         new Post(
-            uriTemplate: '/payment/{id}',
+            uriTemplate: '/orders/{id}/checkout',
             defaults: ['_api_receive' => false],
-            controller: PaymentController::class,
+            controller: StripeCheckoutController::class,
             openapiContext: [
                 'requestBody' => [
                     'content' => [
@@ -50,6 +59,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 ],
             ],
             output: false,
+            security: "object.getOrderer() == user"
+        ),
+        new Post(
+            uriTemplate: '/orders/{id}/payment_validation',
+            defaults: ['_api_receive' => false],
+            controller: OrderPaymentValidationController::class,
+            openapiContext: [
+                "requestBody" => [
+                    "content" => [
+                        "application/ld+json" => [
+                            "schema" => [
+                                "type" => "object",
+                                "properties" => [
+                                    "sessionId" => ["type" => "string"],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            security: "object.getOrderer() == user"
         ),
         new GetCollection(
             uriTemplate: '/users/{id}/orders',
@@ -59,7 +89,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: User::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or id == user.getId()"
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/orders',
@@ -69,7 +100,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new GetCollection(
             uriTemplate: '/cars/{id}/orders',
@@ -79,7 +111,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Car::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'id']],
+            normalizationContext: ['groups' => ['collection:get:order', 'item:get:car', 'item:get:status', 'item:get:carIdentity', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:order', 'item:get:order']],
@@ -114,7 +147,7 @@ class Order
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
     private ?float $totalPrice = null;
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $appointmentDate = null;
 
@@ -130,7 +163,7 @@ class Order
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $finalisedAt = null;
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
+    #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Status $status = null;
@@ -139,17 +172,22 @@ class Order
     #[ORM\Column(nullable: false, options: ['default' => 'in-progress'])]
     private ?string $progression = null;
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
     #[ORM\Column(nullable: true)]
     private array $stripe = [];
 
-    #[Groups(['collection:get:order', 'item:get:order', 'item:post:order', 'item:put:order', 'item:patch:order'])]
-    #[ORM\Column(type: Types::GUID, unique: true)]
-    private ?string $uuid = null;
-
     #[Groups(['collection:get:order', 'item:get:order', 'item:put:order', 'item:patch:order'])]
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
     private ?bool $sold = null;
+
+    #[ORM\OneToMany(mappedBy: 'associateOrder', targetEntity: GarageSchudleEvent::class)]
+    private Collection $garageSchudleEvents;
+
+    public function __construct()
+    {
+        $this->garageSchudleEvents = new ArrayCollection();
+        $this->sold = false;
+        $this->progression = 'in-progress';
+    }
 
     public function getId(): ?int
     {
@@ -288,18 +326,6 @@ class Order
         return $this;
     }
 
-    public function getUuid(): ?string
-    {
-        return $this->uuid;
-    }
-
-    public function setUuid(string $uuid): self
-    {
-        $this->uuid = $uuid;
-
-        return $this;
-    }
-
     public function isSold(): ?bool
     {
         return $this->sold;
@@ -308,6 +334,36 @@ class Order
     public function setSold(bool $sold): self
     {
         $this->sold = $sold;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GarageSchudleEvent>
+     */
+    public function getGarageSchudleEvents(): Collection
+    {
+        return $this->garageSchudleEvents;
+    }
+
+    public function addGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if (!$this->garageSchudleEvents->contains($garageSchudleEvent)) {
+            $this->garageSchudleEvents->add($garageSchudleEvent);
+            $garageSchudleEvent->setAssociateOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGarageSchudleEvent(GarageSchudleEvent $garageSchudleEvent): self
+    {
+        if ($this->garageSchudleEvents->removeElement($garageSchudleEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($garageSchudleEvent->getAssociateOrder() === $this) {
+                $garageSchudleEvent->setAssociateOrder(null);
+            }
+        }
 
         return $this;
     }

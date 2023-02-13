@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -21,23 +23,36 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:status']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:status', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:status']],
+            security: "is_granted('ROLE_ADMIN')"
+
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:status']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
     ],
     normalizationContext: ['groups' => ['collection:get:status', 'item:get:status']],
     denormalizationContext: ['groups' => ['item:post:status', 'item:put:status', 'item:patch:status']],
     paginationClientEnabled: true,
     paginationClientItemsPerPage: 10,
     paginationMaximumItemsPerPage: 50,
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'name' => 'partial',
+        'slug' => 'partial',
+    ],
 )]
 class Status
 {
@@ -48,7 +63,7 @@ class Status
     private ?int $id = null;
 
     #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status'])]
-    #[ORM\Column(length: 30)]
+    #[ORM\Column(length: 50)]
     private ?string $name = null;
 
     #[Groups(['collection:get:status', 'item:get:status', 'item:post:status', 'item:put:status', 'item:patch:status', 'id'])]

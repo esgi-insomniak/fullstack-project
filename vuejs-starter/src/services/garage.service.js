@@ -9,6 +9,14 @@ class GarageService {
       });
   }
 
+  async getGarageOrders(id) {
+    return getAxiosInstance()
+      .get(`garages/${id}/orders`)
+      .then((response) => {
+        return response.data;
+      });
+  }
+
   async get(id) {
     return getAxiosInstance()
       .get(`garages/${id}`)
