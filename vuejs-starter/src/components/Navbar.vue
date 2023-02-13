@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { UserIcon, MagnifyingGlassIcon, ShoppingCartIcon, ArrowLeftOnRectangleIcon, ArrowRightOnRectangleIcon, RocketLaunchIcon, HomeModernIcon, KeyIcon } from '@heroicons/vue/24/outline';
-import { ref, reactive, computed, watch, shallowRef } from 'vue';
+import { ref, reactive, computed, watch, shallowRef, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 const route = useRoute();
@@ -40,7 +40,11 @@ const handleSearch = () => {
 }
 
 watch(isLoggedIn, (val) => {
-    // console.log(val)
+    isAdmin.value = userRoles.value ? userRoles.value.roles.includes('ROLE_ADMIN') : false
+    isOwner.value = userRoles.value ? userRoles.value.roles.includes('ROLE_DEALER') : false
+})
+
+onMounted(() => {
     isAdmin.value = userRoles.value ? userRoles.value.roles.includes('ROLE_ADMIN') : false
     isOwner.value = userRoles.value ? userRoles.value.roles.includes('ROLE_DEALER') : false
 })
