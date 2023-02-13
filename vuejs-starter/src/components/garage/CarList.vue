@@ -6,9 +6,9 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  search: {
+  onlyShow: {
     type: Boolean,
-    required: true,
+    default: false,
   },
   user: {
     type: Object,
@@ -19,7 +19,7 @@ const props = defineProps({
 
 <template>
   <div class="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-1 gap-4 py-4">
-    <CarListItem v-for="car in cars" :car="car" :user="user"/>
+    <CarListItem v-for="car in cars" :car="car" :onlyShow="onlyShow" :user="user"/>
   </div>
 </template>
 

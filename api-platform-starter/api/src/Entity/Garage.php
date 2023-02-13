@@ -51,6 +51,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'coordinates' => 'exact',
         'isOpen' => 'exact',
         'cars.identity.id' => 'exact',
+        'owner.id' => 'exact',
     ],
 )]
 #[ApiFilter(
