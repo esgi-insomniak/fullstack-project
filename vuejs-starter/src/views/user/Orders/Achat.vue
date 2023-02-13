@@ -100,7 +100,7 @@ const loadCancelModal = (order) => {
 const loadDetailsModal = (order) => {
     modalProps.id = 'order-details-modal';
     modalProps.title = 'Détails de la commande';
-    modalProps.content = `Order number: ${order.id}<br>Année: ${order.car.year}<br>Status: ${order.status.name}<br>Montant: ${order.car.price} €`;
+    modalProps.content = `Order number: ${order.id}<br>Modèle: ${order.car.identity.name}<br>Année: ${order.car.year}<br>Status: ${order.status.name}<br>Montant: ${order.car.price} €`;
     modalProps.icon = null;
     modalProps.buttons = [
         {
@@ -227,7 +227,7 @@ const modalProps = reactive({
             <div class="relative w-full py-5 px-5 flex flex-col space-y-5 ml-10 item-start">
                 <div class="flex justify-between w-full h-full">
                     <div class="flex flex-col w-4/6">
-                        <span>Modèle : {{ order.car.model }} - {{ order.car.year }}</span>
+                        <span>Modèle : {{ order.car.identity.name }}</span>
                         <span>Numéro du chassis : {{ order.car.slug }}</span>
                         <span>Prix : {{ order.car.price }} €</span>
                         <span>Status de la commande : {{ order.status.name }}</span>

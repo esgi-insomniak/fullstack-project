@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -18,21 +19,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:carIdentity', 'item:get:garage', 'item:get:status', 'item:get:user', 'id']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:recovery']],
         ),
         new Get(
-            normalizationContext: ['groups' => ['item:get:recovery', 'id']],
+            normalizationContext: ['groups' => ['item:get:recovery', 'item:get:carIdentity', 'item:get:garage', 'item:get:status', 'item:get:user', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getRecoverer() == user"
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:recovery']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getRecoverer() == user"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:recovery']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or object.getRecoverer() == user"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new GetCollection(
             uriTemplate: '/users/{id}/recoveries',
             uriVariables: [
@@ -41,7 +48,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: User::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:carIdentity', 'item:get:garage', 'item:get:status', 'item:get:user', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER') or id == user.getId()"
         ),
         new GetCollection(
             uriTemplate: '/garages/{id}/recoveries',
@@ -51,17 +59,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Garage::class
                 )
             ],
-            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
-        ),
-        new GetCollection(
-            uriTemplate: '/cars/{id}/recoveries',
-            uriVariables: [
-                'id' => new Link(
-                    fromProperty: 'recoveries',
-                    fromClass: Car::class
-                )
-            ],
-            normalizationContext: ['groups' => ['collection:get:recovery', 'id']],
+            normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:carIdentity', 'item:get:garage', 'item:get:status', 'item:get:user', 'id']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
     ],
     normalizationContext: ['groups' => ['collection:get:recovery', 'item:get:recovery']],
@@ -81,12 +80,7 @@ class Recovery
     #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery'])]
     #[ORM\ManyToOne(inversedBy: 'recoveries')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Car $car = null;
-
-    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery'])]
-    #[ORM\ManyToOne(inversedBy: 'recoveries')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $recover = null;
+    private ?User $recoverer = null;
 
     #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery'])]
     #[ORM\ManyToOne(inversedBy: 'recoveries')]
@@ -97,6 +91,7 @@ class Recovery
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $carDescription = null;
 
+    #[ApiProperty(securityPostDenormalize: "is_granted('ROLE_ADMIN')")]
     #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -106,10 +101,6 @@ class Recovery
     #[ORM\Column]
     private ?float $proposedPrice = null;
 
-    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:put:recovery', 'item:patch:recovery'])]
-    #[ORM\Column]
-    private ?float $totalPrice = null;
-
     #[Groups(['collection:get:recovery', 'item:get:recovery'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -118,31 +109,48 @@ class Recovery
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\ManyToOne(inversedBy: 'recoveries')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CarIdentity $carIdentity = null;
+
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\Column(length: 255)]
+    private ?string $year = null;
+
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\Column(length: 255)]
+    private ?string $kilometers = null;
+
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\Column(length: 255)]
+    private ?string $power = null;
+
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\Column(length: 255)]
+    private ?string $gearbox = null;
+
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\Column(length: 255)]
+    private ?string $fuel = null;
+
+    #[Groups(['collection:get:recovery', 'item:get:recovery', 'item:post:recovery', 'item:put:recovery', 'item:patch:recovery'])]
+    #[ORM\Column(length: 255)]
+    private ?string $progression = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCar(): ?Car
+    public function getRecoverer(): ?User
     {
-        return $this->car;
+        return $this->recoverer;
     }
 
-    public function setCar(?Car $car): self
+    public function setRecoverer(?User $recoverer): self
     {
-        $this->car = $car;
-
-        return $this;
-    }
-
-    public function getRecover(): ?User
-    {
-        return $this->recover;
-    }
-
-    public function setRecover(?User $recover): self
-    {
-        $this->recover = $recover;
+        $this->recoverer = $recoverer;
 
         return $this;
     }
@@ -195,18 +203,6 @@ class Recovery
         return $this;
     }
 
-    public function getTotalPrice(): ?float
-    {
-        return $this->totalPrice;
-    }
-
-    public function setTotalPrice(float $totalPrice): self
-    {
-        $this->totalPrice = $totalPrice;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -227,6 +223,90 @@ class Recovery
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getCarIdentity(): ?CarIdentity
+    {
+        return $this->carIdentity;
+    }
+
+    public function setCarIdentity(?CarIdentity $carIdentity): self
+    {
+        $this->carIdentity = $carIdentity;
+
+        return $this;
+    }
+
+    public function getYear(): ?string
+    {
+        return $this->year;
+    }
+
+    public function setYear(string $year): self
+    {
+        $this->year = $year;
+
+        return $this;
+    }
+
+    public function getKilometers(): ?string
+    {
+        return $this->kilometers;
+    }
+
+    public function setKilometers(string $kilometers): self
+    {
+        $this->kilometers = $kilometers;
+
+        return $this;
+    }
+
+    public function getPower(): ?string
+    {
+        return $this->power;
+    }
+
+    public function setPower(string $power): self
+    {
+        $this->power = $power;
+
+        return $this;
+    }
+
+    public function getGearbox(): ?string
+    {
+        return $this->gearbox;
+    }
+
+    public function setGearbox(string $gearbox): self
+    {
+        $this->gearbox = $gearbox;
+
+        return $this;
+    }
+
+    public function getFuel(): ?string
+    {
+        return $this->fuel;
+    }
+
+    public function setFuel(string $fuel): self
+    {
+        $this->fuel = $fuel;
+
+        return $this;
+    }
+
+    public function getProgression(): ?string
+    {
+        return $this->progression;
+    }
+
+    public function setProgression(string $progression): self
+    {
+        $this->progression = $progression;
 
         return $this;
     }

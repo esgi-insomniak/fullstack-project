@@ -29,17 +29,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:car']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:car', 'item:get:garage', 'item:get:carIdentity', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:car']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:car']],
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_DEALER')"
+        ),
         new GetCollection(
             uriTemplate: '/garages/{id}/cars',
             uriVariables: [
@@ -116,9 +121,6 @@ class Car
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Order::class)]
     private Collection $orders;
 
-    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Recovery::class)]
-    private Collection $recoveries;
-
     #[Groups(['collection:get:car', 'item:get:car', 'item:post:car', 'item:put:car', 'item:patch:car'])]
     #[ORM\Column]
     private ?int $year = null;
@@ -155,7 +157,6 @@ class Car
     public function __construct()
     {
         $this->orders = new ArrayCollection();
-        $this->recoveries = new ArrayCollection();
         $this->images = new ArrayCollection();
     }
 
@@ -271,34 +272,6 @@ class Car
         // set the owning side to null (unless already changed)
         if ($this->orders->removeElement($order) && $order->getCar() === $this) {
             $order->setCar(null);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Recovery>
-     */
-    public function getRecoveries(): Collection
-    {
-        return $this->recoveries;
-    }
-
-    public function addRecovery(Recovery $recovery): self
-    {
-        if (!$this->recoveries->contains($recovery)) {
-            $this->recoveries->add($recovery);
-            $recovery->setCar($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRecovery(Recovery $recovery): self
-    {
-        // set the owning side to null (unless already changed)
-        if ($this->recoveries->removeElement($recovery) && $recovery->getCar() === $this) {
-            $recovery->setCar(null);
         }
 
         return $this;

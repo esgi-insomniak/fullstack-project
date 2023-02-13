@@ -1,15 +1,27 @@
 import * as VueRouter from 'vue-router'
+import VueJwtDecode from 'vue-jwt-decode'
 
 const publicPages = ['/login', '/register', '/'];
+const user = JSON.parse(localStorage.getItem('user')) ?? null;
+const isAdmin = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_ADMIN') : null;
+const isOwner = user ? VueJwtDecode.decode(user.token).roles.includes('ROLE_DEALER') : null;
 
 const needsAuth = (to, from, next) => {
-    const loggedIn = sessionStorage.getItem('user');
     const authRequired = !publicPages.includes(to.path);
-    if (authRequired && !loggedIn) {
+    if (authRequired && !user) {
         return next('/login');
     }
-
     return next();
+}
+
+const needsAdmin = (to, from, next) => {
+    if (isAdmin) return next();
+    return next('/home');
+}
+
+const needsOwner = (to, from, next) => {
+    if (isOwner) return next();
+    return next('/home');
 }
 
 const routes = [
@@ -63,7 +75,7 @@ const routes = [
                         component: () => import('../views/user/Orders/VenteForm.vue'),
                     },
                     {
-                        path: 'sales/:id',
+                        path: 'sales/:slug',
                         name: 'UserSalesEdit',
                         component: () => import('../views/user/Orders/Sales.vue'),
                     }
@@ -83,6 +95,7 @@ const routes = [
                 path: 'concession',
                 name: 'Concession',
                 component: () => import('../views/user/Concession.vue'),
+                beforeEnter: needsOwner
             },
         ]
     },
@@ -91,7 +104,7 @@ const routes = [
         path: '/admin',
         name: 'Admin',
         component: () => import('../views/admin/LayoutAdmin.vue'),
-        beforeEnter: needsAuth,
+        beforeEnter: needsAdmin,
         children: [
             {
                 path: 'users',

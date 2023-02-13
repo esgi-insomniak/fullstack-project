@@ -23,17 +23,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:post:status']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
         new Get(
             normalizationContext: ['groups' => ['item:get:status', 'id']],
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:put:status']],
+            security: "is_granted('ROLE_ADMIN')"
+
         ),
         new Patch(
             denormalizationContext: ['groups' => ['item:patch:status']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
-        new Delete(),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
     ],
     normalizationContext: ['groups' => ['collection:get:status', 'item:get:status']],
     denormalizationContext: ['groups' => ['item:post:status', 'item:put:status', 'item:patch:status']],
