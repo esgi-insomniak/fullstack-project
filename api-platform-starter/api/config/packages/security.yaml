@@ -34,6 +34,13 @@ security:
         - { path: ^/users$, roles: PUBLIC_ACCESS, methods: [POST] } # Register
         - { path: ^/users/recovery_account$, roles: PUBLIC_ACCESS, methods: [POST] } # Recovery account
         - { path: ^/users/recovery_account_change_password$, roles: PUBLIC_ACCESS, methods: [POST] } # Recovery account
+        - { path: /orders$, roles: IS_AUTHENTICATED_FULLY, methods: [GET] }
+        - { path: ^/car_categories, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/car_identities, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/cars, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/images, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/garages, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/statuses, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
             
 when@test:

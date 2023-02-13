@@ -25,7 +25,7 @@ const garageParams = (identityId) ? {
 const garages = ref([]);
 const cars = ref([]);
 const filteredCars = ref([]);
-const me = ref(null);
+const me = ref({ address: "Votre position", coordinates: [46.635738928197114, 2.6308714120530854]});
 const selectedCategory = ref(undefined);
 
 
@@ -96,8 +96,10 @@ const selectGarageById = (id) => {
 };
 
 onMounted(async () => {
-  me.value = await UserService.get("me");
-  me.value.coordinates = me.value.coordinates.reverse();
+  UserService.get("me").then((user) => {
+    me.value = user;
+    me.value.coordinates = me.value.coordinates.reverse();
+  })
   const filteredGarages = await GarageService.getCollection(garageParams);
   garages.value = Object.values(filteredGarages).filter(g => g.cars.filter(c => !c.isOrdered).length > 0);
 });
@@ -145,7 +147,7 @@ onMounted(async () => {
           </div>
         </div>
         <div>
-          <CarList :cars="filteredCars" search/>
+          <CarList :cars="filteredCars" :user="me" search/>
         </div>
       </div>
     </div>

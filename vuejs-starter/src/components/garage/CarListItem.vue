@@ -2,7 +2,6 @@
 import {ref} from "vue";
 import {CurrencyEuroIcon, FunnelIcon, CalendarIcon, BoltIcon, ScaleIcon, Battery50Icon, RocketLaunchIcon, ArrowRightIcon, ArrowLeftIcon, ShoppingCartIcon} from "@heroicons/vue/24/outline";
 import orderService from "../../services/order.service";
-import userService from "../../services/user.service";
 import {useRouter} from "vue-router";
 
 const props = defineProps({
@@ -10,6 +9,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  user: {
+    type: Object,
+    required: false,
+  }
 });
 
 const router = useRouter();
@@ -17,9 +20,8 @@ const router = useRouter();
 const isDetailedShow = ref(false);
 
 const handleOrder = async () => {
-  const me = await userService.get('me');
   const order = {
-    orderer: `users/${me.id}`,
+    orderer: `users/${props.user.id}`,
     car: `cars/${props.car.id}`,
     garage: `garages/${props.car.garage.id}`,
     totalPrice: props.car.price,
@@ -42,7 +44,7 @@ const handleOrder = async () => {
         </a>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p>
 
-        <div class="flex justify-around items-center justify-center">
+        <div class="flex justify-around items-center">
           <button
               class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               @click="isDetailedShow = !isDetailedShow"
@@ -52,6 +54,7 @@ const handleOrder = async () => {
           </button>
 
           <button
+              v-if="props.user.id"
               class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-500 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-700 dark:hover:bg-green-500 dark:focus:ring-green-300"
               @click="handleOrder"
           >
